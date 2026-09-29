@@ -1,0 +1,102 @@
+classDiagram
+    %% Usuarios
+    class User {
+        +id: UUID
+        +email: string
+        +password: string
+        +full_name: string
+        +age: int
+        +sex: enum
+        +major: string
+        +rating: float
+        +vehicle: string
+        +passenger_capacity: int
+        +role: enum[passenger, driver]
+        +created_at: datetime
+        +updated_at: datetime
+        +login()
+        +register()
+        +update_profile()
+    }
+
+    class Passenger {
+        +request_ride()
+        +cancel_ride()
+        +view_driver_details()
+        +rate_driver()
+    }
+
+    class Driver {
+        +offer_ride()
+        +accept_ride()
+        +view_passenger_details()
+        +rate_passenger()
+        +set_availability()
+    }
+
+    %% Viajes
+    class Ride {
+        +id: UUID
+        +ride_type: enum[entrada, salida]
+        +pickup_point: Point
+        +destination: string (always "CU")
+        +arrival_time: datetime
+        +preferences: RidePreferences
+        +status: enum[pending, accepted, in_progress, completed, cancelled]
+        +passenger_id: UUID
+        +driver_id: UUID
+        +created_at: datetime
+        +updated_at: datetime
+        +request_ride()
+        +accept_ride()
+        +start_ride()
+        +complete_ride()
+        +cancel_ride()
+    }
+
+    class RidePreferences {
+        +same_sex_driver: boolean
+        +use_trunk: boolean
+        +other_preferences: string
+    }
+
+    %% Puntos/Ubicaciones
+    class Point {
+        +id: UUID
+        +name: string
+        +latitude: float
+        +longitude: float
+        +address: string
+        +is_active: boolean
+        +get_rides_at_point()
+    }
+
+    %% Autenticación
+    class Auth {
+        +token: string
+        +refresh_token: string
+        +login(email, password)
+        +register(user_data)
+        +logout()
+        +refresh_access_token()
+        +verify_permissions()
+    }
+
+    %% Admin
+    class Admin {
+        +manage_users()
+        +manage_points()
+        +view_statistics()
+        +moderate_content()
+    }
+
+    %% Relaciones
+    User <|-- Passenger : hereda
+    User <|-- Driver : hereda
+    User <|-- Admin : hereda
+
+    Passenger "1" --> "*" Ride : solicita
+    Driver "1" --> "*" Ride : acepta/conduce
+    Ride "*" --> "1" Point : tiene punto de recogida
+    Ride "1" --> "1" RidePreferences : tiene
+    User "1" --> "1" Auth : autentica
