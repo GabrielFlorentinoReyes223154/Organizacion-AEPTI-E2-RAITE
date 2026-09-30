@@ -1,39 +1,49 @@
 <template>
 
-  <q-page class="flex flex-center" padding>
+  <div class="full-height flex flex-center" style="max-width: 400px; margin: 0 auto;">
     <div class="full-width" style="max-width: 400px;">
       <h5 class="q-my-md text-center">
-        Login Form
+        Raite
       </h5>
+      
+      <!-- Imagen local de logo de la aplicación -->
+       <img
+        alt="Quasar logo"
+        src="~@/assets/raite.svg"
+        style="width: 40vh; height: 40vh"
+      />
 
       <q-card class="q-pa-md">
+        <q-card-title class="text-h6 q-mb-md bg-primary text-white flex flex-center">
+          Iniciar sesión
+        </q-card-title>
 
         <q-card-section>
 
           <q-form @submit="onSubmit" ref="formRef">
 
-            <q-input v-model="email" label="Email" placeholder="email@example.com" filled class="q-mb-md" :rules="[required, isEmailValid]">
+            <q-input v-model="email" label="Correo electrónico" placeholder="email@example.com" filled class="q-mb-md" :rules="[required, isEmailValid]">
               <template v-slot:prepend>
                 <q-icon name="mdi-email" />
               </template>
             </q-input>
 
-            <q-input v-model="password" label="Password" placeholder="password" filled class="q-mt-mx" :rules="[required, isPasswordValid]">
+            <q-input v-model="password" label="Contraseña" placeholder="password" filled class="q-mt-mx" :rules="[required, isPasswordValid]">
               <template v-slot:prepend>
                 <q-icon name="mdi-lock" />
               </template>
             </q-input>
 
             <div class="row q-mb-md">
-              <q-checkbox v-model="rememberMeCheckbox" label="Remember Me" class="q-mt-mx col"/>
+              <q-checkbox v-model="rememberMeCheckbox" label="Recordarme" class="q-mt-mx col"/>
 
-              <q-btn label="don't have an account?" flat to="/signup" filled class="q-mt-mx col" />
+              <q-btn label="¿No tienes una cuenta?" flat to="/login/signuppage" filled class="q-mt-mx col" no-caps />
             </div>
 
             <div class="row q-gutter-sm">
-              <q-btn label="login" class="full-width col-3 q-mb-md" color="primary" />
+              <q-btn label="Iniciar sesión" class="full-width col-3 q-mb-md" color="primary" />
 
-              <q-btn label="forgot password?" class="full-width col-3" color="primary" />
+              <q-btn label="¿Olvidaste tu contraseña?" class="full-width col-3" color="primary" />
             </div>
           </q-form>
 
@@ -41,7 +51,7 @@
       </q-card>
 
     </div>
-  </q-page>
+  </div>
 
 </template>
 

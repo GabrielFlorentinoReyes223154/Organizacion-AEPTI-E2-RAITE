@@ -4,7 +4,7 @@
       <q-toolbar>
         <q-btn flat dense round icon="menu" aria-label="Menu" @click="toggleLeftDrawer" />
 
-        <q-toolbar-title> Quasar App </q-toolbar-title>
+        <q-toolbar-title> Raite </q-toolbar-title>
 
         <div>Quasar v{{ $q.version }}</div>
       </q-toolbar>
@@ -30,22 +30,22 @@ import EssentialLink, { type EssentialLinkProps } from '@/components/EssentialLi
 
 const linksList: EssentialLinkProps[] = [
   {
-    label: 'Docs',
+    label: 'Iniciar sesión',
     caption: 'quasar.dev',
-    icon: 'school',
-    link: 'https://quasar.dev',
+    icon: 'person',
+    link: '/#/login/loginpage',
   },
   {
-    label: 'GitHub',
+    label: 'Crear cuenta',
     caption: 'github.com/quasarframework',
-    icon: 'code',
-    link: 'https://github.com/quasarframework',
+    icon: 'add',
+    link: '/#/login/signuppage',
   },
   {
-    label: 'Discord Chat Channel',
+    label: 'Segunda página',
     caption: 'chat.quasar.dev',
-    icon: 'chat',
-    link: 'https://chat.quasar.dev',
+    icon: 'settings',
+    link: '/second',
   },
   {
     label: 'Forum',
