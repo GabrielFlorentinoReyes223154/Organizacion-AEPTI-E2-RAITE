@@ -1,3 +1,42 @@
 {
-  "extends": "./.quasar/tsconfig.json"
+  "extends": "./.quasar/tsconfig.json",
+  "compilerOptions": {
+    "ignoreDeprecations": "6.0",
+    "paths": {
+      "@": ["./src"],
+      "@/*": ["./src/*"],
+      "stores/*": ["./src/stores/*"],
+      "boot/*": ["./src/boot/*"],
+      "router/*": ["./src/router/*"],
+      "components/*": ["./src/components/*"],
+      "pages/*": ["./src/pages/*"],
+      "#q-app": [
+        "./node_modules/.pnpm/@quasar+app-vite@3.8.1_@typ_303a75380d8fcacadf6687681aa11ccc/node_modules/@quasar/app-vite/types/index.d.ts"
+      ],
+      "#q-app/client": [
+        "./node_modules/.pnpm/@quasar+app-vite@3.8.1_@typ_303a75380d8fcacadf6687681aa11ccc/node_modules/@quasar/app-vite/exports/client/client.d.ts"
+      ],
+      "#q-app/bex/background": [
+        "./node_modules/.pnpm/@quasar+app-vite@3.8.1_@typ_303a75380d8fcacadf6687681aa11ccc/node_modules/@quasar/app-vite/types/bex/entrypoints/background.d.ts"
+      ],
+      "#q-app/bex/content": [
+        "./node_modules/.pnpm/@quasar+app-vite@3.8.1_@typ_303a75380d8fcacadf6687681aa11ccc/node_modules/@quasar/app-vite/types/bex/entrypoints/content.d.ts"
+      ],
+      "#q-app/bex/private/bex-bridge": [
+        "./node_modules/.pnpm/@quasar+app-vite@3.8.1_@typ_303a75380d8fcacadf6687681aa11ccc/node_modules/@quasar/app-vite/types/bex/bex-bridge.d.ts"
+      ],
+      "#q-app/electron/main": [
+        "./node_modules/.pnpm/@quasar+app-vite@3.8.1_@typ_303a75380d8fcacadf6687681aa11ccc/node_modules/@quasar/app-vite/exports/electron/main-runtime.d.ts"
+      ],
+      "#q-app/electron/preload": [
+        "./node_modules/.pnpm/@quasar+app-vite@3.8.1_@typ_303a75380d8fcacadf6687681aa11ccc/node_modules/@quasar/app-vite/exports/electron/preload-runtime.d.ts"
+      ],
+      "#q-app/testing": [
+        "./node_modules/.pnpm/@quasar+app-vite@3.8.1_@typ_303a75380d8fcacadf6687681aa11ccc/node_modules/@quasar/app-vite/exports/testing/testing.d.ts"
+      ],
+      "#q-app/capacitor": [
+        "./node_modules/.pnpm/@quasar+app-vite@3.8.1_@typ_303a75380d8fcacadf6687681aa11ccc/node_modules/@quasar/app-vite/exports/capacitor/capacitor.d.ts"
+      ]
+    }
+  }
 }
