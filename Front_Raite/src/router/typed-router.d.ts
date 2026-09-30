@@ -101,71 +101,71 @@ declare module 'vue-router/auto-routes' {
    * @internal
    */
   export interface _RouteFileInfoMap {
-    'src/pages/index.vue': {
+    'src/pages/login/LoginPage.vue': {
       routes:
-        | '/'
-        | '//(index)'
-        | '//second'
+      | '/'
+      | '//(index)'
+      | '//second'
       views:
-        | 'default'
+      | 'default'
       pathParamNames:
-        | never
+      | never
     }
     'src/pages/index/(index).vue': {
       routes:
-        | '//(index)'
+      | '//(index)'
       views:
-        | never
+      | never
       pathParamNames:
-        | never
+      | never
     }
     'src/pages/index/second.vue': {
       routes:
-        | '//second'
+      | '//second'
       views:
-        | never
+      | never
       pathParamNames:
-        | never
+      | never
     }
     'src/pages/[...path].vue': {
       routes:
-        | '/[...path]'
+      | '/[...path]'
       views:
-        | never
+      | never
       pathParamNames:
-        | 'path'
+      | 'path'
     }
     'src/pages/login/ErrorNotFound.vue': {
       routes:
-        | '/login/ErrorNotFound'
+      | '/login/ErrorNotFound'
       views:
-        | never
+      | never
       pathParamNames:
-        | never
+      | never
     }
     'src/pages/login/LoginPage.vue': {
       routes:
-        | '/login/LoginPage'
+      | '/login/LoginPage'
       views:
-        | never
+      | never
       pathParamNames:
-        | never
+      | never
     }
     'src/pages/login/MainPage.vue': {
       routes:
-        | '/login/MainPage'
+      | '/login/MainPage'
       views:
-        | never
+      | never
       pathParamNames:
-        | never
+      | never
     }
     'src/pages/login/SignUpPage.vue': {
       routes:
-        | '/login/SignUpPage'
+      | '/login/SignUpPage'
       views:
-        | never
+      | never
       pathParamNames:
-        | never
+      | never
     }
   }
 
@@ -177,8 +177,8 @@ declare module 'vue-router/auto-routes' {
    */
   export type _RouteNamesForFilePath<FilePath extends string> =
     _RouteFileInfoMap extends Record<FilePath, infer Info>
-      ? Info['routes']
-      : keyof RouteNamedMap
+    ? Info['routes']
+    : keyof RouteNamedMap
 }
 
-export {}
+export { }
