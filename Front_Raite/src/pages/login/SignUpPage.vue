@@ -1,5 +1,5 @@
 <template>
-  <q-page class="flex flex-center" padding>
+ <div class="full-height flex flex-center" style="max-width: 400px; margin: 0 auto;">
     <div class="full-width" style="max-width: 400px;">
       <h5 class="q-my-md text-center">
         Sign Up Form
@@ -61,11 +61,11 @@
 
             </div>
 
-            <q-btn label="already have an account?" flat to="/login" filled class="q-mb-md" />
+            <q-btn label="¿Ya tienes una cuenta?" flat to="/login/loginpage" filled class="q-mb-md" no-caps />
 
             <div class="row" filled>
 
-              <q-btn label="signup" class="full-width" color="positive" :disble="!isPasswordValid" />
+              <q-btn label="Crear cuenta" class="full-width" color="positive" :disble="!isPasswordValid" />
 
             </div>
 
@@ -77,7 +77,7 @@
 
     </div>
 
-  </q-page>
+  </div>
 </template>
 
 <script setup>
