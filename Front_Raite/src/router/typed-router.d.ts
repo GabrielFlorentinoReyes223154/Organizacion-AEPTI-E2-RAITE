@@ -14,15 +14,13 @@ import type {
   ParamValueZeroOrMore,
   ParamValueZeroOrOne,
 } from 'vue-router'
-import type {
-  _ExtractParamParserType,
-} from 'vue-router/experimental'
+import type { _ExtractParamParserType } from 'vue-router/experimental';
 
 declare module 'vue-router' {
   interface TypesConfig {
-    _ParamParsers: {}
-    RouteNamedMap: import('vue-router/auto-routes').RouteNamedMap
-    _RouteFileInfoMap: import('vue-router/auto-routes')._RouteFileInfoMap
+    _ParamParsers: {};
+    RouteNamedMap: import('vue-router/auto-routes').RouteNamedMap;
+    _RouteFileInfoMap: import('vue-router/auto-routes')._RouteFileInfoMap;
   }
 }
 
@@ -36,58 +34,57 @@ declare module 'vue-router/auto-routes' {
       '/',
       Record<never, never>,
       Record<never, never>,
-      | '//(index)'
-      | '//second'
-    >,
+      '//(index)' | '//second'
+    >;
     '//(index)': RouteRecordInfo<
       '//(index)',
       '/',
       Record<never, never>,
       Record<never, never>,
-      | never
-    >,
+      never
+    >;
     '//second': RouteRecordInfo<
       '//second',
       '/second',
       Record<never, never>,
       Record<never, never>,
-      | never
-    >,
+      never
+    >;
     '/[...path]': RouteRecordInfo<
       '/[...path]',
       '/:path(.*)',
       { path: ParamValue<true> },
       { path: ParamValue<false> },
-      | never
-    >,
+      never
+    >;
     '/login/ErrorNotFound': RouteRecordInfo<
       '/login/ErrorNotFound',
       '/login/ErrorNotFound',
       Record<never, never>,
       Record<never, never>,
-      | never
-    >,
+      never
+    >;
     '/login/LoginPage': RouteRecordInfo<
       '/login/LoginPage',
       '/login/LoginPage',
       Record<never, never>,
       Record<never, never>,
-      | never
-    >,
+      never
+    >;
     '/login/MainPage': RouteRecordInfo<
       '/login/MainPage',
       '/login/MainPage',
       Record<never, never>,
       Record<never, never>,
-      | never
-    >,
+      never
+    >;
     '/login/SignUpPage': RouteRecordInfo<
       '/login/SignUpPage',
       '/login/SignUpPage',
       Record<never, never>,
       Record<never, never>,
-      | never
-    >,
+      never
+    >;
   }
 
   /**
@@ -101,72 +98,46 @@ declare module 'vue-router/auto-routes' {
    * @internal
    */
   export interface _RouteFileInfoMap {
-    'src/pages/login/LoginPage.vue': {
-      routes:
-      | '/'
-      | '//(index)'
-      | '//second'
-      views:
-      | 'default'
-      pathParamNames:
-      | never
-    }
+    'src/pages/index.vue': {
+      routes: '/' | '//(index)' | '//second';
+      views: 'default';
+      pathParamNames: never;
+    };
     'src/pages/index/(index).vue': {
-      routes:
-      | '//(index)'
-      views:
-      | never
-      pathParamNames:
-      | never
-    }
+      routes: '//(index)';
+      views: never;
+      pathParamNames: never;
+    };
     'src/pages/index/second.vue': {
-      routes:
-      | '//second'
-      views:
-      | never
-      pathParamNames:
-      | never
-    }
+      routes: '//second';
+      views: never;
+      pathParamNames: never;
+    };
     'src/pages/[...path].vue': {
-      routes:
-      | '/[...path]'
-      views:
-      | never
-      pathParamNames:
-      | 'path'
-    }
+      routes: '/[...path]';
+      views: never;
+      pathParamNames: 'path';
+    };
     'src/pages/login/ErrorNotFound.vue': {
-      routes:
-      | '/login/ErrorNotFound'
-      views:
-      | never
-      pathParamNames:
-      | never
-    }
+      routes: '/login/ErrorNotFound';
+      views: never;
+      pathParamNames: never;
+    };
     'src/pages/login/LoginPage.vue': {
-      routes:
-      | '/login/LoginPage'
-      views:
-      | never
-      pathParamNames:
-      | never
-    }
+      routes: '/login/LoginPage';
+      views: never;
+      pathParamNames: never;
+    };
     'src/pages/login/MainPage.vue': {
-      routes:
-      | '/login/MainPage'
-      views:
-      | never
-      pathParamNames:
-      | never
-    }
+      routes: '/login/MainPage';
+      views: never;
+      pathParamNames: never;
+    };
     'src/pages/login/SignUpPage.vue': {
-      routes:
-      | '/login/SignUpPage'
-      views:
-      | never
-      pathParamNames:
-      | never
-    }
+      routes: '/login/SignUpPage';
+      views: never;
+      pathParamNames: never;
+    };
   }
 
   /**
@@ -176,9 +147,7 @@ declare module 'vue-router/auto-routes' {
    * @internal
    */
   export type _RouteNamesForFilePath<FilePath extends string> =
-    _RouteFileInfoMap extends Record<FilePath, infer Info>
-    ? Info['routes']
-    : keyof RouteNamedMap
+    _RouteFileInfoMap extends Record<FilePath, infer Info> ? Info['routes'] : keyof RouteNamedMap;
 }
 
-export { }
+export {};
