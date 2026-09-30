@@ -60,6 +60,34 @@ declare module 'vue-router/auto-routes' {
       { path: ParamValue<false> },
       | never
     >,
+    '/login/ErrorNotFound': RouteRecordInfo<
+      '/login/ErrorNotFound',
+      '/login/ErrorNotFound',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/login/LoginPage': RouteRecordInfo<
+      '/login/LoginPage',
+      '/login/LoginPage',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/login/MainPage': RouteRecordInfo<
+      '/login/MainPage',
+      '/login/MainPage',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/login/SignUpPage': RouteRecordInfo<
+      '/login/SignUpPage',
+      '/login/SignUpPage',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
   }
 
   /**
@@ -106,6 +134,38 @@ declare module 'vue-router/auto-routes' {
         | never
       pathParamNames:
         | 'path'
+    }
+    'src/pages/login/ErrorNotFound.vue': {
+      routes:
+        | '/login/ErrorNotFound'
+      views:
+        | never
+      pathParamNames:
+        | never
+    }
+    'src/pages/login/LoginPage.vue': {
+      routes:
+        | '/login/LoginPage'
+      views:
+        | never
+      pathParamNames:
+        | never
+    }
+    'src/pages/login/MainPage.vue': {
+      routes:
+        | '/login/MainPage'
+      views:
+        | never
+      pathParamNames:
+        | never
+    }
+    'src/pages/login/SignUpPage.vue': {
+      routes:
+        | '/login/SignUpPage'
+      views:
+        | never
+      pathParamNames:
+        | never
     }
   }
 

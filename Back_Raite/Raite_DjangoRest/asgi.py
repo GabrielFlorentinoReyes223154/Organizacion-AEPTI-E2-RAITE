@@ -1,5 +1,5 @@
 """
-ASGI config for Back_Raite project.
+ASGI config for Raite_DjangoRest project.
 
 It exposes the ASGI callable as a module-level variable named ``application``.
 
@@ -11,6 +11,6 @@ import os
 
 from django.core.asgi import get_asgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Back_Raite.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Raite_DjangoRest.settings')
 
 application = get_asgi_application()
