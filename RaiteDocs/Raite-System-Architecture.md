@@ -321,7 +321,7 @@ raite-frontend/                   # Raíz del proyecto Quasar (Frontend SPA/PWA)
 ├── public/                       # Assets públicos (copiados tal cual a dist/)
 │   ├── manifest.json             # PWA Manifest
 │   ├── icons/                    # PWA icons (generados con pwa-asset-generator)
-│   └── favicon.ico
+│   └── raite.ico
 ├── tests/                        # Tests frontend
 │   ├── unit/                     # Vitest: composables, stores, utils, components
 │   │   ├── composables/

@@ -134,7 +134,7 @@ raite-frontend/
 │   ├── plugins/                # axios, pinia, leaflet, maplibre, i18n, pwa
 │   ├── styles/                 # SCSS: variables, globals, components, quasar overrides
 │   ├── App.vue, main.js
-├── public/                     # manifest.json, icons, favicon
+├── public/                     # manifest.json, icons, raite
 ├── tests/                      # Vitest (unit) + Playwright (e2e)
 ├── quasar.config.js, package.json, .eslintrc.cjs, .prettierrc
 ```

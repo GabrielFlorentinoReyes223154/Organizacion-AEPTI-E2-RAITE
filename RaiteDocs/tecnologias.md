@@ -170,7 +170,7 @@
 | Tecnología | Propósito |
 |------------|-----------|
 | Google Fonts (Inter, Poppins, DM Sans) | `preconnect`, `font-display: swap`, subset latino |
-| Favicon / PWA icons | Generados via `pwa-asset-generator` (todas las densidades) |
+| raite / PWA icons | Generados via `pwa-asset-generator` (todas las densidades) |
 | Imágenes responsive | `<picture>` + `srcset` + WebP/AVIF via template tags |
 
 ---
