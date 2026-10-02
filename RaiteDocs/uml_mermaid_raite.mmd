@@ -1,0 +1,176 @@
+classDiagram
+    %% ===================================================================
+    %% Raite - Diagrama de Clases (Mermaid)
+    %% Espejo de la seccion "1. Diagrama de Clases" de
+    %% Raite_layout_disposition_001.md
+    %%
+    %% NOTA: Mermaid classDiagram no soporta "notes", asi que las
+    %% notas del PlantUML van como comentarios %%.
+    %% ===================================================================
+
+    %% ================= ENUMS =================
+    %% "AMBOS" NO es un valor: es un usuario con filas PASAJERO +
+    %% CONDUCTOR en UsuarioRol. Un ADMIN no requiere Vehiculo;
+    %% un CONDUCTOR si.
+    class Rol {
+        <<enumeration>>
+        PASAJERO
+        CONDUCTOR
+        ADMIN
+    }
+
+    class TipoViaje {
+        <<enumeration>>
+        ENTRADA
+        SALIDA
+    }
+
+    class TipoVehiculo {
+        <<enumeration>>
+        CAMIONETA
+        COCHE
+        TROCA
+    }
+
+    %% ================= USUARIOS =================
+    %% activo y cuenta_activa son CACHE, no fuente de verdad.
+    %% La verdad vive en Raite.activo/aceptado/finalizado.
+    %% Solo Raite.sincronizar_cuenta_activa() las escribe.
+    %% Invariante: cuenta_activa 0..1. Un "if" no basta, dos
+    %% peticiones concurrentes pasan el filtro a la vez: hace
+    %% falta indice unico parcial o lock pesimista.
+    class Usuario {
+        +id: UUID
+        +nombre: String
+        +apellidos: String
+        +correo: String
+        +password_hash: String
+        +edad: Integer
+        +sexo: String
+        +carrera: String
+        +calificacion: Float
+        +activo: Boolean
+        +cuenta_activa: Boolean
+        +created_at: DateTime
+        +updated_at: DateTime
+        +refrescar_cuenta_activa() void
+        +puede_crear_raite() Boolean
+        +puede_aceptar_raite() Boolean
+        +no_tiene_raite_en_curso() Boolean
+    }
+
+    %% Unico por (usuario_id, rol)
+    class UsuarioRol {
+        +id: UUID
+        +usuario_id: UUID
+        +rol: Rol
+    }
+
+    %% 0..1 por usuario, obligatorio para dar raite.
+    %% es_valido_para_conducir(): existe, completo, activo, placas.
+    class Vehiculo {
+        +id: UUID
+        +usuario_id: UUID
+        +marca: String
+        +modelo: String
+        +color: String
+        +placas: String
+        +tipo: TipoVehiculo
+        +asientos_disponibles: Integer
+        +created_at: DateTime
+        +es_valido_para_conducir() Boolean
+        +tiene_capacidad(requeridos) Boolean
+    }
+
+    %% ================= MAPA =================
+    class PuntoMapeado {
+        +id: UUID
+        +nombre_punto: String
+        +latitud: Float
+        +longitud: Float
+        +activo: Boolean
+    }
+
+    %% ================= VIAJE =================
+    %% conductor_id es NULL hasta aceptado=true.
+    %% hora_objetivo: horas enteras 07:00-22:00.
+    %%   ENTRADA = hora de llegada a CU (deadline)
+    %%   SALIDA  = hora de salida de CU
+    %% validar_puntos(): ENTRADA exige destino=CU,
+    %%   SALIDA exige origen=CU. El otro extremo es del sistema.
+    %% validar_vehiculo(): precondicion de aceptar(), exige
+    %%   es_valido_para_conducir() y
+    %%   tiene_capacidad(pasajeros_requeridos).
+    %% sincronizar_cuenta_activa(): recalcula Usuario.activo y
+    %%   cuenta_activa en la MISMA transaccion. La invocan
+    %%   crear, aceptar, expirar_si_pasado_hora y finalizar.
+    class Raite {
+        +id: UUID
+        +pasajero_id: UUID
+        +conductor_id: UUID
+        +rol_actual: Rol
+        +tipo: TipoViaje
+        +punto_origen_id: UUID
+        +punto_destino_id: UUID
+        +hora_objetivo: Time
+        +pasajeros_requeridos: Integer
+        +configuracion: JSON
+        +activo: Boolean
+        +aceptado: Boolean
+        +finalizado: Boolean
+        +created_at: DateTime
+        +updated_at: DateTime
+        +crear(pasajero_id, rol_actual, tipo, origen, destino, hora, n_pasajeros, config) Raite
+        +validar_puntos(tipo) void
+        +validar_hora_objetivo(hora_objetivo) void
+        +validar_vehiculo(conductor_id) void
+        +expirar_si_pasado_hora() void
+        +aceptar(conductor_id) void
+        +finalizar(encuesta_pasajero, encuesta_conductor) void
+        +sincronizar_cuenta_activa() void
+    }
+
+    %% respondio: null=pendiente, true=si, false=no.
+    %% respondio_en y reintentos son null hasta responder.
+    %% Unico por (raite_id, usuario_id): exactamente 2 filas
+    %% por Raite, una por cada parte.
+    class EncuestaFinalizacion {
+        +id: UUID
+        +raite_id: UUID
+        +usuario_id: UUID
+        +respondio: Boolean
+        +respondio_en: DateTime
+        +reintentos: Integer
+    }
+
+    %% tipo: raite_creado, raite_aceptado, raite_expirado,
+    %%       raite_finalizado.
+    %% El FK raite_id lo implica la relacion Raite --> Notificacion.
+    %% usuario_id (destinatario) y esa relacion son info
+    %% redundante: mantener coherentes en la misma transaccion.
+    class Notificacion {
+        +id: UUID
+        +usuario_id: UUID
+        +tipo: String
+        +titulo: String
+        +mensaje: String
+        +leida: Boolean
+        +created_at: DateTime
+    }
+
+    %% ================= RELACIONES =================
+    %% Multiplicidad: el numero junto a una clase indica cuantas
+    %% instancias de ESA clase hay por instancia de la otra.
+    %% "0..1" junto a Usuario en como_conductor = un Raite puede
+    %% no tener conductor todavia (conductor_id NULL).
+    Usuario "1" -- "0..1" Vehiculo : requiere_para_conducir >
+    Usuario "1" -- "*" UsuarioRol : posee >
+    Usuario "1" -- "*" Raite : como_pasajero >
+    Usuario "0..1" -- "*" Raite : como_conductor >
+    Usuario "1" -- "*" Notificacion : recibe >
+    Usuario "1" -- "*" EncuestaFinalizacion : responde >
+    Raite "1" -- "1" PuntoMapeado : origen >
+    Raite "1" -- "1" PuntoMapeado : destino >
+    Raite "1" -- "*" EncuestaFinalizacion : genera >
+    Raite "1" -- "*" Notificacion : dispara >
+    EncuestaFinalizacion "2" -- "1" Raite : requiere_ambos >
