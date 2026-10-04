@@ -13,7 +13,7 @@
         <q-card-section>
           <q-form @submit="onSubmit" ref="formRef">
             <q-input
-              v-model="email"
+              v-model="correo"
               label="Correo electrónico"
               placeholder="email@example.com"
               filled
@@ -32,10 +32,17 @@
               filled
               class="q-mb-md"
               :rules="[required, isPasswordValid]"
-              type="password"
+              :type="showPassword ? 'text' : 'password'"
             >
               <template v-slot:prepend>
                 <q-icon name="mdi-lock" />
+              </template>
+              <template v-slot:append>
+                <q-icon
+                  :name="showPassword ? 'visibility_off' : 'visibility'"
+                  class="cursor-pointer"
+                  @click="showPassword = !showPassword"
+                />
               </template>
             </q-input>
 
@@ -75,25 +82,23 @@ import { ref } from 'vue';
 import { useAuthStore } from '@/stores/auth-store';
 import { Notify } from 'quasar';
 import isEmail from 'validator/lib/isEmail';
-import isStrongPassword from 'validator/lib/isStrongPassword';
 
 const authStore = useAuthStore();
 
-const email = ref('');
+const correo = ref('');
 const password = ref('');
 const rememberMeCheckbox = ref(true);
 const loading = ref(false);
+const showPassword = ref(false);
 
 const required = (val: string) => !!val || 'This field is required';
 const isEmailValid = (val: string) => isEmail(val) || 'Invalid email format';
-const isPasswordValid = (val: string) =>
-  isStrongPassword(val, { minLowercase: 1, minUppercase: 1, minNumbers: 1, minSymbols: 1 }) ||
-  'Password must be strong (e.g., 8+ chars, 1 uppercase, 1 lowercase, 1 number, 1 symbol)';
+const isPasswordValid = (val: string) => val.length >= 8 || 'Password must be at least 8 characters';
 
 const onSubmit = async () => {
   loading.value = true;
   try {
-    await authStore.login({ email: email.value, password: password.value });
+    await authStore.login({ correo: correo.value, password: password.value });
     Notify.create({ type: 'positive', message: 'Bienvenido', position: 'top' });
   } catch (error: unknown) {
     const err = error as { response?: { data?: { detail?: string } }; message?: string };
