@@ -1,0 +1,3477 @@
+{
+    "version": 0.6,
+    "generator": "Overpass API 0.7.62.11 87bfad18",
+    "osm3s": {
+        "timestamp_osm_base": "2026-10-01T21:29:05Z",
+        "timestamp_areas_base": "2026-09-30T08:16:49Z",
+        "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
+    },
+    "elements": [
+        {
+            "type": "node",
+            "id": 880963315,
+            "lat": 31.6937771,
+            "lon": -106.3742820,
+            "tags": {
+                "name": "OXXO",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "node",
+            "id": 1438478064,
+            "lat": 31.6147090,
+            "lon": -106.5220645,
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "name": "Oxxo",
+                "shop": "convenience",
+                "source": "Local Knowledge",
+                "website": "https://www.oxxo.com/tiendas?cr=50EFC"
+            }
+        },
+        {
+            "type": "node",
+            "id": 1609784276,
+            "lat": 31.7194246,
+            "lon": -106.4435720,
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "brand:wikipedia": "es:Oxxo",
+                "name": "Oxxo",
+                "shop": "convenience",
+                "website": "https://www.oxxo.com/tiendas?cr=50PEC"
+            }
+        },
+        {
+            "type": "node",
+            "id": 1906493367,
+            "lat": 31.7167844,
+            "lon": -106.4328006,
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "brand:wikipedia": "es:Oxxo",
+                "name": "Oxxo",
+                "shop": "convenience",
+                "website": "https://www.oxxo.com/tiendas?cr=50QWJ"
+            }
+        },
+        {
+            "type": "node",
+            "id": 3099728026,
+            "lat": 31.6675301,
+            "lon": -106.3496930,
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "name": "Oxxo",
+                "shop": "convenience",
+                "website": "https://www.oxxo.com/tiendas?cr=50WAT"
+            }
+        },
+        {
+            "type": "node",
+            "id": 3119570912,
+            "lat": 31.6982436,
+            "lon": -106.4040583,
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "name": "Oxxo",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "node",
+            "id": 3131679260,
+            "lat": 31.6873378,
+            "lon": -106.3752953,
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "name": "Oxxo",
+                "shop": "convenience",
+                "website": "https://www.oxxo.com/tiendas?cr=50ZTW"
+            }
+        },
+        {
+            "type": "node",
+            "id": 3135135664,
+            "lat": 31.7491066,
+            "lon": -106.4645122,
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "name": "Oxxo",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "node",
+            "id": 3165276848,
+            "lat": 31.6921688,
+            "lon": -106.4056234,
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "name": "Oxxo",
+                "shop": "convenience",
+                "website": "https://www.oxxo.com/tiendas?cr=50EJU"
+            }
+        },
+        {
+            "type": "node",
+            "id": 3264659433,
+            "lat": 31.6252021,
+            "lon": -106.4613595,
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "name": "Oxxo",
+                "shop": "convenience",
+                "website": "https://www.oxxo.com/tiendas?cr=50WPC"
+            }
+        },
+        {
+            "type": "node",
+            "id": 3264705910,
+            "lat": 31.5958860,
+            "lon": -106.4299097,
+            "tags": {
+                "name": "Oxxo",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "node",
+            "id": 3581474747,
+            "lat": 31.6765661,
+            "lon": -106.3790036,
+            "tags": {
+                "addr:housenumber": "12950",
+                "addr:postcode": "32540",
+                "addr:street": "Calle Ortiz Rubio",
+                "name": "OXXO",
+                "phone": "+526566482469",
+                "shop": "convenience",
+                "website": "https://www.oxxo.com/"
+            }
+        },
+        {
+            "type": "node",
+            "id": 3581478107,
+            "lat": 31.6659748,
+            "lon": -106.3814246,
+            "tags": {
+                "addr:housenumber": "5155",
+                "addr:postcode": "32563",
+                "addr:street": "Prolongación Camino Ortiz Rubio",
+                "name": "OXXO",
+                "shop": "convenience",
+                "website": "https://www.oxxo.com/"
+            }
+        },
+        {
+            "type": "node",
+            "id": 3581494614,
+            "lat": 31.6801952,
+            "lon": -106.3887350,
+            "tags": {
+                "addr:street": "Avenida Ejército Nacional",
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "name": "Oxxo",
+                "shop": "convenience",
+                "website": "https://www.oxxo.com/tiendas?cr=50PAU"
+            }
+        },
+        {
+            "type": "node",
+            "id": 3581501896,
+            "lat": 31.6601412,
+            "lon": -106.4432288,
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "name": "Oxxo",
+                "shop": "convenience",
+                "website": "https://www.oxxo.com/tiendas?cr=50OSX"
+            }
+        },
+        {
+            "type": "node",
+            "id": 3780393557,
+            "lat": 31.7286855,
+            "lon": -106.4505980,
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "name": "Oxxo",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "node",
+            "id": 3974633690,
+            "lat": 31.7180634,
+            "lon": -106.4624067,
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "name": "Oxxo",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "node",
+            "id": 4045454121,
+            "lat": 31.6060697,
+            "lon": -106.4532459,
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "name": "Oxxo",
+                "shop": "convenience",
+                "website": "https://www.oxxo.com/tiendas?cr=50IXI"
+            }
+        },
+        {
+            "type": "node",
+            "id": 4056293071,
+            "lat": 31.5993195,
+            "lon": -106.4272614,
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "name": "Oxxo",
+                "shop": "convenience",
+                "website": "https://www.oxxo.com/tiendas?cr=50LKE"
+            }
+        },
+        {
+            "type": "node",
+            "id": 4131777630,
+            "lat": 31.5993543,
+            "lon": -106.4558486,
+            "tags": {
+                "name": "Oxxo",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "node",
+            "id": 4163651234,
+            "lat": 31.6901861,
+            "lon": -106.3542921,
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "name": "Oxxo",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "node",
+            "id": 4216826404,
+            "lat": 25.6473706,
+            "lon": -100.0998746,
+            "tags": {
+                "name": "Oxxo",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "node",
+            "id": 4217014062,
+            "lat": 25.6554173,
+            "lon": -100.1236122,
+            "tags": {
+                "name": "Oxxo",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "node",
+            "id": 4542855531,
+            "lat": 31.5626208,
+            "lon": -106.3396519,
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "name": "Oxxo",
+                "shop": "convenience",
+                "website": "https://www.oxxo.com/tiendas?cr=50DGK"
+            }
+        },
+        {
+            "type": "node",
+            "id": 4542855547,
+            "lat": 31.5708617,
+            "lon": -106.3488558,
+            "tags": {
+                "name": "Oxxo",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "node",
+            "id": 4542855577,
+            "lat": 31.5882529,
+            "lon": -106.3720381,
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "name": "Oxxo",
+                "shop": "convenience",
+                "website": "https://www.oxxo.com/tiendas?cr=50LLK"
+            }
+        },
+        {
+            "type": "node",
+            "id": 4783715332,
+            "lat": 31.6239803,
+            "lon": -106.3272593,
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "name": "Oxxo",
+                "shop": "convenience",
+                "website": "https://www.oxxo.com/tiendas?cr=50SUZ"
+            }
+        },
+        {
+            "type": "node",
+            "id": 4783734242,
+            "lat": 31.6265984,
+            "lon": -106.3249238,
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "name": "Oxxo",
+                "shop": "convenience",
+                "website": "https://www.oxxo.com/tiendas?cr=50KRD"
+            }
+        },
+        {
+            "type": "node",
+            "id": 5950195016,
+            "lat": 31.6600672,
+            "lon": -106.3915190,
+            "tags": {
+                "amenity": "fuel",
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "brand:wikipedia": "es:Oxxo",
+                "name": "Oxxo"
+            }
+        },
+        {
+            "type": "node",
+            "id": 6428818265,
+            "lat": 31.7429763,
+            "lon": -106.4840742,
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "brand:wikipedia": "es:Oxxo",
+                "name": "Oxxo",
+                "shop": "convenience",
+                "website": "https://www.oxxo.com/tiendas?cr=50S1P"
+            }
+        },
+        {
+            "type": "node",
+            "id": 6428818273,
+            "lat": 31.7388008,
+            "lon": -106.4836631,
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "brand:wikipedia": "es:Oxxo",
+                "name": "Oxxo",
+                "shop": "convenience",
+                "website": "https://www.oxxo.com/tiendas?cr=50DGX"
+            }
+        },
+        {
+            "type": "node",
+            "id": 6485825985,
+            "lat": 31.7210813,
+            "lon": -106.4311930,
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "brand:wikipedia": "es:Oxxo",
+                "name": "Oxxo",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "node",
+            "id": 7535530886,
+            "lat": 31.6172554,
+            "lon": -106.3202817,
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "name": "Oxxo",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "node",
+            "id": 7969750788,
+            "lat": 31.6757855,
+            "lon": -106.4460616,
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "name": "Oxxo",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "node",
+            "id": 8151903236,
+            "lat": 25.6894528,
+            "lon": -100.1113350,
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "name": "Oxxo",
+                "shop": "convenience",
+                "survey:date": "2020-11-22"
+            }
+        },
+        {
+            "type": "node",
+            "id": 8454668627,
+            "lat": 25.6223024,
+            "lon": -100.1155544,
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "name": "Oxxo",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "node",
+            "id": 8454668720,
+            "lat": 25.6140467,
+            "lon": -100.1736944,
+            "tags": {
+                "name": "OXXO",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "node",
+            "id": 8454701128,
+            "lat": 25.6063713,
+            "lon": -100.1680544,
+            "tags": {
+                "name": "OXXO",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "node",
+            "id": 8454701222,
+            "lat": 25.6191369,
+            "lon": -100.1294928,
+            "tags": {
+                "name": "OXXO",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "node",
+            "id": 8454701321,
+            "lat": 25.6080354,
+            "lon": -100.1652245,
+            "tags": {
+                "name": "OXXO",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "node",
+            "id": 8454711517,
+            "lat": 25.6391341,
+            "lon": -100.1653320,
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "name": "Oxxo",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "node",
+            "id": 8454731728,
+            "lat": 25.6725943,
+            "lon": -100.1080155,
+            "tags": {
+                "name": "OXXO",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "node",
+            "id": 8454752323,
+            "lat": 25.6488472,
+            "lon": -100.1431357,
+            "tags": {
+                "name": "OXXO",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "node",
+            "id": 8454763826,
+            "lat": 25.6896053,
+            "lon": -100.1110070,
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "name": "Oxxo",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "node",
+            "id": 8454763828,
+            "lat": 25.6659637,
+            "lon": -100.0958971,
+            "tags": {
+                "name": "OXXO",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "node",
+            "id": 8454763831,
+            "lat": 25.6612992,
+            "lon": -100.1041382,
+            "tags": {
+                "name": "OXXO",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "node",
+            "id": 8454763832,
+            "lat": 25.6663738,
+            "lon": -100.1037199,
+            "tags": {
+                "name": "OXXO",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "node",
+            "id": 8454765219,
+            "lat": 25.6440462,
+            "lon": -100.0590310,
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "brand:wikipedia": "es:Oxxo",
+                "contact:facebook": "0XXOTiendas",
+                "name": "Oxxo",
+                "opening_hours": "24/7",
+                "shop": "convenience",
+                "website": "https://www.oxxo.com/"
+            }
+        },
+        {
+            "type": "node",
+            "id": 8504586438,
+            "lat": 25.6415723,
+            "lon": -100.1076261,
+            "tags": {
+                "name": "OXXO",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "node",
+            "id": 8504586440,
+            "lat": 25.6626407,
+            "lon": -100.0812223,
+            "tags": {
+                "addr:street": "Calle Emiliano Zapata",
+                "name": "OXXO",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "node",
+            "id": 8504656927,
+            "lat": 25.6456278,
+            "lon": -100.1184399,
+            "tags": {
+                "addr:street": "Avenida Las Torres",
+                "name": "OXXO",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "node",
+            "id": 8504657336,
+            "lat": 25.6376372,
+            "lon": -100.1464948,
+            "tags": {
+                "name": "OXXO",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "node",
+            "id": 8523157725,
+            "lat": 25.6309476,
+            "lon": -100.1044028,
+            "tags": {
+                "name": "OXXO",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "node",
+            "id": 8523158024,
+            "lat": 25.6220034,
+            "lon": -100.0916781,
+            "tags": {
+                "addr:street": "Calzada oriente",
+                "name": "OXXO",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "node",
+            "id": 8523164717,
+            "lat": 25.6263182,
+            "lon": -100.0965640,
+            "tags": {
+                "addr:street": "Avenida Las Lomas",
+                "name": "OXXO",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "node",
+            "id": 8590101324,
+            "lat": 25.6515999,
+            "lon": -100.1072740,
+            "tags": {
+                "amenity": "fuel",
+                "name": "Oxxo gas"
+            }
+        },
+        {
+            "type": "node",
+            "id": 8947067580,
+            "lat": 25.6643657,
+            "lon": -100.1008440,
+            "tags": {
+                "name": "OXXO",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "node",
+            "id": 9001627843,
+            "lat": 25.6365648,
+            "lon": -100.1787450,
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "name": "Oxxo",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "node",
+            "id": 9002564566,
+            "lat": 31.6255791,
+            "lon": -106.3186784,
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "name": "Oxxo",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "node",
+            "id": 9143474455,
+            "lat": 31.7320425,
+            "lon": -106.5301443,
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "name": "Oxxo",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "node",
+            "id": 9336008206,
+            "lat": 25.6486059,
+            "lon": -100.0838109,
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "brand:wikipedia": "es:Oxxo",
+                "name": "Oxxo",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "node",
+            "id": 9622975209,
+            "lat": 31.6198104,
+            "lon": -106.4134332,
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "brand:wikipedia": "es:Oxxo",
+                "name": "Oxxo",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "node",
+            "id": 9958359985,
+            "lat": 31.6707691,
+            "lon": -106.3430368,
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "name": "Oxxo",
+                "shop": "convenience",
+                "website": "https://www.oxxo.com/tiendas?cr=504W3"
+            }
+        },
+        {
+            "type": "node",
+            "id": 10627366465,
+            "lat": 31.6735385,
+            "lon": -106.3690503,
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "name": "Oxxo",
+                "shop": "convenience",
+                "website": "https://www.oxxo.com/tiendas?cr=50I7W"
+            }
+        },
+        {
+            "type": "node",
+            "id": 10664271606,
+            "lat": 31.7467920,
+            "lon": -106.4488222,
+            "tags": {
+                "air_conditioning": "yes",
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "check_date": "2023-02-15",
+                "internet_access": "no",
+                "name": "Oxxo",
+                "opening_hours": "24/7",
+                "payment:cash": "yes",
+                "payment:coins": "yes",
+                "payment:credit_cards": "yes",
+                "payment:mastercard": "yes",
+                "payment:visa": "yes",
+                "second_hand": "no",
+                "shop": "convenience",
+                "source": "survey",
+                "website": "https://www.oxxo.com/tiendas?cr=505SW",
+                "wheelchair": "limited"
+            }
+        },
+        {
+            "type": "node",
+            "id": 11727698042,
+            "lat": 31.7264432,
+            "lon": -106.4858864,
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "name": "Oxxo",
+                "shop": "convenience",
+                "website": "https://www.oxxo.com/tiendas?cr=50SG5"
+            }
+        },
+        {
+            "type": "node",
+            "id": 11920174658,
+            "lat": 31.7299279,
+            "lon": -106.4984920,
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "name": "Oxxo",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "node",
+            "id": 11962850901,
+            "lat": 31.7061849,
+            "lon": -106.3887831,
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "name": "Oxxo",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "node",
+            "id": 12872664301,
+            "lat": 31.7012104,
+            "lon": -106.4229708,
+            "tags": {
+                "addr:city": "Juarez",
+                "addr:postcode": "32618",
+                "addr:street": "Rancho el 24",
+                "internet_access": "no",
+                "name": "OXXO",
+                "opening_hours": "00:00-24:00",
+                "shop": "convenience",
+                "website": "https://www.oxxo.com/",
+                "wheelchair": "yes"
+            }
+        },
+        {
+            "type": "node",
+            "id": 13043557812,
+            "lat": 31.5626628,
+            "lon": -106.3398632,
+            "tags": {
+                "amenity": "fuel",
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "name": "Oxxo"
+            }
+        },
+        {
+            "type": "node",
+            "id": 13043558479,
+            "lat": 31.5874550,
+            "lon": -106.3507662,
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "name": "Oxxo",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "node",
+            "id": 13259700489,
+            "lat": 31.6100711,
+            "lon": -106.3817674,
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "name": "Oxxo",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "node",
+            "id": 13339687031,
+            "lat": 31.6745075,
+            "lon": -106.3678327,
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "name": "Oxxo",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "node",
+            "id": 13353916541,
+            "lat": 31.5979147,
+            "lon": -106.3052649,
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "name": "Oxxo",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "node",
+            "id": 13453454860,
+            "lat": 31.6646182,
+            "lon": -106.4269775,
+            "tags": {
+                "amenity": "fuel",
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "name": "Oxxo gas Pemex E03986"
+            }
+        },
+        {
+            "type": "node",
+            "id": 13796366471,
+            "lat": 31.5536450,
+            "lon": -106.2817466,
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "name": "Oxxo",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "node",
+            "id": 13808922864,
+            "lat": 31.6821456,
+            "lon": -106.4952243,
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "name": "Oxxo",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "node",
+            "id": 13821827588,
+            "lat": 31.6789229,
+            "lon": -106.3635174,
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "name": "Oxxo",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "node",
+            "id": 13885204723,
+            "lat": 31.6038699,
+            "lon": -106.3089050,
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "name": "Oxxo",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "node",
+            "id": 13904718711,
+            "lat": 31.6772214,
+            "lon": -106.4762947,
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "name": "Oxxo",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "node",
+            "id": 13905843914,
+            "lat": 31.6532376,
+            "lon": -106.4440634,
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "name": "Oxxo",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "node",
+            "id": 13960544044,
+            "lat": 31.4917374,
+            "lon": -106.2361560,
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "name": "Oxxo",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "node",
+            "id": 13962540475,
+            "lat": 31.7368332,
+            "lon": -106.4833621,
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "name": "Oxxo",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "node",
+            "id": 14088298001,
+            "lat": 31.7380605,
+            "lon": -106.4636356,
+            "tags": {
+                "addr:housenumber": "2285",
+                "addr:postcode": "32300",
+                "addr:street": "Calle Paraguay",
+                "check_date": "2026-07-26",
+                "check_date:opening_hours": "2026-07-26",
+                "name": "OXXO",
+                "opening_hours": "24/7",
+                "phone": "+52 81 8320 2020",
+                "shop": "convenience",
+                "website": "http://oxxo.com"
+            }
+        },
+        {
+            "type": "node",
+            "id": 14142855334,
+            "lat": 31.7163753,
+            "lon": -106.4933650,
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "name": "Oxxo",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "node",
+            "id": 14150152471,
+            "lat": 31.6755319,
+            "lon": -106.4065258,
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "name": "Oxxo",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "node",
+            "id": 14160115306,
+            "lat": 31.6466024,
+            "lon": -106.4095932,
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "name": "Oxxo",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "node",
+            "id": 14178384696,
+            "lat": 31.6768196,
+            "lon": -106.4511500,
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "name": "Oxxo",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "node",
+            "id": 14193150918,
+            "lat": 31.6836846,
+            "lon": -106.4550145,
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "name": "Oxxo",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "node",
+            "id": 14193150919,
+            "lat": 31.6817786,
+            "lon": -106.4624476,
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "name": "Oxxo",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "node",
+            "id": 14203827359,
+            "lat": 31.6869979,
+            "lon": -106.4562105,
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "name": "Oxxo",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "node",
+            "id": 14206596473,
+            "lat": 31.6845050,
+            "lon": -106.4801755,
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "name": "Oxxo",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "node",
+            "id": 14227649969,
+            "lat": 31.6592609,
+            "lon": -106.3801451,
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "name": "Oxxo",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "way",
+            "id": 252027861,
+            "center": {
+                "lat": 31.7332938,
+                "lon": -106.4241916
+            },
+            "nodes": [
+                2581480147,
+                2581480148,
+                13375103925,
+                13375103926,
+                2581480150,
+                2581480147
+            ],
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "brand:wikipedia": "es:Oxxo",
+                "building": "yes",
+                "name": "Oxxo",
+                "shop": "convenience",
+                "website": "https://www.oxxo.com/tiendas?cr=50GXX"
+            }
+        },
+        {
+            "type": "way",
+            "id": 252799946,
+            "center": {
+                "lat": 31.7214974,
+                "lon": -106.4428492
+            },
+            "nodes": [
+                2588266358,
+                2588266357,
+                2588266355,
+                2588266361,
+                2588266356,
+                2588266360,
+                2588266354,
+                2588266358
+            ],
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "brand:wikipedia": "es:Oxxo",
+                "name": "Oxxo",
+                "shop": "convenience",
+                "website": "https://www.oxxo.com/tiendas?cr=50KNG"
+            }
+        },
+        {
+            "type": "way",
+            "id": 319642760,
+            "center": {
+                "lat": 31.7260525,
+                "lon": -106.4248668
+            },
+            "nodes": [
+                8204035304,
+                3260820817,
+                3260820818,
+                3260820819,
+                8204035304
+            ],
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "brand:wikipedia": "es:Oxxo",
+                "building": "yes",
+                "name": "Oxxo",
+                "shop": "convenience",
+                "website": "https://www.oxxo.com/tiendas?cr=50CKL"
+            }
+        },
+        {
+            "type": "way",
+            "id": 320752394,
+            "center": {
+                "lat": 31.7104458,
+                "lon": -106.4091447
+            },
+            "nodes": [
+                3273920065,
+                3273920066,
+                3273920068,
+                3273920067,
+                3273920065
+            ],
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "building": "retail",
+                "name": "Oxxo",
+                "shop": "convenience",
+                "website": "https://www.oxxo.com/tiendas?cr=50BEK"
+            }
+        },
+        {
+            "type": "way",
+            "id": 324669520,
+            "center": {
+                "lat": 31.6193067,
+                "lon": -106.4388551
+            },
+            "nodes": [
+                3313696522,
+                3313696523,
+                3313696524,
+                3313696525,
+                3313696522
+            ],
+            "tags": {
+                "addr:city": "Juarez",
+                "addr:postcode": "32695",
+                "addr:street": "Aeromoza",
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "building": "retail",
+                "name": "Oxxo",
+                "operator": "Oxxo",
+                "shop": "convenience",
+                "website": "https://www.oxxo.com/tiendas?cr=50UIT"
+            }
+        },
+        {
+            "type": "way",
+            "id": 326320851,
+            "center": {
+                "lat": 31.7233574,
+                "lon": -106.4200498
+            },
+            "nodes": [
+                3329499355,
+                3329499358,
+                3329499357,
+                6896862873,
+                3329499356,
+                6896862872,
+                3329499355
+            ],
+            "tags": {
+                "amenity": "fuel",
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "brand:wikipedia": "es:Oxxo",
+                "building": "roof",
+                "compressed_air": "yes",
+                "name": "Oxxo",
+                "operator": "AutoPronto",
+                "website": "https://www.oxxo.com/tiendas?cr=50TGL"
+            }
+        },
+        {
+            "type": "way",
+            "id": 337507167,
+            "center": {
+                "lat": 31.3502499,
+                "lon": -106.4700274
+            },
+            "nodes": [
+                3445872472,
+                3445872471,
+                3445872469,
+                3445872470,
+                3445872472
+            ],
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "building": "yes",
+                "name": "Oxxo",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "way",
+            "id": 457772699,
+            "center": {
+                "lat": 31.6019312,
+                "lon": -106.3867047
+            },
+            "nodes": [
+                4538724930,
+                4538724931,
+                4538724932,
+                4538724926,
+                4538724930
+            ],
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "building": "retail",
+                "name": "Oxxo",
+                "shop": "convenience",
+                "website": "https://www.oxxo.com/tiendas?cr=50MUW"
+            }
+        },
+        {
+            "type": "way",
+            "id": 620384756,
+            "center": {
+                "lat": 25.6795804,
+                "lon": -100.1120759
+            },
+            "nodes": [
+                5861412741,
+                5861412742,
+                5861412743,
+                5861412744,
+                5861412741
+            ],
+            "tags": {
+                "building": "yes",
+                "name": "Oxxo",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "way",
+            "id": 626053862,
+            "center": {
+                "lat": 31.6579211,
+                "lon": -106.4649141
+            },
+            "nodes": [
+                5910604070,
+                5910604071,
+                5910604076,
+                5910604075,
+                5910604072,
+                5910604073,
+                5910604074,
+                5910604070
+            ],
+            "tags": {
+                "branch": "Cementera",
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "building": "yes",
+                "level": "0",
+                "name": "Oxxo",
+                "operator": "OXXO",
+                "payment:cards": "yes",
+                "payment:cash": "yes",
+                "payment:coins": "yes",
+                "payment:credit_cards": "yes",
+                "payment:debit_cards": "yes",
+                "payment:electronic_purses": "yes",
+                "payment:mastercard": "yes",
+                "payment:visa": "yes",
+                "payment:visa_debit": "yes",
+                "payment:visa_electron": "yes",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "way",
+            "id": 626069841,
+            "center": {
+                "lat": 31.7443048,
+                "lon": -106.4856748
+            },
+            "nodes": [
+                5872688282,
+                5910772711,
+                5910772712,
+                5872688283,
+                5872688282
+            ],
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "building": "yes",
+                "name": "Oxxo",
+                "shop": "convenience",
+                "website": "https://www.oxxo.com/tiendas?cr=50QEW"
+            }
+        },
+        {
+            "type": "way",
+            "id": 633036470,
+            "center": {
+                "lat": 25.6591904,
+                "lon": -100.1457870
+            },
+            "nodes": [
+                5975985902,
+                5975985903,
+                5975985904,
+                5975985905,
+                4217014090,
+                5975985902
+            ],
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "brand:wikipedia": "es:Oxxo",
+                "building": "yes",
+                "name": "Oxxo",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "way",
+            "id": 634087705,
+            "center": {
+                "lat": 31.6586869,
+                "lon": -106.4285230
+            },
+            "nodes": [
+                5984716764,
+                5984716765,
+                5984716766,
+                5984716767,
+                5984716764
+            ],
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "brand:wikipedia": "es:Oxxo",
+                "building": "yes",
+                "name": "Oxxo",
+                "shop": "convenience",
+                "website": "https://www.oxxo.com/tiendas?cr=50NVU"
+            }
+        },
+        {
+            "type": "way",
+            "id": 635493266,
+            "center": {
+                "lat": 31.6335155,
+                "lon": -106.4201171
+            },
+            "nodes": [
+                5994608628,
+                5994608629,
+                5994608630,
+                5994608631,
+                5994608628
+            ],
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "building": "yes",
+                "name": "Oxxo",
+                "shop": "convenience",
+                "website": "https://www.oxxo.com/tiendas?cr=50HPA"
+            }
+        },
+        {
+            "type": "way",
+            "id": 635493268,
+            "center": {
+                "lat": 31.6352587,
+                "lon": -106.4166692
+            },
+            "nodes": [
+                5994608634,
+                5994608635,
+                5994608636,
+                5994608637,
+                5994608634
+            ],
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "building": "yes",
+                "name": "Oxxo",
+                "shop": "convenience",
+                "website": "https://www.oxxo.com/tiendas?cr=50KPP"
+            }
+        },
+        {
+            "type": "way",
+            "id": 635493288,
+            "center": {
+                "lat": 31.6302723,
+                "lon": -106.4199719
+            },
+            "nodes": [
+                5994608725,
+                5994608726,
+                5994608727,
+                5994608728,
+                5994608725
+            ],
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "building": "yes",
+                "name": "Oxxo",
+                "shop": "convenience",
+                "website": "https://www.oxxo.com/tiendas?cr=50E0B"
+            }
+        },
+        {
+            "type": "way",
+            "id": 636752309,
+            "center": {
+                "lat": 31.6224464,
+                "lon": -106.4174271
+            },
+            "nodes": [
+                6004200758,
+                6004200759,
+                6004200760,
+                6004200761,
+                6004200762,
+                6004200763,
+                6004200758
+            ],
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "building": "yes",
+                "name": "Oxxo",
+                "shop": "convenience",
+                "website": "https://www.oxxo.com/tiendas?cr=50AEJ"
+            }
+        },
+        {
+            "type": "way",
+            "id": 643165553,
+            "center": {
+                "lat": 31.5926321,
+                "lon": -106.4205211
+            },
+            "nodes": [
+                6053205309,
+                6053205310,
+                6053205311,
+                6141311387,
+                6053205313,
+                6053205309
+            ],
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "brand:wikipedia": "es:Oxxo",
+                "building": "yes",
+                "name": "Oxxo",
+                "opening_hours": "Mo-Su 09:00-18:00",
+                "shop": "convenience",
+                "website": "https://www.oxxo.com/tiendas?cr=50AYV"
+            }
+        },
+        {
+            "type": "way",
+            "id": 648330380,
+            "center": {
+                "lat": 31.6227663,
+                "lon": -106.3929969
+            },
+            "nodes": [
+                6086960116,
+                6086960117,
+                6086960118,
+                6086960119,
+                6086960120,
+                6086960121,
+                6086960122,
+                6086960123,
+                6086960124,
+                6086960125,
+                6086960139,
+                6086960116
+            ],
+            "tags": {
+                "building": "industrial",
+                "name": "Centro de distribución Oxxo"
+            }
+        },
+        {
+            "type": "way",
+            "id": 665367008,
+            "center": {
+                "lat": 31.6691372,
+                "lon": -106.4177825
+            },
+            "nodes": [
+                6227698500,
+                6227698501,
+                6227698502,
+                6227698503,
+                6227698500
+            ],
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "brand:wikipedia": "es:Oxxo",
+                "building": "yes",
+                "name": "Oxxo",
+                "payment:cash": "yes",
+                "payment:credit_cards": "yes",
+                "shop": "convenience",
+                "website": "https://www.oxxo.com/tiendas?cr=50JF9"
+            }
+        },
+        {
+            "type": "way",
+            "id": 665632829,
+            "center": {
+                "lat": 31.6734585,
+                "lon": -106.4160514
+            },
+            "nodes": [
+                6230566272,
+                6230566273,
+                6230566274,
+                6230566275,
+                6230566276,
+                6230566277,
+                6230566278,
+                6230566279,
+                6230566272
+            ],
+            "tags": {
+                "addr:city": "Ciudad Juárez",
+                "addr:housenumber": "7304",
+                "addr:postcode": "32662",
+                "addr:street": "Avenida Morelia",
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "brand:wikipedia": "es:Oxxo",
+                "building": "yes",
+                "name": "Oxxo",
+                "shop": "convenience",
+                "website": "https://www.oxxo.com/tiendas?cr=50ELX"
+            }
+        },
+        {
+            "type": "way",
+            "id": 668193447,
+            "center": {
+                "lat": 31.7316780,
+                "lon": -106.4858480
+            },
+            "nodes": [
+                6257307109,
+                6257307110,
+                6257307111,
+                6257307112,
+                6257307113,
+                6257307114,
+                6257307109
+            ],
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "brand:wikipedia": "es:Oxxo",
+                "building": "yes",
+                "name": "Oxxo",
+                "shop": "convenience",
+                "website": "https://www.oxxo.com/tiendas?cr=50BIA"
+            }
+        },
+        {
+            "type": "way",
+            "id": 668594451,
+            "center": {
+                "lat": 25.6898364,
+                "lon": -100.1020281
+            },
+            "nodes": [
+                6261116448,
+                6261116449,
+                6261116451,
+                6261116452,
+                6261116448
+            ],
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "building": "yes",
+                "name": "Oxxo",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "way",
+            "id": 669109480,
+            "center": {
+                "lat": 25.6934910,
+                "lon": -100.1100773
+            },
+            "nodes": [
+                6265732107,
+                13810222909,
+                6265732108,
+                6265732109,
+                6265732110,
+                6265732111,
+                6265732107
+            ],
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "building": "yes",
+                "name": "Oxxo",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "way",
+            "id": 685754259,
+            "center": {
+                "lat": 31.7417204,
+                "lon": -106.4413393
+            },
+            "nodes": [
+                6426910355,
+                6426910356,
+                6426910357,
+                6426910358,
+                6426910355
+            ],
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "brand:wikipedia": "es:Oxxo",
+                "building": "yes",
+                "name": "Oxxo",
+                "shop": "convenience",
+                "website": "https://www.oxxo.com/tiendas?cr=50HNR"
+            }
+        },
+        {
+            "type": "way",
+            "id": 690015574,
+            "center": {
+                "lat": 25.6178940,
+                "lon": -100.1781088
+            },
+            "nodes": [
+                6473530996,
+                6473530997,
+                6473530998,
+                6473530993,
+                6473530996
+            ],
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "brand:wikipedia": "es:Oxxo",
+                "building": "yes",
+                "name": "Oxxo",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "way",
+            "id": 690913675,
+            "center": {
+                "lat": 25.6414282,
+                "lon": -100.0939177
+            },
+            "nodes": [
+                6482558438,
+                6482558436,
+                4216826293,
+                6482558437,
+                6482558438
+            ],
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "brand:wikipedia": "es:Oxxo",
+                "building": "yes",
+                "name": "Oxxo",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "way",
+            "id": 690913677,
+            "center": {
+                "lat": 25.6416322,
+                "lon": -100.0937676
+            },
+            "nodes": [
+                4216826292,
+                7464466228,
+                6482558439,
+                7464466230,
+                6482558440,
+                6482558441,
+                4216826292
+            ],
+            "tags": {
+                "addr:street": "Avenida Francisco Naranjo",
+                "amenity": "fuel",
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "building": "roof",
+                "name": "Oxxo Gas"
+            }
+        },
+        {
+            "type": "way",
+            "id": 699784562,
+            "center": {
+                "lat": 31.6268015,
+                "lon": -106.3970892
+            },
+            "nodes": [
+                6571217644,
+                6571217643,
+                4055804080,
+                6571217641,
+                6571217642,
+                6571217644
+            ],
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "building": "retail",
+                "name": "Oxxo",
+                "shop": "convenience",
+                "website": "https://www.oxxo.com/tiendas?cr=50MIJ"
+            }
+        },
+        {
+            "type": "way",
+            "id": 735009529,
+            "center": {
+                "lat": 31.6029067,
+                "lon": -106.3996889
+            },
+            "nodes": [
+                6883777347,
+                4010339795,
+                6883777346,
+                6883777345,
+                6883777344,
+                6883777347
+            ],
+            "tags": {
+                "building": "retail",
+                "name": "OXXO",
+                "opening_hours": "Mo-Su 07:00-22:00",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "way",
+            "id": 735012098,
+            "center": {
+                "lat": 31.6165202,
+                "lon": -106.3809165
+            },
+            "nodes": [
+                6883790649,
+                6883790647,
+                4055777583,
+                6883790648,
+                6883790649
+            ],
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "brand:wikipedia": "es:Oxxo",
+                "building": "retail",
+                "name": "Oxxo",
+                "shop": "convenience",
+                "website": "https://www.oxxo.com/tiendas?cr=50ORU"
+            }
+        },
+        {
+            "type": "way",
+            "id": 735012126,
+            "center": {
+                "lat": 31.6183431,
+                "lon": -106.4044054
+            },
+            "nodes": [
+                6883793615,
+                6883793614,
+                6883793613,
+                6883793612,
+                3220625678,
+                6883793615
+            ],
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "brand:wikipedia": "es:Oxxo",
+                "building": "retail",
+                "name": "Oxxo",
+                "operator": "OXXO",
+                "shop": "convenience",
+                "website": "https://www.oxxo.com/tiendas?cr=50YPM"
+            }
+        },
+        {
+            "type": "way",
+            "id": 735014077,
+            "center": {
+                "lat": 31.5991522,
+                "lon": -106.3972902
+            },
+            "nodes": [
+                6883793236,
+                6883793232,
+                6883793233,
+                6883793234,
+                3264723797,
+                6883793236
+            ],
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "building": "retail",
+                "name": "Oxxo",
+                "shop": "convenience",
+                "website": "https://www.oxxo.com/tiendas?cr=50ARX"
+            }
+        },
+        {
+            "type": "way",
+            "id": 735383300,
+            "center": {
+                "lat": 31.6918950,
+                "lon": -106.3607177
+            },
+            "nodes": [
+                5379581857,
+                6887705706,
+                6887705707,
+                6887705708,
+                6887705709,
+                5379581857
+            ],
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "brand:wikipedia": "es:Oxxo",
+                "building": "yes",
+                "name": "Oxxo",
+                "shop": "convenience",
+                "website": "https://www.oxxo.com/tiendas?cr=50KTG"
+            }
+        },
+        {
+            "type": "way",
+            "id": 736159351,
+            "center": {
+                "lat": 31.6604836,
+                "lon": -106.4468957
+            },
+            "nodes": [
+                6892161932,
+                6892161930,
+                3099727960,
+                6892161931,
+                6892161932
+            ],
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "building": "retail",
+                "name": "Oxxo",
+                "shop": "convenience",
+                "website": "https://www.oxxo.com/tiendas?cr=50EJX"
+            }
+        },
+        {
+            "type": "way",
+            "id": 736282570,
+            "center": {
+                "lat": 31.6483990,
+                "lon": -106.3912214
+            },
+            "nodes": [
+                6893184712,
+                2629248425,
+                6893184710,
+                6893184711,
+                6893184712
+            ],
+            "tags": {
+                "amenity": "fuel",
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "brand:wikipedia": "es:Oxxo",
+                "building": "roof",
+                "name": "Oxxo"
+            }
+        },
+        {
+            "type": "way",
+            "id": 736354526,
+            "center": {
+                "lat": 31.5973051,
+                "lon": -106.3822938
+            },
+            "nodes": [
+                6893877944,
+                6893877943,
+                4056293074,
+                6893877941,
+                6893877942,
+                6893877944
+            ],
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "building": "retail",
+                "name": "Oxxo",
+                "shop": "convenience",
+                "website": "https://www.oxxo.com/tiendas?cr=50DDX"
+            }
+        },
+        {
+            "type": "way",
+            "id": 736371848,
+            "center": {
+                "lat": 31.6788025,
+                "lon": -106.4240961
+            },
+            "nodes": [
+                6894080020,
+                6894080019,
+                3213534970,
+                6894080017,
+                6894080018,
+                6894080020
+            ],
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "building": "retail",
+                "name": "Oxxo",
+                "shop": "convenience",
+                "website": "https://www.oxxo.com/tiendas?cr=50APX"
+            }
+        },
+        {
+            "type": "way",
+            "id": 736371873,
+            "center": {
+                "lat": 31.6646112,
+                "lon": -106.4277644
+            },
+            "nodes": [
+                6894080099,
+                4045454143,
+                6894080097,
+                6894080098,
+                6894080096,
+                6894080099
+            ],
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "building": "retail",
+                "name": "Oxxo",
+                "shop": "convenience",
+                "website": "https://www.oxxo.com/tiendas?cr=50HIO"
+            }
+        },
+        {
+            "type": "way",
+            "id": 741774431,
+            "center": {
+                "lat": 25.6653118,
+                "lon": -100.1273405
+            },
+            "nodes": [
+                6943918071,
+                6943918072,
+                6943918073,
+                6943918071
+            ],
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "brand:wikipedia": "es:Oxxo",
+                "building": "yes",
+                "name": "Oxxo",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "way",
+            "id": 745179138,
+            "center": {
+                "lat": 25.6111208,
+                "lon": -100.1779392
+            },
+            "nodes": [
+                6975535897,
+                6975535898,
+                6975535899,
+                6975535900,
+                6975535901,
+                6975535902,
+                6975535897
+            ],
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "brand:wikipedia": "es:Oxxo",
+                "building": "yes",
+                "name": "Oxxo",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "way",
+            "id": 745179153,
+            "center": {
+                "lat": 25.6232855,
+                "lon": -100.1747435
+            },
+            "nodes": [
+                6975540065,
+                6975540066,
+                6975540067,
+                6975540068,
+                6975540069,
+                6975540070,
+                6975540065
+            ],
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "brand:wikipedia": "es:Oxxo",
+                "building": "yes",
+                "name": "Oxxo",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "way",
+            "id": 745179155,
+            "center": {
+                "lat": 25.6146344,
+                "lon": -100.1760175
+            },
+            "nodes": [
+                6975540077,
+                6975540078,
+                6975540079,
+                6975540080,
+                6975540077
+            ],
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "brand:wikipedia": "es:Oxxo",
+                "building": "yes",
+                "name": "Oxxo",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "way",
+            "id": 750543524,
+            "center": {
+                "lat": 31.6218215,
+                "lon": -106.4457738
+            },
+            "nodes": [
+                7017745361,
+                7017745358,
+                7017745359,
+                7017745360,
+                7017745361
+            ],
+            "tags": {
+                "amenity": "fuel",
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "brand:wikipedia": "es:Oxxo",
+                "building": "roof",
+                "name": "Oxxo"
+            }
+        },
+        {
+            "type": "way",
+            "id": 750543525,
+            "center": {
+                "lat": 31.6213392,
+                "lon": -106.4457681
+            },
+            "nodes": [
+                7017745365,
+                7017745362,
+                7017745363,
+                7017745364,
+                7017745365
+            ],
+            "tags": {
+                "amenity": "fuel",
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "brand:wikipedia": "es:Oxxo",
+                "building": "roof",
+                "name": "Oxxo",
+                "website": "https://www.oxxo.com/tiendas?cr=50TGI"
+            }
+        },
+        {
+            "type": "way",
+            "id": 750543527,
+            "center": {
+                "lat": 31.6214168,
+                "lon": -106.4459878
+            },
+            "nodes": [
+                7017745373,
+                7017745370,
+                7017745371,
+                7017745372,
+                7017745373
+            ],
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "brand:wikipedia": "es:Oxxo",
+                "building": "yes",
+                "name": "Oxxo",
+                "shop": "convenience",
+                "website": "https://www.oxxo.com/tiendas?cr=50TGI"
+            }
+        },
+        {
+            "type": "way",
+            "id": 753066837,
+            "center": {
+                "lat": 31.6268204,
+                "lon": -106.3143644
+            },
+            "nodes": [
+                7036549743,
+                7036549740,
+                7036549741,
+                7036549742,
+                7036549743
+            ],
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "building": "retail",
+                "name": "Oxxo",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "way",
+            "id": 778687795,
+            "center": {
+                "lat": 31.6499967,
+                "lon": -106.4016879
+            },
+            "nodes": [
+                7269859267,
+                7269859268,
+                7269859269,
+                7269859270,
+                7269859271,
+                7269859267
+            ],
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "brand:wikipedia": "es:Oxxo",
+                "building": "yes",
+                "name": "Oxxo",
+                "shop": "convenience",
+                "website": "https://www.oxxo.com/tiendas?cr=50QSZ"
+            }
+        },
+        {
+            "type": "way",
+            "id": 787282934,
+            "center": {
+                "lat": 31.6207116,
+                "lon": -106.3894482
+            },
+            "nodes": [
+                7360133873,
+                7360133874,
+                7360133875,
+                7360133876,
+                7360133877,
+                7360133873
+            ],
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "brand:wikipedia": "es:Oxxo",
+                "building": "yes",
+                "name": "Oxxo",
+                "shop": "convenience",
+                "website": "https://www.oxxo.com/tiendas?cr=50TIK"
+            }
+        },
+        {
+            "type": "way",
+            "id": 787282980,
+            "center": {
+                "lat": 31.6150490,
+                "lon": -106.3916334
+            },
+            "nodes": [
+                7360141660,
+                7360141661,
+                7360141662,
+                7360141663,
+                7360141660
+            ],
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "brand:wikipedia": "es:Oxxo",
+                "building": "yes",
+                "name": "Oxxo",
+                "shop": "convenience",
+                "website": "https://www.oxxo.com/tiendas?cr=50NGX"
+            }
+        },
+        {
+            "type": "way",
+            "id": 788725397,
+            "center": {
+                "lat": 31.7186075,
+                "lon": -106.3964057
+            },
+            "nodes": [
+                7373942145,
+                7373942148,
+                7373942149,
+                7373942150,
+                7373942152,
+                7373942151,
+                7373942145
+            ],
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "brand:wikipedia": "es:Oxxo",
+                "building": "yes",
+                "name": "Oxxo",
+                "shop": "convenience",
+                "website": "https://www.oxxo.com/tiendas?cr=50KPQ"
+            }
+        },
+        {
+            "type": "way",
+            "id": 790630089,
+            "center": {
+                "lat": 31.6363998,
+                "lon": -106.4036923
+            },
+            "nodes": [
+                7391440424,
+                7391440425,
+                7391440426,
+                7391440427,
+                7391440428,
+                7391440424
+            ],
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "brand:wikipedia": "es:Oxxo",
+                "building": "yes",
+                "name": "Oxxo",
+                "shop": "convenience",
+                "website": "https://www.oxxo.com/tiendas?cr=50SBK"
+            }
+        },
+        {
+            "type": "way",
+            "id": 790630098,
+            "center": {
+                "lat": 31.6315851,
+                "lon": -106.4005534
+            },
+            "nodes": [
+                7391440454,
+                7391440455,
+                7391440456,
+                7391440457,
+                7391440458,
+                7391440454
+            ],
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "brand:wikipedia": "es:Oxxo",
+                "building": "yes",
+                "name": "Oxxo",
+                "shop": "convenience",
+                "website": "https://www.oxxo.com/tiendas?cr=50ORZ"
+            }
+        },
+        {
+            "type": "way",
+            "id": 790630110,
+            "center": {
+                "lat": 31.6267126,
+                "lon": -106.4106491
+            },
+            "nodes": [
+                7391442637,
+                7391442638,
+                7391442646,
+                7391442639,
+                7391442640,
+                7391442637
+            ],
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "brand:wikipedia": "es:Oxxo",
+                "building": "yes",
+                "name": "Oxxo",
+                "shop": "convenience",
+                "website": "https://www.oxxo.com/tiendas?cr=50PRJ"
+            }
+        },
+        {
+            "type": "way",
+            "id": 790630112,
+            "center": {
+                "lat": 31.6255494,
+                "lon": -106.4060316
+            },
+            "nodes": [
+                7391442647,
+                7391442648,
+                7391442649,
+                7391442650,
+                7391442647
+            ],
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "brand:wikipedia": "es:Oxxo",
+                "building": "yes",
+                "name": "Oxxo",
+                "shop": "convenience",
+                "website": "https://www.oxxo.com/tiendas?cr=50RUF"
+            }
+        },
+        {
+            "type": "way",
+            "id": 792800318,
+            "center": {
+                "lat": 31.6223945,
+                "lon": -106.4109844
+            },
+            "nodes": [
+                7413396342,
+                7413396349,
+                7413396343,
+                7413396344,
+                7413396345,
+                7413396346,
+                7413396347,
+                7413396348,
+                7413396342
+            ],
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "brand:wikipedia": "es:Oxxo",
+                "building": "yes",
+                "name": "Oxxo",
+                "shop": "convenience",
+                "website": "https://www.oxxo.com/tiendas?cr=50LZR"
+            }
+        },
+        {
+            "type": "way",
+            "id": 793107174,
+            "center": {
+                "lat": 31.6152676,
+                "lon": -106.3963160
+            },
+            "nodes": [
+                7416261550,
+                7416261551,
+                7416261552,
+                7416261553,
+                7416261550
+            ],
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "brand:wikipedia": "es:Oxxo",
+                "building": "yes",
+                "name": "Oxxo",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "way",
+            "id": 793359319,
+            "center": {
+                "lat": 31.6143832,
+                "lon": -106.4269809
+            },
+            "nodes": [
+                7418442618,
+                7418442619,
+                7418442620,
+                7418442621,
+                7418442622,
+                7418442623,
+                7418442618
+            ],
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "brand:wikipedia": "es:Oxxo",
+                "building": "yes",
+                "name": "Oxxo",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "way",
+            "id": 795755112,
+            "center": {
+                "lat": 25.6461300,
+                "lon": -100.0963993
+            },
+            "nodes": [
+                7443013992,
+                7443013991,
+                7443013990,
+                7464471273,
+                7443013989,
+                7464471275,
+                7443013992
+            ],
+            "tags": {
+                "addr:street": "Avenida Licenciado Arturo B. De la Garza",
+                "amenity": "fuel",
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "brand:wikipedia": "es:Oxxo",
+                "building": "roof",
+                "name": "Oxxo"
+            }
+        },
+        {
+            "type": "way",
+            "id": 795755128,
+            "center": {
+                "lat": 25.6204971,
+                "lon": -100.1051943
+            },
+            "nodes": [
+                7443014188,
+                7464471280,
+                7443014187,
+                7443014186,
+                7464471281,
+                7443014185,
+                7443014188
+            ],
+            "tags": {
+                "amenity": "fuel",
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "building": "roof",
+                "compressed_air": "yes",
+                "name": "Oxxo Gas",
+                "website": "https://www.oxxo.com/tiendas?cr=50Q1G"
+            }
+        },
+        {
+            "type": "way",
+            "id": 797142782,
+            "center": {
+                "lat": 25.6515856,
+                "lon": -100.1072787
+            },
+            "nodes": [
+                7455164332,
+                7455164331,
+                7455164330,
+                7455164329,
+                7455164332
+            ],
+            "tags": {
+                "brand": "Oxxo Gas",
+                "building": "roof",
+                "covered": "yes",
+                "layer": "1",
+                "name": "Oxxo Gas"
+            }
+        },
+        {
+            "type": "way",
+            "id": 797570158,
+            "center": {
+                "lat": 25.6529823,
+                "lon": -100.1115095
+            },
+            "nodes": [
+                4216963048,
+                7459395417,
+                7459395418,
+                8024564419,
+                7459395419,
+                7459395413,
+                4216963048
+            ],
+            "tags": {
+                "amenity": "fuel",
+                "brand": "Oxxo Gas",
+                "building": "roof",
+                "layer": "1",
+                "name": "Oxxo Gas"
+            }
+        },
+        {
+            "type": "way",
+            "id": 807943341,
+            "center": {
+                "lat": 31.7367817,
+                "lon": -106.4819003
+            },
+            "nodes": [
+                7555357617,
+                7555357618,
+                7555357619,
+                7555357620,
+                7555357621,
+                7555357622,
+                7555357623,
+                7555357624,
+                7555357617
+            ],
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "brand:wikipedia": "es:Oxxo",
+                "building": "yes",
+                "name": "Oxxo",
+                "shop": "convenience",
+                "website": "https://www.oxxo.com/tiendas?cr=50VIK"
+            }
+        },
+        {
+            "type": "way",
+            "id": 807943367,
+            "center": {
+                "lat": 31.7391279,
+                "lon": -106.4806459
+            },
+            "nodes": [
+                7555391011,
+                7555391013,
+                7555391015,
+                7555391016,
+                7555391010,
+                7555391011
+            ],
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "brand:wikipedia": "es:Oxxo",
+                "building": "yes",
+                "name": "Oxxo",
+                "shop": "convenience",
+                "website": "https://www.oxxo.com/tiendas?cr=50PP4"
+            }
+        },
+        {
+            "type": "way",
+            "id": 815997625,
+            "center": {
+                "lat": 31.6635610,
+                "lon": -106.3633261
+            },
+            "nodes": [
+                7620954863,
+                7620954864,
+                7620954865,
+                7620954866,
+                7620954867,
+                7620954863
+            ],
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "brand:wikipedia": "es:Oxxo",
+                "building": "yes",
+                "name": "Oxxo",
+                "payment:cash": "yes",
+                "payment:credit_cards": "yes",
+                "payment:debit_cards": "yes",
+                "payment:mastercard": "yes",
+                "payment:visa": "yes",
+                "payment:visa_debit": "yes",
+                "shop": "convenience",
+                "website": "https://www.oxxo.com/tiendas?cr=50ABL"
+            }
+        },
+        {
+            "type": "way",
+            "id": 839535309,
+            "center": {
+                "lat": 25.6887689,
+                "lon": -100.1157226
+            },
+            "nodes": [
+                7834105413,
+                7834105414,
+                7834105415,
+                7834105416,
+                7834105417,
+                7834105413
+            ],
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "brand:wikipedia": "es:Oxxo",
+                "building": "yes",
+                "name": "Oxxo",
+                "name:en": "Oxxo",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "way",
+            "id": 849822693,
+            "center": {
+                "lat": 31.7380979,
+                "lon": -106.4327396
+            },
+            "nodes": [
+                7928552701,
+                7928552702,
+                7928552703,
+                7928552704,
+                7928552701
+            ],
+            "tags": {
+                "building": "retail",
+                "name": "Oxxo"
+            }
+        },
+        {
+            "type": "way",
+            "id": 866365690,
+            "center": {
+                "lat": 25.6554865,
+                "lon": -100.0811530
+            },
+            "nodes": [
+                8075212403,
+                8075212404,
+                8075212405,
+                8075212406,
+                8075212407,
+                8075212403
+            ],
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "brand:wikipedia": "es:Oxxo",
+                "building": "yes",
+                "name": "Oxxo",
+                "shop": "convenience",
+                "website": "https://www.oxxo.com/tiendas?cr=50LCX"
+            }
+        },
+        {
+            "type": "way",
+            "id": 866365691,
+            "center": {
+                "lat": 25.6554035,
+                "lon": -100.0809794
+            },
+            "nodes": [
+                8075212408,
+                8075212409,
+                8075212411,
+                8075212412,
+                8075212408
+            ],
+            "tags": {
+                "amenity": "fuel",
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "brand:wikipedia": "es:Oxxo",
+                "name": "Oxxo Gas"
+            }
+        },
+        {
+            "type": "way",
+            "id": 866367205,
+            "center": {
+                "lat": 25.6415800,
+                "lon": -100.0895930
+            },
+            "nodes": [
+                8075253765,
+                8075253766,
+                8075253767,
+                8075253768,
+                8075253769,
+                8075253770,
+                8075253771,
+                8075253765
+            ],
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "brand:wikipedia": "es:Oxxo",
+                "building": "yes",
+                "name": "Oxxo",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "way",
+            "id": 880004058,
+            "center": {
+                "lat": 31.6083374,
+                "lon": -106.6855147
+            },
+            "nodes": [
+                8185778531,
+                8185778532,
+                8185778533,
+                8185778534,
+                8185778531
+            ],
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "brand:wikipedia": "es:Oxxo",
+                "building": "yes",
+                "name": "Oxxo Santa Teresa",
+                "shop": "convenience",
+                "website": "https://www.oxxo.com/tiendas?cr=501RD"
+            }
+        },
+        {
+            "type": "way",
+            "id": 932724414,
+            "center": {
+                "lat": 25.6517076,
+                "lon": -100.0819815
+            },
+            "nodes": [
+                8646039197,
+                8646039188,
+                8646039192,
+                8646039184,
+                8646039198,
+                8646039197
+            ],
+            "tags": {
+                "building": "yes",
+                "name": "OXXO",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "way",
+            "id": 932726743,
+            "center": {
+                "lat": 25.6377552,
+                "lon": -100.0857900
+            },
+            "nodes": [
+                8646048835,
+                8646048834,
+                8646048832,
+                8646048831,
+                8646048833,
+                8646048835
+            ],
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "building": "yes",
+                "name": "Oxxo",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "way",
+            "id": 967152928,
+            "center": {
+                "lat": 25.6227235,
+                "lon": -100.1239801
+            },
+            "nodes": [
+                8947744299,
+                8947744302,
+                8947744301,
+                8947744297,
+                8947744299
+            ],
+            "tags": {
+                "building": "yes",
+                "name": "OXXO san Antonio 1",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "way",
+            "id": 1011343195,
+            "center": {
+                "lat": 25.6100548,
+                "lon": -100.1544645
+            },
+            "nodes": [
+                9330888331,
+                9330888332,
+                9330888333,
+                9330888334,
+                9330888331
+            ],
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "brand:wikipedia": "es:Oxxo",
+                "building": "yes",
+                "name": "Oxxo",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "way",
+            "id": 1022733958,
+            "center": {
+                "lat": 25.6410993,
+                "lon": -100.1583801
+            },
+            "nodes": [
+                9432417359,
+                9432417355,
+                9432417362,
+                9432417360,
+                9432417359
+            ],
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "building": "yes",
+                "name": "Oxxo",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "way",
+            "id": 1059431894,
+            "center": {
+                "lat": 31.6627636,
+                "lon": -106.4736851
+            },
+            "nodes": [
+                9733877257,
+                9733877258,
+                9733877259,
+                9733877260,
+                9733877257
+            ],
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "building": "yes",
+                "name": "Oxxo",
+                "shop": "convenience",
+                "website": "https://www.oxxo.com/tiendas?cr=50GLK"
+            }
+        },
+        {
+            "type": "way",
+            "id": 1147972306,
+            "center": {
+                "lat": 31.6262955,
+                "lon": -106.3310338
+            },
+            "nodes": [
+                10681110359,
+                10681110360,
+                10681110361,
+                10681110362,
+                10681110359
+            ],
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "building": "yes",
+                "name": "Oxxo",
+                "shop": "convenience",
+                "source": "microsoft/BuildingFootprints",
+                "website": "https://www.oxxo.com/tiendas?cr=50TFH"
+            }
+        },
+        {
+            "type": "way",
+            "id": 1188953931,
+            "center": {
+                "lat": 31.7482786,
+                "lon": -106.4988019
+            },
+            "nodes": [
+                11039990360,
+                11039990361,
+                11039990362,
+                11039990363,
+                11039990364,
+                11039990365,
+                11039990366,
+                11039990367,
+                11039990360
+            ],
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "building": "yes",
+                "name": "Oxxo",
+                "shop": "convenience",
+                "source": "microsoft/BuildingFootprints",
+                "website": "https://www.oxxo.com/tiendas?cr=50V5M"
+            }
+        },
+        {
+            "type": "way",
+            "id": 1220063199,
+            "center": {
+                "lat": 31.6647634,
+                "lon": -106.4187608
+            },
+            "nodes": [
+                11304953942,
+                11304953943,
+                11304953944,
+                11304953945,
+                11304953946,
+                11304953947,
+                11304953948,
+                11304953949,
+                11304953950,
+                11304953951,
+                11304953942
+            ],
+            "tags": {
+                "area": "yes",
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "name": "Oxxo",
+                "shop": "convenience",
+                "source": "microsoft/BuildingFootprints",
+                "website": "https://www.oxxo.com/tiendas?cr=5042I"
+            }
+        },
+        {
+            "type": "way",
+            "id": 1249940257,
+            "center": {
+                "lat": 31.6807094,
+                "lon": -106.4780250
+            },
+            "nodes": [
+                11618869864,
+                11618869865,
+                11618869866,
+                11618869867,
+                11618869864
+            ],
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "building": "yes",
+                "name": "Oxxo",
+                "shop": "convenience",
+                "source": "microsoft/BuildingFootprints",
+                "website": "https://www.oxxo.com/tiendas?cr=500PO"
+            }
+        },
+        {
+            "type": "way",
+            "id": 1290261624,
+            "center": {
+                "lat": 31.7125207,
+                "lon": -106.3776639
+            },
+            "nodes": [
+                11962834897,
+                11962834898,
+                11962834899,
+                11962834900,
+                11962834897
+            ],
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "building": "yes",
+                "name": "Oxxo",
+                "shop": "convenience",
+                "source": "microsoft/BuildingFootprints"
+            }
+        },
+        {
+            "type": "way",
+            "id": 1337290087,
+            "center": {
+                "lat": 31.7177036,
+                "lon": -106.4743309
+            },
+            "nodes": [
+                12368942234,
+                12368942235,
+                12368942236,
+                12368942237,
+                12368942234
+            ],
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "building": "yes",
+                "name": "Oxxo",
+                "shop": "convenience",
+                "source": "microsoft/BuildingFootprints"
+            }
+        },
+        {
+            "type": "way",
+            "id": 1419729238,
+            "center": {
+                "lat": 31.5494786,
+                "lon": -106.3496606
+            },
+            "nodes": [
+                13046730460,
+                13046730461,
+                13046730462,
+                13046730463,
+                13046730460
+            ],
+            "tags": {
+                "addr:street": "Avenida L. Solís Barraza",
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "building": "yes",
+                "name": "Oxxo",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "way",
+            "id": 1452246394,
+            "center": {
+                "lat": 31.6078907,
+                "lon": -106.4712407
+            },
+            "nodes": [
+                13318465823,
+                13318465824,
+                13318465825,
+                13318465826,
+                13318465823
+            ],
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "building": "yes",
+                "name": "Oxxo",
+                "shop": "convenience",
+                "source": "microsoft/BuildingFootprints"
+            }
+        },
+        {
+            "type": "way",
+            "id": 1455530075,
+            "center": {
+                "lat": 31.6117487,
+                "lon": -106.4321573
+            },
+            "nodes": [
+                7418442805,
+                13348408325,
+                13348408326,
+                13348408327,
+                13348408328,
+                7418442805
+            ],
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "brand:wikipedia": "es:Oxxo",
+                "building": "yes",
+                "name": "Oxxo",
+                "shop": "convenience",
+                "website": "https://www.oxxo.com/tiendas?cr=50URQ"
+            }
+        },
+        {
+            "type": "way",
+            "id": 1488414966,
+            "center": {
+                "lat": 31.6067899,
+                "lon": -106.4829750
+            },
+            "nodes": [
+                13643965047,
+                13643965048,
+                13643965049,
+                13643965050,
+                13643965047
+            ],
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "building": "yes",
+                "name": "Oxxo",
+                "shop": "convenience",
+                "source": "microsoft/BuildingFootprints"
+            }
+        },
+        {
+            "type": "way",
+            "id": 1509370508,
+            "center": {
+                "lat": 25.6985966,
+                "lon": -100.1124428
+            },
+            "nodes": [
+                13797529359,
+                13797529360,
+                13797529361,
+                13797529362,
+                13797529363,
+                13797529359
+            ],
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "building": "yes",
+                "name": "Oxxo",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "way",
+            "id": 1509370511,
+            "center": {
+                "lat": 25.6977989,
+                "lon": -100.1067705
+            },
+            "nodes": [
+                13797529378,
+                13797529384,
+                13797529379,
+                13797529380,
+                13797529381,
+                13797529382,
+                13797529378
+            ],
+            "tags": {
+                "amenity": "fuel",
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "name": "Oxxo"
+            }
+        },
+        {
+            "type": "way",
+            "id": 1509370512,
+            "center": {
+                "lat": 25.6978538,
+                "lon": -100.1069476
+            },
+            "nodes": [
+                13797529378,
+                13797529382,
+                13797529383,
+                13797529384,
+                13797529378
+            ],
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "building": "yes",
+                "name": "Oxxo",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "way",
+            "id": 1509370513,
+            "center": {
+                "lat": 25.6945632,
+                "lon": -100.1085808
+            },
+            "nodes": [
+                13797529385,
+                13797529386,
+                13809883116,
+                13797529387,
+                13797529388,
+                13797529389,
+                13797529390,
+                13797529391,
+                13797529385
+            ],
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "building": "yes",
+                "name": "Oxxo",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "way",
+            "id": 1509370517,
+            "center": {
+                "lat": 25.6895860,
+                "lon": -100.1110073
+            },
+            "nodes": [
+                13797529903,
+                13797529904,
+                13797529905,
+                13797529906,
+                13797529907,
+                13797529903
+            ],
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "building": "yes",
+                "name": "Oxxo",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "way",
+            "id": 1509370518,
+            "center": {
+                "lat": 25.6865547,
+                "lon": -100.1149817
+            },
+            "nodes": [
+                13797529908,
+                13797529909,
+                13797529910,
+                13797529911,
+                13797529908
+            ],
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "building": "yes",
+                "name": "Oxxo",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "way",
+            "id": 1509370521,
+            "center": {
+                "lat": 25.6870058,
+                "lon": -100.0982493
+            },
+            "nodes": [
+                13797529920,
+                13797529921,
+                13797529922,
+                13797529923,
+                13797529920
+            ],
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "building": "yes",
+                "name": "Oxxo",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "way",
+            "id": 1510795739,
+            "center": {
+                "lat": 25.6958090,
+                "lon": -100.1171665
+            },
+            "nodes": [
+                13810157880,
+                13810157881,
+                13810157882,
+                13810157883,
+                13810157884,
+                13810157880
+            ],
+            "tags": {
+                "brand": "Oxxo",
+                "brand:wikidata": "Q1342538",
+                "building": "yes",
+                "name": "Oxxo",
+                "shop": "convenience"
+            }
+        },
+        {
+            "type": "way",
+            "id": 1525618002,
+            "center": {
+                "lat": 31.6234532,
+                "lon": -106.4531894
+            },
+            "nodes": [
+                13905836863,
+                13905836864,
+                13905836865,
+                13905836866,
+                13905836867,
+                13905836868,
+                13905836863
+            ],
+            "tags": {
+                "building": "warehouse",
+                "name": "CEDIS Oxxo"
+            }
+        }
+    ]
+}
