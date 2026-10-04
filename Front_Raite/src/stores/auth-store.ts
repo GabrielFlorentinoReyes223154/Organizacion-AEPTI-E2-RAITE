@@ -3,9 +3,10 @@ import { api } from '@/boot/axios';
 import { Router } from '@/router';
 
 interface User {
-  id: number;
-  email: string;
-  name: string;
+  id: string;
+  correo: string;
+  nombre: string;
+  apellidos: string;
   roles: string[];
 }
 
@@ -25,17 +26,17 @@ export const useAuthStore = defineStore('auth', {
   },
 
   actions: {
-    async login(credentials: { email: string; password: string }) {
-      const { data } = await api.post('/api/token/', credentials);
+    async login(credentials: { correo: string; password: string }) {
+      const { data } = await api.post('/api/auth/token/', credentials);
       this.setTokens(data.access, data.refresh);
       await this.fetchUser();
-      await Router.push('/');
+      await Router.push('/second');
     },
 
     async logout() {
       if (this.refreshToken) {
         try {
-          await api.post('/api/token/blacklist/', { refresh: this.refreshToken });
+          await api.post('/api/auth/token/blacklist/', { refresh: this.refreshToken });
         } catch {
           /* ignore */
         }
@@ -44,14 +45,30 @@ export const useAuthStore = defineStore('auth', {
       await Router.push('/login/loginpage');
     },
 
+    async register(data: {
+      nombre: string;
+      apellidos: string;
+      correo: string;
+      password: string;
+      edad: number;
+      sexo: string;
+      carrera: string;
+      roles: string[];
+    }) {
+      const { data: response } = await api.post('/api/auth/register/', data);
+      // Registration returns: id, roles, suspendido, requiere_vehiculo
+      // If requiere_vehiculo is true, user needs to register vehicle
+      return response;
+    },
+
     async refreshAccessToken() {
       if (!this.refreshToken) throw new Error('No refresh token');
-      const { data } = await api.post('/api/token/refresh/', { refresh: this.refreshToken });
+      const { data } = await api.post('/api/auth/token/refresh/', { refresh: this.refreshToken });
       this.setTokens(data.access, this.refreshToken);
     },
 
     async fetchUser() {
-      const { data } = await api.get('/api/me/');
+      const { data } = await api.get('/api/auth/me/');
       this.user = data;
     },
 
