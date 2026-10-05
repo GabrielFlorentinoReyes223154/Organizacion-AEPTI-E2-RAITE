@@ -106,17 +106,14 @@
             </q-input>
 
             <q-select
-              v-model="roles"
-              label="Roles"
+              v-model="rol"
+              label="Rol"
               filled
               class="q-mt-md"
               :options="rolOptions"
-              :rules="[required, validRoles]"
-              use-chips
-              multiple
+              :rules="[required]"
               emit-value
               map-options
-              hint="Máximo 2: Pasajero y/o Conductor"
             />
 
             <div class="q-mt-sm q-ml-md">
@@ -153,13 +150,15 @@
               Al menos 1 símbolo (e.g. !@#$)
             </div>
 
-            <q-btn
-              label="¿Ya tienes una cuenta?"
+            <div class="text-center q-mt-md">
+<q-btn
+              label="¿Ya tienes una cuenta? Inicia sesión"
               flat
-              to="/login/loginpage"
-              class="q-mb-md"
+              to="/login/LoginPage"
               no-caps
+              color="primary"
             />
+            </div>
 
             <div class="row">
               <q-btn
@@ -197,12 +196,13 @@ const confirmPassword = ref('');
 const edad = ref<number | null>(null);
 const sexo = ref('');
 const carrera = ref('');
-const roles = ref<string[]>([]);
+const rol = ref<number | null>(null);
 const loading = ref(false);
 
 const rolOptions = [
-  { label: 'Pasajero', value: 'PASAJERO' },
-  { label: 'Conductor', value: 'CONDUCTOR' },
+  { label: 'Pasajero', value: 2 },
+  { label: 'Conductor', value: 3 },
+  { label: 'Ambos (Pasajero y Conductor)', value: 4 },
 ];
 
 const sexoOptions = [
@@ -231,21 +231,27 @@ const hasSymbol = computed(() => /[^A-Za-z0-9]/.test(password.value));
 
 const isPasswordValid = (val: string) => val.length >= 8 || 'Contraseña debe tener al menos 8 caracteres';
 
-const validRoles = (val: string[]) => {
-  if (!val || val.length === 0) return 'Selecciona al menos un rol';
-  if (val.length > 2) return 'Máximo 2 roles';
-  if (new Set(val).size !== val.length) return 'No repitas roles';
-  if (val.includes('ADMIN')) return 'El rol ADMIN no se otorga en el registro público';
-  return true;
-};
+// const validRoles = (val: string[]) => {
+//   if (!val || val.length === 0) return 'Selecciona al menos un rol';
+//   if (val.length > 2) return 'Máximo 2 roles';
+//   if (new Set(val).size !== val.length) return 'No repitas roles';
+//   if (val.includes('ADMIN')) return 'El rol ADMIN no se otorga en el registro público';
+//   return true;
+// };
 
 const onSubmit = async () => {
   if (!formRef.value) return;
-  const form = formRef.value as unknown as { validate: () => boolean };
-  if (!form.validate()) return;
+  const form = formRef.value as unknown as { validate: () => boolean; reset: () => void };
+  console.log('Form validation...');
+  if (!form.validate()) {
+    console.log('Form validation failed');
+    return;
+  }
+  console.log('Form validation passed');
 
   loading.value = true;
   try {
+    console.log('Calling authStore.register...');
     await authStore.register({
       nombre: nombre.value,
       apellidos: apellidos.value,
@@ -254,11 +260,25 @@ const onSubmit = async () => {
       edad: edad.value!,
       sexo: sexo.value,
       carrera: carrera.value,
-      roles: roles.value,
+      rol: rol.value!,
     });
-    Notify.create({ type: 'positive', message: 'Cuenta creada', position: 'top' });
-    await Router.push('/second');
+    console.log('Register successful');
+    form.reset();
+    Notify.create({ type: 'positive', message: 'Cuenta creada satisfactoriamente', position: 'top' });
+    await new Promise(r => setTimeout(r, 500));
+    console.log('Redirecting to /login/LoginPage...');
+    try {
+      await Router.replace({ path: '/login/LoginPage' });
+      console.log('Router.replace succeeded');
+    } catch (navError) {
+      console.error('Router.replace failed:', navError);
+      // Fallback: use window.location
+      console.log('Using window.location fallback...');
+      window.location.href = '/#/login/LoginPage';
+    }
+    console.log('Current route after redirect:', Router.currentRoute.value.fullPath);
   } catch (error: unknown) {
+    console.error('Error in onSubmit:', error);
     const err = error as { response?: { data?: { detail?: string } }; message?: string };
     const message = err.response?.data?.detail || err.message || 'Error al crear cuenta';
     Notify.create({ type: 'negative', message, position: 'top' });
