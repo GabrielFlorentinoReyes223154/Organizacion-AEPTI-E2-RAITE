@@ -18,7 +18,7 @@ class AuthAPITests(TestCase):
             edad=20,
             sexo=Sexo.F,
             carrera="Ingeniería",
-            roles=[Rol.PASAJERO],
+            rol=Rol.PASAJERO,
         )
 
     def test_obtener_token_login_valido(self):
@@ -61,7 +61,8 @@ class AuthAPITests(TestCase):
         self.assertEqual(response.data["nombre"], "Test")
         self.assertEqual(response.data["apellidos"], "User")
         self.assertIn("nombre_completo", response.data)
-        self.assertIn("roles", response.data)
+        self.assertIn("rol", response.data)
+        self.assertIn("rol_display", response.data)
         self.assertNotIn("password", response.data)
         self.assertNotIn("is_superuser", response.data)
 
@@ -89,27 +90,66 @@ class AuthAPITests(TestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    # Tests nuevos para C10
-    def test_registro_crea_dos_filas_para_ambos(self):
+    def test_registro_crea_usuario_con_rol_pasajero(self):
         response = self.client.post(
             "/api/auth/register/",
             {
-                "nombre": "Ambos",
+                "nombre": "Pasajero",
                 "apellidos": "Test",
-                "correo": "ambos@uacj.mx",
+                "correo": "pasajero@uacj.mx",
                 "password": "password123",
                 "edad": 20,
                 "sexo": "M",
                 "carrera": "Ingeniería",
-                "roles": ["PASAJERO", "CONDUCTOR"],
+                "rol": Rol.PASAJERO,
             },
             format="json",
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        user = self.User.objects.get(correo="ambos@uacj.mx")
-        self.assertEqual(user.usuario_roles.count(), 2)
+        user = self.User.objects.get(correo="pasajero@uacj.mx")
+        self.assertEqual(user.rol, Rol.PASAJERO)
         self.assertTrue(user.es_pasajero)
+        self.assertFalse(user.es_conductor)
+
+    def test_registro_crea_usuario_con_rol_conductor(self):
+        response = self.client.post(
+            "/api/auth/register/",
+            {
+                "nombre": "Conductor",
+                "apellidos": "Test",
+                "correo": "conductor@uacj.mx",
+                "password": "password123",
+                "edad": 20,
+                "sexo": "M",
+                "carrera": "Ingeniería",
+                "rol": Rol.CONDUCTOR,
+            },
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        user = self.User.objects.get(correo="conductor@uacj.mx")
+        self.assertEqual(user.rol, Rol.CONDUCTOR)
         self.assertTrue(user.es_conductor)
+        self.assertFalse(user.es_pasajero)
+
+    def test_registro_rol_default_pasajero(self):
+        response = self.client.post(
+            "/api/auth/register/",
+            {
+                "nombre": "Default",
+                "apellidos": "Test",
+                "correo": "default@uacj.mx",
+                "password": "password123",
+                "edad": 20,
+                "sexo": "M",
+                "carrera": "Ingeniería",
+            },
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        user = self.User.objects.get(correo="default@uacj.mx")
+        self.assertEqual(user.rol, Rol.PASAJERO)
+        self.assertTrue(user.es_pasajero)
 
     def test_registro_rechaza_admin(self):
         response = self.client.post(
@@ -122,24 +162,7 @@ class AuthAPITests(TestCase):
                 "edad": 20,
                 "sexo": "M",
                 "carrera": "Ingeniería",
-                "roles": ["ADMIN"],
-            },
-            format="json",
-        )
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-
-    def test_registro_rechaza_roles_duplicados(self):
-        response = self.client.post(
-            "/api/auth/register/",
-            {
-                "nombre": "Dup",
-                "apellidos": "Test",
-                "correo": "dup@uacj.mx",
-                "password": "password123",
-                "edad": 20,
-                "sexo": "M",
-                "carrera": "Ingeniería",
-                "roles": ["PASAJERO", "PASAJERO"],
+                "rol": Rol.ADMIN,
             },
             format="json",
         )
@@ -157,12 +180,13 @@ class AuthAPITests(TestCase):
                 "edad": 20,
                 "sexo": "M",
                 "carrera": "Ingeniería",
-                "roles": ["CONDUCTOR"],
+                "rol": Rol.CONDUCTOR,
             },
             format="json",
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertTrue(response.data["requiere_vehiculo"])
+        self.assertEqual(response.data["rol"], Rol.CONDUCTOR)
 
         # Sin CONDUCTOR
         response = self.client.post(
@@ -175,9 +199,10 @@ class AuthAPITests(TestCase):
                 "edad": 20,
                 "sexo": "F",
                 "carrera": "Ingeniería",
-                "roles": ["PASAJERO"],
+                "rol": Rol.PASAJERO,
             },
             format="json",
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertFalse(response.data["requiere_vehiculo"])
+        self.assertEqual(response.data["rol"], Rol.PASAJERO)

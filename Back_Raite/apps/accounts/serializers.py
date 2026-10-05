@@ -9,7 +9,7 @@ class UsuarioSerializer(serializers.ModelSerializer):
     es_pasajero = serializers.BooleanField(read_only=True)
     es_conductor = serializers.BooleanField(read_only=True)
     es_admin = serializers.BooleanField(read_only=True)
-    roles = serializers.SerializerMethodField()
+    rol_display = serializers.CharField(source="get_rol_display", read_only=True)
 
     class Meta:
         model = Usuario
@@ -26,24 +26,18 @@ class UsuarioSerializer(serializers.ModelSerializer):
             "activo",
             "cuenta_activa",
             "suspendido",
+            "rol",
+            "rol_display",
             "es_pasajero",
             "es_conductor",
             "es_admin",
-            "roles",
         ]
         read_only_fields = ["id", "calificacion", "activo", "cuenta_activa", "suspendido"]
-
-    def get_roles(self, obj):
-        return [r.rol.lower() for r in obj.usuario_roles.all()]
 
 
 class RegistroSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, min_length=8)
-    roles = serializers.ListField(
-        child=serializers.ChoiceField(choices=[Rol.PASAJERO, Rol.CONDUCTOR]),
-        allow_empty=False,
-        max_length=2,
-    )
+    rol = serializers.ChoiceField(choices=[Rol.PASAJERO, Rol.CONDUCTOR, Rol.AMBOS], required=False)
 
     class Meta:
         model = Usuario
@@ -55,7 +49,7 @@ class RegistroSerializer(serializers.ModelSerializer):
             "edad",
             "sexo",
             "carrera",
-            "roles",
+            "rol",
         ]
         extra_kwargs = {
             "edad": {"required": True},
@@ -68,22 +62,21 @@ class RegistroSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Este correo ya está registrado.")
         return value.lower()
 
-    def validate_roles(self, value):
-        if len(value) != len(set(value)):
-            raise serializers.ValidationError("No repitas roles.")
-        if Rol.ADMIN in value:
+    def validate_rol(self, value):
+        if value == Rol.ADMIN:
             raise serializers.ValidationError("El rol ADMIN no se otorga en el registro público.")
         return value
 
     def create(self, validated_data):
         password = validated_data.pop("password")
-        roles = validated_data.pop("roles")
-        return Usuario.objects.create_user(password=password, roles=roles, **validated_data)
+        rol = validated_data.pop("rol", None)
+        return Usuario.objects.create_user(password=password, rol=rol, **validated_data)
 
 
 class RegistroResponseSerializer(serializers.Serializer):
     id = serializers.UUIDField()
-    roles = serializers.ListField(child=serializers.CharField())
+    rol = serializers.IntegerField()
+    rol_display = serializers.CharField()
     suspendido = serializers.BooleanField()
     requiere_vehiculo = serializers.BooleanField()
 

@@ -21,7 +21,7 @@ class UsuarioModelTests(TestCase):
             edad=20,
             sexo=Sexo.M,
             carrera="Ingeniería",
-            roles=[Rol.PASAJERO],
+            rol=Rol.PASAJERO,
         )
         self.assertEqual(user.correo, "test@uacj.mx")
         self.assertEqual(user.nombre, "Juan")
@@ -31,10 +31,24 @@ class UsuarioModelTests(TestCase):
         self.assertEqual(user.carrera, "Ingeniería")
         self.assertTrue(user.es_pasajero)
         self.assertFalse(user.es_conductor)
-        self.assertEqual(user.cuenta_activa, 0)  # IntegerField default=0 (no Raite activo)
+        self.assertEqual(user.cuenta_activa, 0)
         self.assertFalse(user.activo)
         self.assertFalse(user.suspendido)
         self.assertEqual(user.calificacion, Decimal("0.00"))
+        self.assertEqual(user.rol, Rol.PASAJERO)
+
+    def test_crear_usuario_rol_default_pasajero(self):
+        user = self.User.objects.create_user(
+            correo="default@uacj.mx",
+            password="password123",
+            nombre="Default",
+            apellidos="Test",
+            edad=20,
+            sexo=Sexo.M,
+            carrera="Ingeniería",
+        )
+        self.assertEqual(user.rol, Rol.PASAJERO)
+        self.assertTrue(user.es_pasajero)
 
     def test_edad_fuera_de_rango_falla(self):
         with self.assertRaises(Exception):
@@ -102,7 +116,7 @@ class UsuarioModelTests(TestCase):
                 carrera="Medicina",
             )
 
-    def test_es_pasajero_es_conductor(self):
+    def test_es_pasajero_es_conductor_es_admin(self):
         user_pasajero = self.User.objects.create_user(
             correo="pasajero@uacj.mx",
             password="password123",
@@ -111,7 +125,7 @@ class UsuarioModelTests(TestCase):
             edad=20,
             sexo=Sexo.F,
             carrera="Ingeniería",
-            roles=[Rol.PASAJERO],
+            rol=Rol.PASAJERO,
         )
         user_conductor = self.User.objects.create_user(
             correo="conductor@uacj.mx",
@@ -121,24 +135,41 @@ class UsuarioModelTests(TestCase):
             edad=22,
             sexo=Sexo.M,
             carrera="Ingeniería",
-            roles=[Rol.CONDUCTOR],
+            rol=Rol.CONDUCTOR,
         )
-        user_ambos = self.User.objects.create_user(
-            correo="ambos@uacj.mx",
+        user_admin = self.User.objects.create_superuser(
+            correo="admin@uacj.mx",
             password="password123",
-            nombre="Ambos",
+            nombre="Admin",
             apellidos="Test",
-            edad=21,
-            sexo=Sexo.X,
+            edad=25,
+            sexo=Sexo.M,
             carrera="Ingeniería",
-            roles=[Rol.PASAJERO, Rol.CONDUCTOR],
         )
         self.assertTrue(user_pasajero.es_pasajero)
         self.assertFalse(user_pasajero.es_conductor)
+        self.assertFalse(user_pasajero.es_admin)
+
         self.assertFalse(user_conductor.es_pasajero)
         self.assertTrue(user_conductor.es_conductor)
-        self.assertTrue(user_ambos.es_pasajero)
-        self.assertTrue(user_ambos.es_conductor)
+        self.assertFalse(user_conductor.es_admin)
+
+        self.assertFalse(user_admin.es_pasajero)
+        self.assertFalse(user_admin.es_conductor)
+        self.assertTrue(user_admin.es_admin)
+
+    def test_no_se_puede_crear_usuario_con_rol_admin_via_create_user(self):
+        with self.assertRaises(ValueError):
+            self.User.objects.create_user(
+                correo="admin_falso@uacj.mx",
+                password="password123",
+                nombre="Admin",
+                apellidos="Falso",
+                edad=25,
+                sexo=Sexo.M,
+                carrera="Ingeniería",
+                rol=Rol.ADMIN,
+            )
 
     def test_nombre_completo(self):
         user = self.User.objects.create_user(
@@ -161,10 +192,10 @@ class UsuarioModelTests(TestCase):
             edad=20,
             sexo=Sexo.F,
             carrera="Ingeniería",
-            roles=[Rol.PASAJERO],
+            rol=Rol.PASAJERO,
         )
         self.assertTrue(user.puede_crear_raite())
-        user.cuenta_activa = 1  # Tiene un Raite activo
+        user.cuenta_activa = 1
         user.save()
         self.assertFalse(user.puede_crear_raite())
         user.cuenta_activa = 0
@@ -181,10 +212,9 @@ class UsuarioModelTests(TestCase):
             edad=22,
             sexo=Sexo.M,
             carrera="Ingeniería",
-            roles=[Rol.CONDUCTOR],
+            rol=Rol.CONDUCTOR,
         )
         self.assertFalse(user.puede_aceptar_raite())
-        # Crear vehículo real (sin PerfilConductor)
         from apps.accounts.models import Vehiculo
         vehiculo = Vehiculo.objects.create(
             usuario=user,
@@ -197,7 +227,7 @@ class UsuarioModelTests(TestCase):
             activo=True,
         )
         self.assertTrue(user.puede_aceptar_raite())
-        user.cuenta_activa = 1  # Tiene un Raite activo
+        user.cuenta_activa = 1
         user.save()
         self.assertFalse(user.puede_aceptar_raite())
 
@@ -218,64 +248,21 @@ class UsuarioModelTests(TestCase):
         user_fail = authenticate(request=None, correo="auth@uacj.mx", password="wrong")
         self.assertIsNone(user_fail)
 
-    # Tests nuevos para C1
-    def test_ambos_es_dos_filas(self):
-        user = self.User.objects.create_user(
-            correo="ambos2@uacj.mx",
+    def test_tiene_rol(self):
+        user_pasajero = self.User.objects.create_user(
+            correo="tiene_rol@uacj.mx",
             password="password123",
-            nombre="Ambos",
-            apellidos="Dos",
-            edad=21,
-            sexo=Sexo.X,
-            carrera="Ingeniería",
-            roles=[Rol.PASAJERO, Rol.CONDUCTOR],
-        )
-        self.assertEqual(user.usuario_roles.count(), 2)
-        self.assertTrue(user.es_pasajero)
-        self.assertTrue(user.es_conductor)
-
-    def test_usuario_rol_es_unico(self):
-        user = self.User.objects.create_user(
-            correo="unico@uacj.mx",
-            password="password123",
-            nombre="Unico",
-            apellidos="Test",
+            nombre="Tiene",
+            apellidos="Rol",
             edad=20,
             sexo=Sexo.M,
             carrera="Ingeniería",
-            roles=[Rol.PASAJERO],
+            rol=Rol.PASAJERO,
         )
-        with self.assertRaises(IntegrityError):
-            from apps.accounts.models import UsuarioRol
-            UsuarioRol.objects.create(usuario=user, rol=Rol.PASAJERO)
+        self.assertTrue(user_pasajero.tiene_rol(Rol.PASAJERO))
+        self.assertFalse(user_pasajero.tiene_rol(Rol.CONDUCTOR))
+        self.assertFalse(user_pasajero.tiene_rol(Rol.ADMIN))
 
-    def test_rol_admin_no_esta_en_el_enum_ambos(self):
-        self.assertFalse(hasattr(Rol, "AMBOS"))
-
-    def test_sexo_es_obligatorio(self):
-        # Sin sexo, el campo es requerido (no default). En SQLite no siempre falla,
-        # pero en PostgreSQL sí. Verificamos que no haya default en el campo.
-        from django.db import connection
-        field = self.User._meta.get_field('sexo')
-        self.assertFalse(field.has_default())
-        # En PostgreSQL esto fallaría con IntegrityError
-        if connection.vendor == 'postgresql':
-            user = self.User(
-                correo="sin_sexo@uacj.mx",
-                password="password123",
-                nombre="Sin",
-                apellidos="Sexo",
-                edad=20,
-                carrera="Ingeniería",
-            )
-            user.set_password("password123")
-            with self.assertRaises(IntegrityError):
-                user.save()
-
-    def test_sexo_no_tiene_prefiere_no_decir(self):
-        self.assertFalse(hasattr(Sexo, "PREFIERE_NO_DECIR"))
-
-    # Tests nuevos para C5
     def test_is_staff_requiere_rol_admin(self):
         user = self.User.objects.create_user(
             correo="staff@uacj.mx",
@@ -285,7 +272,7 @@ class UsuarioModelTests(TestCase):
             edad=20,
             sexo=Sexo.M,
             carrera="Ingeniería",
-            roles=[Rol.PASAJERO],
+            rol=Rol.PASAJERO,
         )
         user.is_staff = True
         with self.assertRaises(ValidationError):
@@ -304,7 +291,7 @@ class UsuarioModelTests(TestCase):
         self.assertTrue(user.is_staff)
         self.assertTrue(user.is_superuser)
         self.assertTrue(user.es_admin)
-        self.assertEqual(user.usuario_roles.filter(rol=Rol.ADMIN).count(), 1)
+        self.assertEqual(user.rol, Rol.ADMIN)
 
     def test_admin_no_deriva_pasajero(self):
         user = self.User.objects.create_superuser(
@@ -316,12 +303,10 @@ class UsuarioModelTests(TestCase):
             sexo=Sexo.M,
             carrera="Ingeniería",
         )
-        roles = [r.rol.lower() for r in user.usuario_roles.all()]
-        self.assertEqual(roles, ["admin"])
+        self.assertEqual(user.rol, Rol.ADMIN)
         self.assertFalse(user.es_pasajero)
         self.assertFalse(user.es_conductor)
 
-    # Tests nuevos para C4
     def test_suspendido_bloquea_crear_y_aceptar(self):
         user = self.User.objects.create_user(
             correo="suspendido@uacj.mx",
@@ -331,9 +316,8 @@ class UsuarioModelTests(TestCase):
             edad=20,
             sexo=Sexo.M,
             carrera="Ingeniería",
-            roles=[Rol.PASAJERO, Rol.CONDUCTOR],
+            rol=Rol.CONDUCTOR,
         )
-        # Set up vehicle for conductor test
         from apps.accounts.models import Vehiculo
         Vehiculo.objects.create(
             usuario=user,
@@ -345,11 +329,9 @@ class UsuarioModelTests(TestCase):
             asientos_disponibles=4,
             activo=True,
         )
-        self.assertTrue(user.puede_crear_raite())
         self.assertTrue(user.puede_aceptar_raite())
         user.suspendido = True
         user.save()
-        self.assertFalse(user.puede_crear_raite())
         self.assertFalse(user.puede_aceptar_raite())
 
     def test_suspendido_permite_login(self):
@@ -361,10 +343,30 @@ class UsuarioModelTests(TestCase):
             edad=20,
             sexo=Sexo.M,
             carrera="Ingeniería",
-            roles=[Rol.PASAJERO],
+            rol=Rol.PASAJERO,
             suspendido=True,
         )
         from django.contrib.auth import authenticate
         user = authenticate(request=None, correo="login@uacj.mx", password="password123")
         self.assertIsNotNone(user)
         self.assertTrue(user.suspendido)
+
+    def test_sexo_es_obligatorio(self):
+        from django.db import connection
+        field = self.User._meta.get_field('sexo')
+        self.assertFalse(field.has_default())
+        if connection.vendor == 'postgresql':
+            user = self.User(
+                correo="sin_sexo@uacj.mx",
+                password="password123",
+                nombre="Sin",
+                apellidos="Sexo",
+                edad=20,
+                carrera="Ingeniería",
+            )
+            user.set_password("password123")
+            with self.assertRaises(IntegrityError):
+                user.save()
+
+    def test_sexo_no_tiene_prefiere_no_decir(self):
+        self.assertFalse(hasattr(Sexo, "PREFIERE_NO_DECIR"))
