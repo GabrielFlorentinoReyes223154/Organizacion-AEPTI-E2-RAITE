@@ -1,10 +1,11 @@
 from django.db import models
 
 
-class Rol(models.TextChoices):
-    PASAJERO = "PASAJERO", "Pasajero"
-    CONDUCTOR = "CONDUCTOR", "Conductor"
-    ADMIN = "ADMIN", "Admin"
+class Rol(models.IntegerChoices):
+    ADMIN = 1, "Admin"
+    PASAJERO = 2, "Pasajero"
+    CONDUCTOR = 3, "Conductor"
+    AMBOS = 4, "Ambos"
 
 
 class TipoVehiculo(models.TextChoices):

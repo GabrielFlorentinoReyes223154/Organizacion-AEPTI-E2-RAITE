@@ -11,19 +11,21 @@ from .models_choices import Rol, Sexo, TipoVehiculo
 
 
 class UsuarioManager(BaseUserManager):
-    def create_user(self, correo, password=None, roles=None, **extra_fields):
+    def create_user(self, correo, password=None, rol=None, **extra_fields):
         if not correo:
             raise ValueError("El correo es obligatorio")
         correo = self.normalize_email(correo)
-        if extra_fields.get("rol"):
+        if extra_fields.get("roles"):
             raise ValueError(
-                "El rol ya no es un campo de Usuario. Usa roles=['PASAJERO', 'CONDUCTOR']."
+                "El parámetro 'roles' ya no se usa. Usa rol=Rol.PASAJERO, rol=Rol.CONDUCTOR o rol=Rol.AMBOS."
             )
-        user = self.model(correo=correo, **extra_fields)
+        if rol is None:
+            rol = Rol.PASAJERO
+        if rol == Rol.ADMIN:
+            raise ValueError("El rol ADMIN no se otorga en el registro público.")
+        user = self.model(correo=correo, rol=rol, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
-        for rol in roles if roles is not None else [Rol.PASAJERO]:
-            UsuarioRol.objects.create(usuario=user, rol=rol)
         return user
 
     def create_superuser(self, correo, password, **extra_fields):
@@ -36,31 +38,15 @@ class UsuarioManager(BaseUserManager):
         if extra_fields.get("is_superuser") is not True:
             raise ValueError("Superuser must have is_superuser=True.")
 
-        user = self.model(correo=self.normalize_email(correo), **extra_fields)
+        user = self.model(correo=self.normalize_email(correo), rol=Rol.ADMIN, **extra_fields)
         user.is_staff = False
         user.is_superuser = False
         user.set_password(password)
         user.save(using=self._db)
-        UsuarioRol.objects.create(usuario=user, rol=Rol.ADMIN)
         user.is_staff = True
         user.is_superuser = True
         user.save(update_fields=["is_staff", "is_superuser"])
         return user
-
-
-class UsuarioRol(models.Model):
-    usuario = models.ForeignKey(
-        "Usuario", on_delete=models.CASCADE, related_name="usuario_roles"
-    )
-    rol = models.CharField(max_length=12, choices=Rol.choices)
-
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(fields=["usuario", "rol"], name="unico_usuario_rol"),
-        ]
-
-    def __str__(self):
-        return f"{self.usuario_id} · {self.rol}"
 
 
 class Usuario(AbstractBaseUser, PermissionsMixin):
@@ -83,6 +69,7 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
         default=Decimal("0.00"),
         validators=[MinValueValidator(Decimal("0.00")), MaxValueValidator(Decimal("5.00"))],
     )
+    rol = models.PositiveSmallIntegerField(choices=Rol.choices, default=Rol.PASAJERO)
     activo = models.BooleanField(default=False)
     """CACHÉ: True = el usuario está OCUPADO en un Raite activo.
     NO significa "cuenta habilitada" (eso es `is_active`). Lo escribe exclusivamente
@@ -127,27 +114,27 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
 
     def save(self, *args, **kwargs):
         if self.is_staff or self.is_superuser:
-            if not UsuarioRol.objects.filter(usuario=self, rol=Rol.ADMIN).exists():
+            if self.rol != Rol.ADMIN:
                 raise ValidationError(
                     "is_staff/is_superuser son exclusivos del rol ADMIN: "
-                    "el usuario debe tener la fila ADMIN en UsuarioRol."
+                    "el usuario debe tener rol=1 (ADMIN)."
                 )
         super().save(*args, **kwargs)
 
-    def tiene_rol(self, rol: str) -> bool:
-        return self.usuario_roles.filter(rol=rol).exists()
+    def tiene_rol(self, rol: int) -> bool:
+        return self.rol == rol
 
     @property
     def es_pasajero(self) -> bool:
-        return self.tiene_rol(Rol.PASAJERO)
+        return self.rol in (Rol.PASAJERO, Rol.AMBOS)
 
     @property
     def es_conductor(self) -> bool:
-        return self.tiene_rol(Rol.CONDUCTOR)
+        return self.rol in (Rol.CONDUCTOR, Rol.AMBOS)
 
     @property
     def es_admin(self) -> bool:
-        return self.tiene_rol(Rol.ADMIN)
+        return self.rol == Rol.ADMIN
 
     @property
     def nombre_completo(self) -> str:
