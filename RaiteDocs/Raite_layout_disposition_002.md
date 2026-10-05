@@ -8,8 +8,8 @@
 | Pantalla | Campos | Notas |
 |----------|--------|-------|
 | **Login** | Correo, Contraseña | Autenticación estándar |
-| **Registro - Paso 1** | Nombre completo, Correo, Contraseña, **Rol(es)** | Usuario elige: **Pasajero**, **Conductor**, o **Ambos** (marca ambos = 2 filas en `UsuarioRol`) |
-| **Registro - Paso 2 (Condicional)** | **Datos del Vehículo** | **Solo si posee el rol `CONDUCTOR`** (directo o vía "Ambos") |
+| **Registro - Paso 1** | Nombre completo, Correo, Contraseña, **Rol** | Usuario elige: **Pasajero** o **Conductor** (rol único) |
+| **Registro - Paso 2 (Condicional)** | **Datos del Vehículo** | **Solo si eligió rol `CONDUCTOR`** |
 
 > **Campos del Vehículo (Paso 2):**
 > - Marca
@@ -50,13 +50,13 @@
 > - **El conductor solo ve los puntos con raites activos**: el mapa nunca muestra el catálogo completo, solo los puntos donde hay alguien esperando
 > - **Entrada**: Recogida = Punto del catálogo (seleccionable), Destino = **CU** (fijo)
 > - **Salida**: Recogida = **CU** (fijo), Destino = Punto del catálogo (seleccionable)
-> - Usuario con ambos roles ve ambas interfaces. El rol elegido se persiste en `Raite.rol_actual` (propiedad del viaje, no del usuario)
+> - Usuario con rol PASAJERO ve interfaz de pasajero; usuario con rol CONDUCTOR ve interfaz de conductor
 > - **El rol `ADMIN` no está disponible en el registro público.** Solo un Admin existente lo otorga
-> - **El rol `ADMIN` es independiente y NO implica `PASAJERO` ni `CONDUCTOR`.** Asignar `ADMIN` no crea filas adicionales en `UsuarioRol`. El perfil administrativo **está exento de poseer `Vehiculo`** y la interfaz de Administración no le exige datos de vehículo
-> - **Si un administrador quiere operar en la plataforma** (pedir raite como pasajero o dar raite como conductor), debe **adquirir ese rol por separado** y, en el caso de `CONDUCTOR`, **completar el Paso 2 de registro (datos del vehículo)**. `ADMIN + PASAJERO` y `ADMIN + CONDUCTOR` son combinaciones válidas, pero **opt-in**, nunca automáticas
+> - **El rol `ADMIN` es independiente y NO implica `PASAJERO` ni `CONDUCTOR`.** Asignar `ADMIN` no cambia el rol del usuario (un usuario tiene un solo rol). El perfil administrativo **está exento de poseer `Vehiculo`** y la interfaz de Administración no le exige datos de vehículo
+> - **Si un administrador quiere operar en la plataforma** (pedir raite como pasajero o dar raite como conductor), debe **cambiar su rol por separado** y, en el caso de `CONDUCTOR`, **completar el Paso 2 de registro (datos del vehículo)**. `ADMIN + PASAJERO` y `ADMIN + CONDUCTOR` son combinaciones válidas, pero **opt-in**, nunca automáticas
 > - **`sexo` es obligatorio y sin opción "prefiere no decir".** Por seguridad de los estudiantes no se permite la opción de no verificar el sexo biológico. El catálogo de `Sexo` no debe incluir `PREFIERE_NO_DECIR` ni valores vacíos
 > - **Suspensión por reincidencia:** `Usuario.suspendido=true` cuando el usuario acumula **`MAX_TICKETS_SUSPENSION = 3` tickets resueltos** en su contra (`TicketRevision.implicado_id`). Mientras está suspendido **no puede crear ni tomar raites**; el login sigue permitido para que vea el aviso y sus viajes históricos. El Admin puede levantar la suspensión. La regla es **simétrica** para pasajero y conductor
-> - **`is_superuser` / `is_staff` son exclusivos del rol `ADMIN`.** Ninguna cuenta que sea **solo** `PASAJERO`, **solo** `CONDUCTOR` o `Ambos` puede tenerlos en `true`; ambas banderas deben permanecer en `false`. El acceso al Panel de Administración y al Django Admin se concede únicamente vía `is_staff`/`is_superuser`, y quien las tenga `true` debe poseer la fila `ADMIN` en `UsuarioRol`
+> - **`is_superuser` / `is_staff` son exclusivos del rol `ADMIN`.** Ninguna cuenta que sea **solo** `PASAJERO`, **solo** `CONDUCTOR` puede tenerlos en `true`; ambas banderas deben permanecer en `false`. El acceso al Panel de Administración y al Django Admin se concede únicamente vía `is_staff`/`is_superuser`, y quien las tenga `true` debe tener `rol=ADMIN`
 > - Perfil de conductor **requiere vehículo válido** (`Vehiculo.es_valido_para_conducir()`) para activar modo "Dar Raite"
 > - **`Usuario.activo` y `Usuario.cuenta_activa` son caché, no fuente de verdad.** `Usuario.activo` significa **"el usuario está ocupado en un Raite activo"**, NO "la cuenta está habilitada". La verdad es el estado de los Raites del usuario (`activo/aceptado/confirmado/en_curso/en_revision/rechazado/finalizado`); **única** estrategia de sincronización: `Raite.sincronizar_cuenta_activa()`, llamada dentro de la misma transacción de cada transición
 > - Nunca editar `activo`/`cuenta_activa` desde la API: se hace dentro de la transacción de la transición que los dispara
@@ -267,11 +267,11 @@ class AppMovil {
 - **No se borra al liberar raites:** no es caché de `Raite`, es una sanción. Solo la limpia el Admin
 - Conteo **derivado** (sin contador almacenado): `tickets_en_contra = COUNT(TicketRevision) WHERE implicado_id = X AND estado = RESUELTO`
 
-**Roles (`UsuarioRol`):**
-- Un usuario tiene **N** filas: `PASAJERO`, `CONDUCTOR`, `ADMIN`
-- **Único** por `(usuario_id, rol)` — no puede haber duplicados
-- **"Ambos" no es un valor almacenado**: es un usuario con filas `PASAJERO` + `CONDUCTOR`
-- Un `ADMIN` **no** requiere `Vehiculo` (exento por diseño). Un `CONDUCTOR` sí: si además es `ADMIN`, el vehículo se exige únicamente por el rol `CONDUCTOR`
+**Roles (`Usuario.rol`):**
+- Un usuario tiene **UN** rol: `PASAJERO` (2), `CONDUCTOR` (3), `ADMIN` (1)
+- Valores enteros: `1=ADMIN`, `2=PASAJERO` (default), `3=CONDUCTOR`
+- **"Ambos" no es un valor almacenado**: en la interfaz se muestra "Ambos" si el usuario cambió de rol (opt-in) o tiene historial en ambos, pero en BD es un solo rol actual
+- Un `ADMIN` **no** requiere `Vehiculo` (exento por diseño). Un `CONDUCTOR` sí requiere vehículo válido
 
 **Perfil de Conductor:**
 - Nombre, Edad, Sexo, Carrera
@@ -399,7 +399,7 @@ Registra **cada vez que un conductor toma un Raite** y qué pasó con esa propue
 
 > **Validación previa (`puede_aceptar_raite()`):**
 > - `no_tiene_raite_en_curso()` → `cuenta_activa == 0` (y lock para evitar carrera)
-> - Posee el rol `CONDUCTOR` en `UsuarioRol`
+> - Posee `rol = CONDUCTOR` (3)
 > - `Vehiculo.es_valido_para_conducir()` → existe, completo y activo
 > - `Vehiculo.tiene_capacidad(Raite.pasajeros_requeridos)` → hay asientos libres
 > - **No** existe un `RaiteIntento` de ese conductor para ese raite con `resultado = RECHAZADO` (misma sesión activa)
@@ -447,7 +447,7 @@ Esta es la **decisión que cierra el acuerdo**. Sin ella el raite no está confi
 
 | Sección | Funcionalidades |
 |---------|-----------------|
-| **Usuarios** | Listar todos / filtrar por rol vía `UsuarioRol` (Pasajero/Conductor/Admin), búsqueda, paginación. Filtro "Ambos" = usuarios con ambas filas. Acciones: **Suspender** (`Usuario.suspendido=true`) y **Levantar suspensión**; columna con `tickets_en_contra` derivado |
+| **Usuarios** | Listar todos / filtrar por rol (`Usuario.rol`: 1=Admin, 2=Pasajero, 3=Conductor), búsqueda, paginación. Acciones: **Suspender** (`Usuario.suspendido=true`) y **Levantar suspensión**; columna con `tickets_en_contra` derivado |
 | **Puntos de Raite** | CRUD del catálogo + filtrar por cadena, zona, `activo`. Alta por sucursal, no solo por cadena |
 | **Raites Pedidos** | Filtrar por fecha, estado, usuario, punto |
 | **Raites Programados** | Igual que anterior + `confirmado=true` (no hay campo `status`: el estado son los bools `activo`/`aceptado`/`confirmado`/`rechazado`/`finalizado`) |
@@ -464,7 +464,7 @@ Esta es la **decisión que cierra el acuerdo**. Sin ella el raite no está confi
 - [x] **Integración Leaflet**: Los puntos son **POIs pre-mapeados** de un catálogo cerrado (10 cadenas), no coordenadas libres. Solo el Admin los da de alta. Ver **MAPAS, GEOCODIFICACIÓN Y RASTREO EN VIVO**
 - [ ] **Cargar catálogo de sucursales**: *seed* de `PuntoMapeado` con `latitud`/`longitud` reales de cada sucursal. **Procedimiento definido** (extracción con Overpass Turbo + script de seed), **pendiente de ejecutar** sobre las 10 cadenas y sus sucursales en Ciudad Juárez
 - [x] **Distinguir sucursales**: `nombre_punto` compuesto (`Soriana - Centro`) built desde `tags.name + tags['addr:street']` de Overpass, para evitar colisiones; queda pendiente un identificador de sucursal propio si se requiere
-- [ ] **Guardias de Autenticación**: Protección de rutas por rol — la fuente es `UsuarioRol` (filas), no un enum. Un admin pasa si posee la fila `ADMIN`; "ambos roles" = tiene `PASAJERO` **y** `CONDUCTOR`
+- [ ] **Guardias de Autenticación**: Protección de rutas por rol — la fuente es `Usuario.rol` (campo entero), no una tabla separada. Un admin pasa si `rol=1`; pasajero si `rol=2`; conductor si `rol=3`
 - [ ] **Django Admin**: Personalizar admin por defecto para modelos de Raite
 - [x] **Diagrama UML**: Generado desde esta especificación (Clases, Estados, Secuencia crear/tomar/responder, Secuencia expiración). Incluye `GestorUbicacionLive` y `AppMovil` para el rastreo GPS
 - [ ] **Sincronía de flags**: `Usuario.activo`/`cuenta_activa` son caché derivada de los Raites activos del usuario. Única estrategia: `Raite.sincronizar_cuenta_activa()` dentro de la misma transacción de cada una de las **6 operaciones de dominio** (`crear`, `aceptar`, `responder`, `expirar_si_pasado_hora`, `finalizar`, `marcar_en_revision`); nunca SQL directo ni una operación propia de `Usuario`. Garantizar el **índice único parcial o lock pesimista** que impide dos raites concurrentes con `no_tiene_raite_en_curso()`
@@ -505,9 +505,9 @@ Esta es la **decisión que cierra el acuerdo**. Sin ella el raite no está confi
 skinparam classAttributeIconSize 0
 
 enum Rol {
-  PASAJERO
-  CONDUCTOR
-  ADMIN
+  ADMIN = 1
+  PASAJERO = 2
+  CONDUCTOR = 3
 }
 
 enum TipoViaje {
@@ -546,20 +546,24 @@ class Usuario {
   + sexo: String
   + carrera: String
   + calificacion: Float (1-5)
-  + activo: Boolean  -- CACHA: esta ocupado en un Raite activo (NO es "cuenta habilitada")
-  + cuenta_activa: Integer  -- CACHA: nº de Raites activos; hoy 0 o 1 (restriccion de negocio), Integer por extensibilidad
-  + suspendido: Boolean  -- SANCION: cuenta penalizada (3 tickets resueltos en contra o accion del Admin)
+  + rol: Rol  -- 1=ADMIN, 2=PASAJERO, 3=CONDUCTOR (default=2). Un usuario tiene UN solo rol.
+  + activo: Boolean  -- CACHÉ: está ocupado en un Raite activo (NO es "cuenta habilitada")
+  + cuenta_activa: Integer  -- CACHÉ: nº de Raites activos; hoy 0 o 1 (restricción de negocio), Integer por extensibilidad
+  + suspendido: Boolean  -- SANCIÓN: cuenta penalizada (3 tickets resueltos en contra o acción del Admin)
+  + is_staff: Boolean  -- exclusivo de rol ADMIN
+  + is_superuser: Boolean  -- exclusivo de rol ADMIN
+  + is_active: Boolean  -- habilitación de cuenta (login permitido aunque suspendido)
+  + last_login: DateTime
+  + date_joined: DateTime
   + created_at: DateTime
   + updated_at: DateTime
   + puede_crear_raite(): Boolean
   + puede_aceptar_raite(): Boolean
   + no_tiene_raite_en_curso(): Boolean
-}
-
-class UsuarioRol {
-  + id: UUID
-  + usuario_id: UUID (FK)
-  + rol: Rol
+  + tiene_rol(rol: Rol): Boolean
+  + es_pasajero(): Boolean
+  + es_conductor(): Boolean
+  + es_admin(): Boolean
 }
 
 class Vehiculo {
@@ -688,7 +692,6 @@ class AppMovil <<Client>> {
 }
 
 Usuario "1" -- "0..1" Vehiculo : requiere_para_conducir >
-Usuario "1" -- "*" UsuarioRol : posee >
 Usuario "1" -- "*" Raite : como_pasajero >
 Usuario "1" -- "0..*" Raite : como_conductor >
 Usuario "1" -- "0..*" RaiteIntento : tomo_como_conductor >
@@ -710,13 +713,11 @@ AppMovil --> Raite : opera >
 AppMovil --> Usuario : autentica >
 
 note right of Rol
-  Un usuario con PASAJERO y CONDUCTOR
-  (dos filas en UsuarioRol) es "AMBOS"
-  en la interfaz. No es un valor del enum.
-end note
-
-note right of UsuarioRol
-  Unico: (usuario_id, rol)
+  Rol es IntegerChoices: 1=ADMIN, 2=PASAJERO, 3=CONDUCTOR.
+  Un usuario tiene UN solo rol (campo rol en Usuario).
+  "AMBOS" en la interfaz = usuario con rol PASAJERO
+  que obtiene rol CONDUCTOR por separado (opt-in),
+  o viceversa. No es un valor del enum.
 end note
 
 note right of Usuario::activo
