@@ -242,16 +242,10 @@ const isPasswordValid = (val: string) => val.length >= 8 || 'Contraseña debe te
 const onSubmit = async () => {
   if (!formRef.value) return;
   const form = formRef.value as unknown as { validate: () => boolean; reset: () => void };
-  console.log('Form validation...');
-  if (!form.validate()) {
-    console.log('Form validation failed');
-    return;
-  }
-  console.log('Form validation passed');
+  if (!form.validate()) return;
 
   loading.value = true;
   try {
-    console.log('Calling authStore.register...');
     await authStore.register({
       nombre: nombre.value,
       apellidos: apellidos.value,
@@ -262,21 +256,14 @@ const onSubmit = async () => {
       carrera: carrera.value,
       rol: rol.value!,
     });
-    console.log('Register successful');
     form.reset();
     Notify.create({ type: 'positive', message: 'Cuenta creada satisfactoriamente', position: 'top' });
     await new Promise(r => setTimeout(r, 500));
-    console.log('Redirecting to /login/LoginPage...');
     try {
       await Router.replace({ path: '/login/LoginPage' });
-      console.log('Router.replace succeeded');
-    } catch (navError) {
-      console.error('Router.replace failed:', navError);
-      // Fallback: use window.location
-      console.log('Using window.location fallback...');
+    } catch {
       window.location.href = '/#/login/LoginPage';
     }
-    console.log('Current route after redirect:', Router.currentRoute.value.fullPath);
   } catch (error: unknown) {
     console.error('Error in onSubmit:', error);
     const err = error as { response?: { data?: { detail?: string } }; message?: string };
