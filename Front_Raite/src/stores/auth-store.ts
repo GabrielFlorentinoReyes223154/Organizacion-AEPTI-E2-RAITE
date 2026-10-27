@@ -1,5 +1,4 @@
 import { defineStore } from 'pinia';
-import { ref } from 'vue';
 import { api } from '@/boot/axios';
 import { Router } from '@/router';
 
@@ -18,7 +17,7 @@ export const useAuthStore = defineStore('auth', {
     refreshToken: localStorage.getItem('refresh_token') || null,
     user: null as User | null,
     // Role selection modal state (for rol=4 AMBOS)
-    roleSelectionModal: ref(false),
+    roleSelectionModal: false,
     roleSelectionResolve: null as ((role: 'pasajero' | 'conductor') => void) | null,
   }),
 

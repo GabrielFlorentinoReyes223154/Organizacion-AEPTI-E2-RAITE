@@ -74,12 +74,18 @@
         </q-card-section>
       </q-card>
     </div>
+
+    <RoleSelectionModal
+      v-model="authStore.roleSelectionModal"
+      @select="authStore.onRoleSelected"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useAuthStore } from '@/stores/auth-store';
+import RoleSelectionModal from '@/components/RoleSelectionModal.vue';
 import { Notify } from 'quasar';
 import isEmail from 'validator/lib/isEmail';
 
