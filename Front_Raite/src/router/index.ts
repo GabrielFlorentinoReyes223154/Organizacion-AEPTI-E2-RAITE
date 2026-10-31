@@ -32,15 +32,27 @@ const Router = createRouter({
 // Global auth guard
 Router.beforeEach((to) => {
   const authStore = useAuthStore();
-  const publicPaths = ['/login', '/login/signuppage'];
+  const publicPaths = ['/login', '/login/SignUpPage'];
   const requiresAuth = !publicPaths.some((p) => to.path.startsWith(p));
 
   if (requiresAuth && !authStore.isAuthenticated) {
-    return { path: '/login/loginpage' };
+    return { path: '/login/LoginPage' };
   }
 
   if (to.path.startsWith('/login') && authStore.isAuthenticated) {
-    return { path: '/' };
+    return { path: '/home' };
+  }
+
+  if (to.path === '/') {
+    return authStore.isAuthenticated ? { path: '/home' } : { path: '/login/LoginPage' };
+  }
+
+  // Role-based access control for home pages
+  if (to.path === '/home-pasajero' && !authStore.isPasajero) {
+    return { path: '/home-conductor' };
+  }
+  if (to.path === '/home-conductor' && !authStore.isConductor) {
+    return { path: '/home-pasajero' };
   }
 });
 

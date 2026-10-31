@@ -7,7 +7,8 @@ interface User {
   correo: string;
   nombre: string;
   apellidos: string;
-  roles: string[];
+  rol: number;
+  rol_display: string;
 }
 
 export const useAuthStore = defineStore('auth', {
@@ -15,14 +16,18 @@ export const useAuthStore = defineStore('auth', {
     accessToken: localStorage.getItem('access_token') || null,
     refreshToken: localStorage.getItem('refresh_token') || null,
     user: null as User | null,
+    // Role selection modal state (for rol=4 AMBOS)
+    roleSelectionModal: false,
+    roleSelectionResolve: null as ((role: 'pasajero' | 'conductor') => void) | null,
+    activeRole: null as 'pasajero' | 'conductor' | null,
   }),
 
   getters: {
     isAuthenticated: (state) => !!state.accessToken,
     authHeader: (state) => (state.accessToken ? `Bearer ${state.accessToken}` : ''),
-    isAdmin: (state) => state.user?.roles.includes('admin') ?? false,
-    isConductor: (state) => state.user?.roles.includes('conductor') ?? false,
-    isPasajero: (state) => state.user?.roles.includes('pasajero') ?? false,
+    isAdmin: (state) => state.user?.rol === 1,
+    isConductor: (state) => state.user?.rol === 3 || state.user?.rol === 4,
+    isPasajero: (state) => state.user?.rol === 2 || state.user?.rol === 4,
   },
 
   actions: {
@@ -30,7 +35,7 @@ export const useAuthStore = defineStore('auth', {
       const { data } = await api.post('/api/auth/token/', credentials);
       this.setTokens(data.access, data.refresh);
       await this.fetchUser();
-      await Router.push('/second');
+      await Router.push('/home');
     },
 
     async logout() {
@@ -42,7 +47,7 @@ export const useAuthStore = defineStore('auth', {
         }
       }
       this.clearTokens();
-      await Router.push('/login/loginpage');
+      await Router.push('/login/LoginPage');
     },
 
     async register(data: {
@@ -53,11 +58,9 @@ export const useAuthStore = defineStore('auth', {
       edad: number;
       sexo: string;
       carrera: string;
-      roles: string[];
+      rol: number;
     }) {
       const { data: response } = await api.post('/api/auth/register/', data);
-      // Registration returns: id, roles, suspendido, requiere_vehiculo
-      // If requiere_vehiculo is true, user needs to register vehicle
       return response;
     },
 
@@ -82,6 +85,7 @@ export const useAuthStore = defineStore('auth', {
 
     clearTokens() {
       this.accessToken = this.refreshToken = this.user = null;
+      this.activeRole = null;
       localStorage.removeItem('access_token');
       localStorage.removeItem('refresh_token');
       delete api.defaults.headers.common.Authorization;
@@ -100,6 +104,24 @@ export const useAuthStore = defineStore('auth', {
             this.clearTokens();
           }
         }
+      }
+    },
+
+    // Show role selection modal for users with rol=4 (AMBOS)
+    showRoleSelectionModal(): Promise<'pasajero' | 'conductor'> {
+      this.roleSelectionModal = true;
+      return new Promise((resolve) => {
+        this.roleSelectionResolve = resolve;
+      });
+    },
+
+    // Called from RoleSelectionModal when user selects a role
+    onRoleSelected(role: 'pasajero' | 'conductor') {
+      this.activeRole = role;
+      this.roleSelectionModal = false;
+      if (this.roleSelectionResolve) {
+        this.roleSelectionResolve(role);
+        this.roleSelectionResolve = null;
       }
     },
   },

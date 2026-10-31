@@ -21,7 +21,7 @@ class MeView(APIView):
 
 
 class RegistroView(APIView):
-    """Paso 1: Crea usuario y roles. Si tiene CONDUCTOR, devuelve requiere_vehiculo=True."""
+    """Paso 1: Crea usuario y rol. Si tiene CONDUCTOR, devuelve requiere_vehiculo=True."""
 
     def post(self, request):
         serializer = RegistroSerializer(data=request.data)
@@ -32,7 +32,8 @@ class RegistroView(APIView):
         response_serializer = RegistroResponseSerializer(
             {
                 "id": user.id,
-                "roles": [r.rol.lower() for r in user.usuario_roles.all()],
+                "rol": user.rol,
+                "rol_display": user.get_rol_display(),
                 "suspendido": user.suspendido,
                 "requiere_vehiculo": requiere_vehiculo,
             }

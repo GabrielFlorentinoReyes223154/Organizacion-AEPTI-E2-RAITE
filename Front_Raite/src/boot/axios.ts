@@ -24,8 +24,11 @@ api.interceptors.response.use(
   async (error: AxiosError) => {
     const authStore = useAuthStore();
     const originalRequest = error.config as RetryableRequestConfig;
+    const isAuthRequest = ['/api/auth/token/', '/api/auth/register/'].some((path) =>
+      originalRequest.url?.includes(path),
+    );
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    if (error.response?.status === 401 && !originalRequest._retry && !isAuthRequest) {
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
           failedQueue.push((token) => {

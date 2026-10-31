@@ -3,7 +3,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User as AuthUser
 
-from .models import Usuario, UsuarioRol
+from .models import Usuario
 
 try:
     admin.site.unregister(AuthUser)
@@ -19,7 +19,7 @@ class UsuarioCreationForm(forms.ModelForm):
 
     class Meta:
         model = Usuario
-        fields = ("correo", "nombre", "apellidos", "edad", "sexo", "carrera")
+        fields = ("correo", "nombre", "apellidos", "edad", "sexo", "carrera", "rol")
 
     def clean_password2(self):
         password1 = self.cleaned_data.get("password1")
@@ -42,23 +42,17 @@ class UsuarioChangeForm(forms.ModelForm):
         fields = "__all__"
 
 
-class UsuarioRolInline(admin.TabularInline):
-    model = UsuarioRol
-    extra = 1
-
-
 @admin.register(Usuario)
 class UsuarioAdmin(BaseUserAdmin):
     form = UsuarioChangeForm
     add_form = UsuarioCreationForm
     add_form_template = "admin/auth/user/add_form.html"
-    inlines = [UsuarioRolInline]
 
     fieldsets = (
         (None, {"fields": ("correo", "password")}),
         (
             "Datos personales",
-            {"fields": ("nombre", "apellidos", "edad", "sexo", "carrera")},
+            {"fields": ("nombre", "apellidos", "edad", "sexo", "carrera", "rol")},
         ),
         (
             "Estado en Raite",
@@ -97,6 +91,10 @@ class UsuarioAdmin(BaseUserAdmin):
                     "correo",
                     "nombre",
                     "apellidos",
+                    "edad",
+                    "sexo",
+                    "carrera",
+                    "rol",
                     "password1",
                     "password2",
                 ),
@@ -108,6 +106,7 @@ class UsuarioAdmin(BaseUserAdmin):
         "correo",
         "nombre",
         "apellidos",
+        "rol",
         "calificacion",
         "activo",
         "cuenta_activa",
@@ -115,6 +114,7 @@ class UsuarioAdmin(BaseUserAdmin):
         "is_staff",
     )
     list_filter = (
+        "rol",
         "sexo",
         "activo",
         "cuenta_activa",
@@ -134,10 +134,3 @@ class UsuarioAdmin(BaseUserAdmin):
         "activo",
         "cuenta_activa",
     )
-
-
-@admin.register(UsuarioRol)
-class UsuarioRolAdmin(admin.ModelAdmin):
-    list_display = ("usuario", "rol")
-    list_filter = ("rol",)
-    search_fields = ("usuario__correo", "usuario__nombre", "usuario__apellidos")

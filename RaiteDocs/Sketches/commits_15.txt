@@ -1,0 +1,161 @@
+# ============================================================
+# 15 COMMITS: Backend C1-C10 + Front 5 tareas
+# Copia y pega cada bloque EN ORDEN
+# ============================================================
+
+# -----------------------------------------------------------------
+# COMMIT 1 - C1: Roles -> UsuarioRol, ADMIN real
+# -----------------------------------------------------------------
+git add Back_Raite/apps/accounts/models_choices.py Back_Raite/apps/accounts/models.py Back_Raite/apps/accounts/migrations/0007_remove_usuario_rol_usuariorol.py
+git commit -m "C1: Roles -> tabla UsuarioRol; elimina AMBOS; añade ADMIN real
+- models_choices.py: Rol {PASAJERO, CONDUCTOR, ADMIN}, TipoVehiculo
+- models.py: UsuarioRol (FK Usuario, unique usuario+rol), elimina Usuario.rol
+- UsuarioManager.create_user usa roles=[]; create_superuser crea ADMIN + is_staff
+- Propiedades es_pasajero/es_conductor/es_admin consultan UsuarioRol
+- Migración 0007: CreateModel UsuarioRol + RunPython migra AMBOS->2 filas"
+
+# -----------------------------------------------------------------
+# COMMIT 2 - C2: sexo obligatorio, sin PREFIERE_NO_DECIR
+# -----------------------------------------------------------------
+git add Back_Raite/apps/accounts/models_choices.py Back_Raite/apps/accounts/models.py Back_Raite/apps/accounts/migrations/0005_alter_usuario_sexo.py
+git commit -m "C2: sexo obligatorio (M/F/X), elimina PREFIERE_NO_DECIR
+- models_choices.py: Sexo {M, F, X} sin PREFIERE_NO_DECIR
+- models.py: sexo CharField sin default (requerido)
+- Migración 0005: RunPython convierte PREFIERE_NO_DECIR -> X"
+
+# -----------------------------------------------------------------
+# COMMIT 3 - C3: activo (bool caché) + cuenta_activa (int 0..1)
+# -----------------------------------------------------------------
+git add Back_Raite/apps/accounts/models.py Back_Raite/apps/accounts/migrations/0009_usuario_activo_alter_usuario_cuenta_activa.py
+git commit -m "C3: activo (bool, default=False) + cuenta_activa (PositiveSmallInteger, default=0)
+- activo: caché 'usuario ocupado en Raite activo' (NO = cuenta habilitada)
+- cuenta_activa: nº de Raites activos (invariante 0..1), Integer no Boolean
+- Migración 0009: AddField activo + RunPython True->1/False->0 + AlterField"
+
+# -----------------------------------------------------------------
+# COMMIT 4 - C4: suspendido (sanción) reemplaza verificado
+# -----------------------------------------------------------------
+git add Back_Raite/apps/accounts/models.py Back_Raite/apps/accounts/migrations/0008_remove_usuario_verificado_usuario_suspendido.py
+git commit -m "C4: suspendido (bool, default=False) reemplaza verificado
+- suspendido: sanción (3 tickets RESUELTOS), bloquea crear/aceptar, login OK
+- Elimina verificado (no está en 002.md)
+- puede_crear_raite/puede_aceptar_raite usan suspendido
+- Migración 0008: AddField suspendido + check verificado count + RemoveField verificado"
+
+# -----------------------------------------------------------------
+# COMMIT 5 - C5: ADMIN real, guardias is_staff/is_superuser
+# -----------------------------------------------------------------
+git add Back_Raite/apps/accounts/models.py Back_Raite/apps/accounts/permissions.py Back_Raite/apps/accounts/serializers.py
+git commit -m "C5: ADMIN rol real, independiente de is_staff/is_superuser
+- Usuario.save(): ValidationError si is_staff/is_superuser sin fila ADMIN
+- create_superuser: crea fila ADMIN -> luego setea is_staff/is_superuser=True
+- IsAdmin permission usa request.user.es_admin (rol), no is_staff
+- UsuarioSerializer.get_roles lee UsuarioRol (['admin'] sin derivar pasajero)"
+
+# -----------------------------------------------------------------
+# COMMIT 6 - C6: Vehiculo métodos + elimina PerfilConductor
+# -----------------------------------------------------------------
+git add Back_Raite/apps/accounts/models.py Back_Raite/apps/accounts/migrations/0010_alter_vehiculo_tipo_delete_perfilconductor.py Back_Raite/apps/accounts/signals.py Back_Raite/apps/accounts/views.py
+git commit -m "C6: Vehiculo.es_valido_para_conducir()/tiene_capacidad(); elimina PerfilConductor
+- Vehiculo: es_valido_para_conducir() -> self.activo; tiene_capacidad(n) -> asientos >= n
+- Usuario.vehiculo_valido usa hasattr(self, 'vehiculo')
+- Elimina PerfilConductor, signals crear_perfil_conductor/actualizar_vehiculo_valido
+- VehiculoRegistroView ya no actualiza PerfilConductor
+- Migración 0010: AlterField tipo -> TipoVehiculo.choices + DeleteModel PerfilConductor"
+
+# -----------------------------------------------------------------
+# COMMIT 7 - C7: no_tiene_raite_en_curso() + elimina en_viaje
+# -----------------------------------------------------------------
+git add Back_Raite/apps/accounts/models.py
+git commit -m "C7: no_tiene_raite_en_curso() lee cuenta_activa==0; elimina en_viaje
+- no_tiene_raite_en_curso(): return self.cuenta_activa == 0 (invariante 0..1)
+- Documenta que carrera se resuelve en Raite.crear/aceptar (fase 3)
+- Elimina property en_viaje (consultaba rides inexistente)"
+
+# -----------------------------------------------------------------
+# COMMIT 8 - C8: Limpieza código muerto
+# -----------------------------------------------------------------
+git add Back_Raite/apps/accounts/serializers.py Back_Raite/apps/accounts/admin.py Back_Raite/Raite_DjangoRest/settings.py
+git rm Back_Raite/apps/accounts/urls.py 2>/dev/null || true
+git commit -m "C8: Limpieza código muerto
+- serializers: elimina pass en validate_placas; usa VehiculoRegistroResponseSerializer; elimina VehiculoSerializer (PerfilConductor)
+- admin: readonly_fields incluye activo/cuenta_activa/suspendido; elimina verificado
+- settings: comentario sobre USERNAME_FIELD=correo (no EmailBackend)
+- Elimina urls.py (duplicado, no usado)"
+
+# -----------------------------------------------------------------
+# COMMIT 9 - C9: calificacion 0.00-5.00
+# -----------------------------------------------------------------
+git add Back_Raite/apps/accounts/models.py Back_Raite/apps/accounts/migrations/0006_alter_usuario_calificacion.py
+git commit -m "C9: calificacion acotada 0.00-5.00 con validators
+- DecimalField max_digits=3, decimal_places=2, Min/MaxValueValidator(0.00, 5.00)
+- Default 0.00 (usuario sin calificar), no 1-5
+- Migración 0006: RunPython normaliza >5.00->5.00, <0->0"
+
+# -----------------------------------------------------------------
+# COMMIT 10 - C10: Registro roles[] + tests
+# -----------------------------------------------------------------
+git add Back_Raite/apps/accounts/serializers.py Back_Raite/apps/accounts/views.py Back_Raite/apps/accounts/tests/test_models.py Back_Raite/apps/accounts/tests/test_auth_api.py
+git commit -m "C10: Registro roles[] (máx 2, sin ADMIN) + tests actualizados (29 passing)
+- RegistroSerializer: roles=ListField(PASAJERO/CONDUCTOR), validate_roles (no dup, no ADMIN)
+- RegistroView: usa RegistroResponseSerializer (roles[], suspendido, requiere_vehiculo)
+- Tests: 29 passing (era 17), cubren C1-C10"
+
+# -----------------------------------------------------------------
+# COMMIT 11 - FRONT 1: MainLayout global + user menu
+# -----------------------------------------------------------------
+git add Front_Raite/src/layouts/MainLayout.vue
+git commit -m "FRONT 1: MainLayout.vue global (header, drawer, user menu)
+- Header: logo Raite, menu btn, user menu (person icon) con dropdown
+- Dropdown: Info (/info -> 404) + Cerrar sesión (authStore.logout)
+- Left drawer: EssentialLinks navegación
+- q-page-container con <router-view /> para contenido dinámico"
+
+# -----------------------------------------------------------------
+# COMMIT 12 - FRONT 2: LoginPage show/hide password
+# -----------------------------------------------------------------
+git add Front_Raite/src/pages/login/LoginPage.vue
+git commit -m "FRONT 2: LoginPage - show/hide password toggle
+- Añade showPassword ref
+- Input type alterna text/password
+- Append icon visibility/visibility_off clickeable alterna showPassword"
+
+# -----------------------------------------------------------------
+# COMMIT 13 - FRONT 3: SignUpPage campos C10
+# -----------------------------------------------------------------
+git add Front_Raite/src/pages/login/SignUpPage.vue
+git commit -m "FRONT 3: SignUpPage - campos C10 (nombre, apellidos, edad, sexo, carrera, roles[])
+- Separados nombre + apellidos
+- edad (number, 17-70), sexo (select M/F/X), carrera (text)
+- roles: q-select multiple chips (PASAJERO/CONDUCTOR, max 2, no ADMIN)
+- Validación password >= 8 chars (match backend)
+- onSubmit llama authStore.register() y redirige a /second
+- Fix typo :disble -> :disable"
+
+# -----------------------------------------------------------------
+# COMMIT 14 - FRONT 4: auth-store register + redirects
+# -----------------------------------------------------------------
+git add Front_Raite/src/stores/auth-store.ts Front_Raite/src/router/index.ts
+git commit -m "FRONT 4: auth-store register() + redirects login/logout
+- register(): POST /api/auth/register/ con payload C10
+- login(): redirect a /second (index/second.vue) tras fetchUser()
+- logout(): clear tokens + redirect a /login/loginpage
+- router guards mantienen auth en rutas privadas"
+
+# -----------------------------------------------------------------
+# COMMIT 15 - FRONT 5: Pages usan MainLayout + docs/configs
+# -----------------------------------------------------------------
+git add Front_Raite/src/pages/index.vue Front_Raite/src/pages/index/second.vue
+git add RaiteDocs/first_correction_phase2.md RaiteDocs/Raite_layout_disposition_002.md Back_Raite/Raite_DjangoRest/settings.py Back_Raite/Raite_DjangoRest/urls.py Front_Raite/.gitignore Front_Raite/.editorconfig Front_Raite/pnpm-workspace.yaml README.md
+git commit -m "FRONT 5: Pages usan MainLayout + docs/configs
+- index.vue + second.vue envueltos en <MainLayout>
+- 002.md: marca tareas completadas en NOTAS TÉCNICAS
+- first_correction_phase2.md: registra decisiones C1-C10
+- settings.py: comment USERNAME_FIELD=correo (no EmailBackend)
+- Frontend configs actualizadas (.gitignore, .editorconfig, pnpm-workspace.yaml)
+- README.md actualizado"
+
+# -----------------------------------------------------------------
+# PUSH FINAL
+# -----------------------------------------------------------------
+git push origin Front-Implementation

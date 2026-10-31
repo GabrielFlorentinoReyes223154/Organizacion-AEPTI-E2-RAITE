@@ -1,0 +1,52 @@
+# ============================================================
+# COMANDOS PARA APLICAR TODOS LOS CAMBIOS (Fase 1-2 + Front)
+# ============================================================
+# Copia y pega EN ORDEN en tu terminal
+# ============================================================
+
+# 1. Ver estado actual
+git status
+
+# 2. Agregar TODOS los cambios (backend + front + docs)
+git add -A
+
+# 3. Ver qué se va a commitear
+git status
+
+# 4. Commit único con todos los cambios
+git commit -m "
+Fase 1-2: Corrección completa apps/accounts + Front global layout
+
+Backend (C1-C10):
+- C1: Roles -> tabla UsuarioRol (sin AMBOS almacenado); ADMIN real
+- C2: sexo obligatorio (M/F/X), sin PREFIERE_NO_DECIR
+- C3: activo (bool caché=ocupado) + cuenta_activa (int 0..1)
+- C4: suspendido (sanción) reemplaza verificado
+- C5: ADMIN rol real, independiente de is_staff/is_superuser
+- C6: Vehiculo.es_valido_para_conducir()/tiene_capacidad(); elimina PerfilConductor
+- C7: no_tiene_raite_en_curso() lee caché; elimina en_viaje legacy
+- C8: Limpieza dead code (urls.py, serializers pass, signals vacíos)
+- C9: calificacion acotada 0.00-5.00 con validators
+- C10: Registro contrato roles[] (máx 2, sin ADMIN), requiere_vehiculo
+
+Front:
+- MainLayout.vue global (header, drawer, user menu con logout)
+- LoginPage: show/hide password toggle
+- SignUpPage: campos C10 (nombre/apellidos, edad, sexo, carrera, roles[])
+- auth-store: register(), logout redirect, login redirect a /second
+- index.vue + second.vue usan MainLayout
+
+Tests: 29 passing (era 17)
+Migraciones: 10 aplicadas (0001-0010)
+"
+
+# 5. Push a tu rama
+git push origin Front-Implementation
+
+# ============================================================
+# NOTAS:
+# - Si quieres commits separados por corrección (C1, C2, etc.),
+#   haz git add -p y commit incremental
+# - El backend requiere BD PostgreSQL con migraciones 0001-0010
+# - Front: npm install && npm run dev (puerto 9000)
+# ============================================================

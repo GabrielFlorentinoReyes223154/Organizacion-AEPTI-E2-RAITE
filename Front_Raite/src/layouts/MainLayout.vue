@@ -40,6 +40,12 @@
     <q-page-container>
       <router-view />
     </q-page-container>
+
+    <!-- Role Selection Modal for users with rol=4 (AMBOS) -->
+    <RoleSelectionModal
+      v-model="authStore.roleSelectionModal"
+      @select="authStore.onRoleSelected"
+    />
   </q-layout>
 </template>
 
@@ -47,6 +53,7 @@
 import { ref } from 'vue';
 import { useAuthStore } from '@/stores/auth-store';
 import EssentialLink, { type EssentialLinkProps } from '@/components/EssentialLink.vue';
+import RoleSelectionModal from '@/components/RoleSelectionModal.vue';
 
 const authStore = useAuthStore();
 
@@ -55,13 +62,13 @@ const linksList: EssentialLinkProps[] = [
     label: 'Iniciar sesión',
     caption: 'quasar.dev',
     icon: 'person',
-    link: '/#/login/loginpage',
+    link: '/login/LoginPage',
   },
   {
     label: 'Crear cuenta',
     caption: 'github.com/quasarframework',
     icon: 'add',
-    link: '/#/login/signuppage',
+    link: '/login/SignUpPage',
   },
   {
     label: 'Segunda página',

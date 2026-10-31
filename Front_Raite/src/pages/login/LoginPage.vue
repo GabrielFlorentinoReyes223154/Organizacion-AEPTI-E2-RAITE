@@ -47,39 +47,45 @@
             </q-input>
 
             <div class="row q-mb-md">
-              <q-checkbox v-model="rememberMeCheckbox" label="Recordarme" class="q-mt-mx col" />
-
-              <q-btn
-                label="¿No tienes una cuenta?"
-                flat
-                to="/login/signuppage"
-                class="q-mt-mx col"
-                no-caps
-              />
+              <q-checkbox v-model="rememberMeCheckbox" label="Recordarme" class="q-mt-mx" />
             </div>
 
-            <div class="row q-gutter-sm">
-              <q-btn
-                label="Iniciar sesión"
-                type="submit"
-                class="full-width col-3 q-mb-md"
-                color="primary"
-                :loading="loading"
-                :disable="loading"
-              />
+            <q-btn
+              label="Iniciar sesión"
+              type="submit"
+              class="full-width q-mb-md"
+              color="primary"
+              :loading="loading"
+              :disable="loading"
+            />
 
-              <q-btn label="¿Olvidaste tu contraseña?" class="full-width col-3" color="primary" />
+            <q-btn label="¿Olvidaste tu contraseña?" class="full-width q-mb-md" color="primary" flat no-caps />
+
+            <div class="text-center q-mt-md">
+              <q-btn
+                label="¿No tienes una cuenta? Regístrate"
+                flat
+                to="/login/SignUpPage"
+                no-caps
+                color="primary"
+              />
             </div>
           </q-form>
         </q-card-section>
       </q-card>
     </div>
+
+    <RoleSelectionModal
+      v-model="authStore.roleSelectionModal"
+      @select="authStore.onRoleSelected"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useAuthStore } from '@/stores/auth-store';
+import RoleSelectionModal from '@/components/RoleSelectionModal.vue';
 import { Notify } from 'quasar';
 import isEmail from 'validator/lib/isEmail';
 
