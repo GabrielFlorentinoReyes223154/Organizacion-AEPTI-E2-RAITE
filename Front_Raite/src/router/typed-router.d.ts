@@ -60,6 +60,13 @@ declare module 'vue-router/auto-routes' {
       { path: ParamValue<false> },
       | never
     >,
+    '/home': RouteRecordInfo<
+      '/home',
+      '/home',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
     '/home-conductor': RouteRecordInfo<
       '/home-conductor',
       '/home-conductor',
@@ -148,6 +155,14 @@ declare module 'vue-router/auto-routes' {
         | never
       pathParamNames:
         | 'path'
+    }
+    'src/pages/home.vue': {
+      routes:
+        | '/home'
+      views:
+        | never
+      pathParamNames:
+        | never
     }
     'src/pages/home-conductor.vue': {
       routes:

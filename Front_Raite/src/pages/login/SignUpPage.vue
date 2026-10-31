@@ -262,7 +262,7 @@ const onSubmit = async () => {
     try {
       await Router.replace({ path: '/login/LoginPage' });
     } catch {
-      window.location.href = '/#/login/LoginPage';
+      window.location.href = '/login/LoginPage';
     }
   } catch (error: unknown) {
     console.error('Error in onSubmit:', error);

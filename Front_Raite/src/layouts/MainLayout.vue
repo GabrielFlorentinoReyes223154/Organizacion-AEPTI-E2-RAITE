@@ -62,13 +62,13 @@ const linksList: EssentialLinkProps[] = [
     label: 'Iniciar sesión',
     caption: 'quasar.dev',
     icon: 'person',
-    link: '/#/login/LoginPage',
+    link: '/login/LoginPage',
   },
   {
     label: 'Crear cuenta',
     caption: 'github.com/quasarframework',
     icon: 'add',
-    link: '/#/login/SignUpPage',
+    link: '/login/SignUpPage',
   },
   {
     label: 'Segunda página',

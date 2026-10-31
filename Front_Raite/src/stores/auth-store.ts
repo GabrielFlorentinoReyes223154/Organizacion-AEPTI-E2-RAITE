@@ -19,6 +19,7 @@ export const useAuthStore = defineStore('auth', {
     // Role selection modal state (for rol=4 AMBOS)
     roleSelectionModal: false,
     roleSelectionResolve: null as ((role: 'pasajero' | 'conductor') => void) | null,
+    activeRole: null as 'pasajero' | 'conductor' | null,
   }),
 
   getters: {
@@ -34,24 +35,7 @@ export const useAuthStore = defineStore('auth', {
       const { data } = await api.post('/api/auth/token/', credentials);
       this.setTokens(data.access, data.refresh);
       await this.fetchUser();
-
-      // Redirect based on role
-      const role = this.user?.rol;
-      switch (role) {
-        case 2: // PASAJERO
-          await Router.push('/home-pasajero');
-          break;
-        case 3: // CONDUCTOR
-          await Router.push('/home-conductor');
-          break;
-        case 4: { // AMBOS - show modal to choose
-          const chosenRole = await this.showRoleSelectionModal();
-          await Router.push(chosenRole === 'pasajero' ? '/home-pasajero' : '/home-conductor');
-          break;
-        }
-        default:
-          await Router.push('/');
-      }
+      await Router.push('/home');
     },
 
     async logout() {
@@ -101,6 +85,7 @@ export const useAuthStore = defineStore('auth', {
 
     clearTokens() {
       this.accessToken = this.refreshToken = this.user = null;
+      this.activeRole = null;
       localStorage.removeItem('access_token');
       localStorage.removeItem('refresh_token');
       delete api.defaults.headers.common.Authorization;
@@ -132,6 +117,7 @@ export const useAuthStore = defineStore('auth', {
 
     // Called from RoleSelectionModal when user selects a role
     onRoleSelected(role: 'pasajero' | 'conductor') {
+      this.activeRole = role;
       this.roleSelectionModal = false;
       if (this.roleSelectionResolve) {
         this.roleSelectionResolve(role);

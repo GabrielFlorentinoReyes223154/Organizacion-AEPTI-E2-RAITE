@@ -40,15 +40,11 @@ Router.beforeEach((to) => {
   }
 
   if (to.path.startsWith('/login') && authStore.isAuthenticated) {
-    // Redirect authenticated users away from login pages to their home
-    if (authStore.isPasajero && !authStore.isConductor) {
-      return { path: '/home-pasajero' };
-    }
-    if (authStore.isConductor && !authStore.isPasajero) {
-      return { path: '/home-conductor' };
-    }
-    // For AMBOS (both true), let them choose or go to root
-    return { path: '/' };
+    return { path: '/home' };
+  }
+
+  if (to.path === '/') {
+    return authStore.isAuthenticated ? { path: '/home' } : { path: '/login/LoginPage' };
   }
 
   // Role-based access control for home pages
