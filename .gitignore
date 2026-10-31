@@ -230,6 +230,7 @@ OnecodeFiles/
 
 # Credenciales locales de QA y artefactos locales
 RaiteDocs/Context/qa_credentials.md
+RaiteDocs/Context/BD_Keys.md
 cookies.txt
 Back_Raite/tmp_test.sqlite3
 
