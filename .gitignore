@@ -227,3 +227,11 @@ CLAUDE.md
 
 # OnecodeFiles - local commit references
 OnecodeFiles/
+
+# Credenciales locales de QA y artefactos locales
+RaiteDocs/Context/qa_credentials.md
+cookies.txt
+Back_Raite/tmp_test.sqlite3
+
+# Caché generada por graphify
+graphify-out/cache/
