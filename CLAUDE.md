@@ -232,6 +232,7 @@ Al terminar cada capa, actualizar aquí su estado y la tabla de requerimientos.
 - Los archivos de `RaiteDocs/docs/` vienen de Google Docs: no editarlos a mano aquí (ver `RaiteDocs/docs/README.md`).
 - `Front_Raite/src/router/typed-router.d.ts` es generado: no editar a mano.
 - Antes de dar por terminado un cambio: `python manage.py test` (backend) y `pnpm lint:check && pnpm typecheck` (frontend).
+- **Una rama por capa:** `capa/modelos` (Capa 1, ya integrada en `main`), `capa/logica` (Capa 2), `capa/vistas` (Capa 3). Cada rama sale de `main` después de integrar la capa anterior; se trabaja en la rama de la capa en curso.
 - **Solo commits locales: no hacer push ni abrir PR.** Del push se encarga el usuario.
 - **Los mensajes de commit no llevan `Co-Authored-By` ni ninguna mención a Claude** (también configurado en `.claude/settings.json`, que es local: `.claude/` está en `.gitignore`).
 - `AGENTS.md` pide usar `graphify` para consultas del código y correr `graphify update .` tras modificarlo, si la herramienta está instalada.
