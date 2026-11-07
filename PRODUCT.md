@@ -49,7 +49,7 @@ Solo entre alumnos de la UACJ, verificados con correo institucional. No es un se
 - **Colores institucionales de la UACJ** (Manual básico de Identidad Gráfica Institucional): azul Pantone 293 C `#003CA6`, amarillo Pantone Yellow 012 C `#FFD600`, gris Pantone Cool Gray 11 C `#555559` y negro `#231F20`. Son los colores de marca; se pueden derivar tonos más claros u oscuros para fondos, bordes y estados. El amarillo nunca va como texto sobre fondo claro. Detalle y reglas de contraste en `DESIGN.md`.
 - **Sin escudo ni logotipo oficial de la UACJ.** Los textos sí pueden mencionar a la universidad ("solo alumnos de la UACJ"), porque el acceso es con correo institucional.
 - **Voz:** de tú. Estudiantil, juarense, cercana y confiable; no corporativa. "Raite" es la palabra del producto.
-- **Logo:** sin decidir. Existe `Front_Raite/src/assets/raite.svg`, pero no se ha confirmado que sea el definitivo.
+- **Logo:** la palabra "Raite" con la "R" formada por una carretera y una flecha (original en `RaiteDocs/Design/logo/logo-raite-original.png`, azul marino con amarillo). Sobre azul se usa la versión blanca con el amarillo UACJ (`Front_Raite/src/assets/logo-raite-sobre-azul.png`). El original es un PNG chico (317×270); una versión en SVG o más grande se vería más nítida. `Front_Raite/src/assets/raite.svg` ya no se usa.
 
 ## Evidence on Hand
 
