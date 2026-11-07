@@ -6,7 +6,7 @@
     "colonia": "",
     "latitud": "31.673539",
     "longitud": "-106.369050",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "node/10664271606",
@@ -15,7 +15,7 @@
     "colonia": "",
     "latitud": "31.746792",
     "longitud": "-106.448822",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "node/11727698042",
@@ -42,7 +42,7 @@
     "colonia": "",
     "latitud": "31.706185",
     "longitud": "-106.388783",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "node/12872664301",
@@ -69,7 +69,7 @@
     "colonia": "",
     "latitud": "31.587455",
     "longitud": "-106.350766",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "node/13259700489",
@@ -78,7 +78,7 @@
     "colonia": "",
     "latitud": "31.610071",
     "longitud": "-106.381767",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "node/13339687031",
@@ -87,7 +87,7 @@
     "colonia": "",
     "latitud": "31.674508",
     "longitud": "-106.367833",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "node/13353916541",
@@ -96,7 +96,7 @@
     "colonia": "",
     "latitud": "31.597915",
     "longitud": "-106.305265",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "node/13453454860",
@@ -105,7 +105,7 @@
     "colonia": "",
     "latitud": "31.664618",
     "longitud": "-106.426978",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "node/13796366471",
@@ -114,7 +114,7 @@
     "colonia": "",
     "latitud": "31.553645",
     "longitud": "-106.281747",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "node/13808922864",
@@ -123,7 +123,7 @@
     "colonia": "",
     "latitud": "31.682146",
     "longitud": "-106.495224",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "node/13821827588",
@@ -132,7 +132,7 @@
     "colonia": "",
     "latitud": "31.678923",
     "longitud": "-106.363517",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "node/13885204723",
@@ -150,7 +150,7 @@
     "colonia": "",
     "latitud": "31.677221",
     "longitud": "-106.476295",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "node/13905843914",
@@ -159,7 +159,7 @@
     "colonia": "",
     "latitud": "31.653238",
     "longitud": "-106.444063",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "node/13960544044",
@@ -168,7 +168,7 @@
     "colonia": "",
     "latitud": "31.491737",
     "longitud": "-106.236156",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "node/13962540475",
@@ -186,7 +186,7 @@
     "colonia": "",
     "latitud": "31.738061",
     "longitud": "-106.463636",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "node/14142855334",
@@ -222,7 +222,7 @@
     "colonia": "",
     "latitud": "31.676820",
     "longitud": "-106.451150",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "node/14193150918",
@@ -231,7 +231,7 @@
     "colonia": "",
     "latitud": "31.683685",
     "longitud": "-106.455015",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "node/14193150919",
@@ -240,7 +240,7 @@
     "colonia": "",
     "latitud": "31.681779",
     "longitud": "-106.462448",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "node/14203827359",
@@ -249,7 +249,7 @@
     "colonia": "",
     "latitud": "31.686998",
     "longitud": "-106.456211",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "node/14206596473",
@@ -258,7 +258,7 @@
     "colonia": "",
     "latitud": "31.684505",
     "longitud": "-106.480176",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "node/14227649969",
@@ -267,7 +267,7 @@
     "colonia": "",
     "latitud": "31.659261",
     "longitud": "-106.380145",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "node/1438478064",
@@ -285,7 +285,7 @@
     "colonia": "",
     "latitud": "31.719425",
     "longitud": "-106.443572",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "node/1906493367",
@@ -294,7 +294,7 @@
     "colonia": "",
     "latitud": "31.716784",
     "longitud": "-106.432801",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "node/3099728026",
@@ -321,7 +321,7 @@
     "colonia": "",
     "latitud": "31.687338",
     "longitud": "-106.375295",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "node/3135135664",
@@ -348,7 +348,7 @@
     "colonia": "",
     "latitud": "31.625202",
     "longitud": "-106.461360",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "node/3264705910",
@@ -357,7 +357,7 @@
     "colonia": "",
     "latitud": "31.595886",
     "longitud": "-106.429910",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "node/3581474747",
@@ -366,7 +366,7 @@
     "colonia": "",
     "latitud": "31.676566",
     "longitud": "-106.379004",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "node/3581478107",
@@ -375,7 +375,7 @@
     "colonia": "",
     "latitud": "31.665975",
     "longitud": "-106.381425",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "node/3581494614",
@@ -384,7 +384,7 @@
     "colonia": "",
     "latitud": "31.680195",
     "longitud": "-106.388735",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "node/3581501896",
@@ -393,7 +393,7 @@
     "colonia": "",
     "latitud": "31.660141",
     "longitud": "-106.443229",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "node/3780393557",
@@ -402,7 +402,7 @@
     "colonia": "",
     "latitud": "31.728686",
     "longitud": "-106.450598",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "node/3974633690",
@@ -411,7 +411,7 @@
     "colonia": "",
     "latitud": "31.718063",
     "longitud": "-106.462407",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "node/4045454121",
@@ -420,7 +420,7 @@
     "colonia": "",
     "latitud": "31.606070",
     "longitud": "-106.453246",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "node/4056293071",
@@ -429,7 +429,7 @@
     "colonia": "",
     "latitud": "31.599320",
     "longitud": "-106.427261",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "node/4131777630",
@@ -447,7 +447,7 @@
     "colonia": "",
     "latitud": "31.690186",
     "longitud": "-106.354292",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "node/4542855531",
@@ -474,7 +474,7 @@
     "colonia": "",
     "latitud": "31.588253",
     "longitud": "-106.372038",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "node/4783715332",
@@ -501,7 +501,7 @@
     "colonia": "",
     "latitud": "31.660067",
     "longitud": "-106.391519",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "node/6428818265",
@@ -528,7 +528,7 @@
     "colonia": "",
     "latitud": "31.721081",
     "longitud": "-106.431193",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "node/7535530886",
@@ -546,7 +546,7 @@
     "colonia": "",
     "latitud": "31.675786",
     "longitud": "-106.446062",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "node/880963315",
@@ -555,7 +555,7 @@
     "colonia": "",
     "latitud": "31.693777",
     "longitud": "-106.374282",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "node/9002564566",
@@ -582,7 +582,7 @@
     "colonia": "",
     "latitud": "31.619810",
     "longitud": "-106.413433",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "node/9958359985",
@@ -600,7 +600,7 @@
     "colonia": "",
     "latitud": "31.662764",
     "longitud": "-106.473685",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "way/1147972306",
@@ -627,7 +627,7 @@
     "colonia": "",
     "latitud": "31.664763",
     "longitud": "-106.418761",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "way/1249940257",
@@ -636,7 +636,7 @@
     "colonia": "",
     "latitud": "31.680709",
     "longitud": "-106.478025",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "way/1290261624",
@@ -645,7 +645,7 @@
     "colonia": "",
     "latitud": "31.712521",
     "longitud": "-106.377664",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "way/1337290087",
@@ -654,7 +654,7 @@
     "colonia": "",
     "latitud": "31.717704",
     "longitud": "-106.474331",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "way/1419729238",
@@ -663,7 +663,7 @@
     "colonia": "",
     "latitud": "31.549479",
     "longitud": "-106.349661",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "way/1452246394",
@@ -672,7 +672,7 @@
     "colonia": "",
     "latitud": "31.607891",
     "longitud": "-106.471241",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "way/1455530075",
@@ -681,7 +681,7 @@
     "colonia": "",
     "latitud": "31.611749",
     "longitud": "-106.432157",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "way/1488414966",
@@ -690,7 +690,7 @@
     "colonia": "",
     "latitud": "31.606790",
     "longitud": "-106.482975",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "way/252027861",
@@ -699,7 +699,7 @@
     "colonia": "",
     "latitud": "31.733294",
     "longitud": "-106.424192",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "way/252799946",
@@ -708,7 +708,7 @@
     "colonia": "",
     "latitud": "31.721497",
     "longitud": "-106.442849",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "way/319642760",
@@ -717,7 +717,7 @@
     "colonia": "",
     "latitud": "31.726053",
     "longitud": "-106.424867",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "way/320752394",
@@ -735,7 +735,7 @@
     "colonia": "",
     "latitud": "31.619307",
     "longitud": "-106.438855",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "way/326320851",
@@ -744,7 +744,7 @@
     "colonia": "",
     "latitud": "31.723357",
     "longitud": "-106.420050",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "way/337507167",
@@ -753,7 +753,7 @@
     "colonia": "",
     "latitud": "31.350250",
     "longitud": "-106.470027",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "way/457772699",
@@ -762,7 +762,7 @@
     "colonia": "",
     "latitud": "31.601931",
     "longitud": "-106.386705",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "way/626053862",
@@ -771,7 +771,7 @@
     "colonia": "",
     "latitud": "31.657921",
     "longitud": "-106.464914",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "way/626069841",
@@ -789,7 +789,7 @@
     "colonia": "",
     "latitud": "31.658687",
     "longitud": "-106.428523",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "way/635493266",
@@ -816,7 +816,7 @@
     "colonia": "",
     "latitud": "31.630272",
     "longitud": "-106.419972",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "way/636752309",
@@ -825,7 +825,7 @@
     "colonia": "",
     "latitud": "31.622446",
     "longitud": "-106.417427",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "way/643165553",
@@ -834,7 +834,7 @@
     "colonia": "",
     "latitud": "31.592632",
     "longitud": "-106.420521",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "way/665367008",
@@ -870,7 +870,7 @@
     "colonia": "",
     "latitud": "31.741720",
     "longitud": "-106.441339",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "way/699784562",
@@ -879,7 +879,7 @@
     "colonia": "",
     "latitud": "31.626802",
     "longitud": "-106.397089",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "way/735009529",
@@ -888,7 +888,7 @@
     "colonia": "",
     "latitud": "31.602907",
     "longitud": "-106.399689",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "way/735012098",
@@ -897,7 +897,7 @@
     "colonia": "",
     "latitud": "31.616520",
     "longitud": "-106.380917",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "way/735012126",
@@ -906,7 +906,7 @@
     "colonia": "",
     "latitud": "31.618343",
     "longitud": "-106.404405",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "way/735014077",
@@ -915,7 +915,7 @@
     "colonia": "",
     "latitud": "31.599152",
     "longitud": "-106.397290",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "way/735383300",
@@ -924,7 +924,7 @@
     "colonia": "",
     "latitud": "31.691895",
     "longitud": "-106.360718",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "way/736159351",
@@ -933,7 +933,7 @@
     "colonia": "",
     "latitud": "31.660484",
     "longitud": "-106.446896",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "way/736282570",
@@ -942,7 +942,7 @@
     "colonia": "",
     "latitud": "31.648399",
     "longitud": "-106.391221",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "way/736354526",
@@ -951,7 +951,7 @@
     "colonia": "",
     "latitud": "31.597305",
     "longitud": "-106.382294",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "way/736371848",
@@ -978,7 +978,7 @@
     "colonia": "",
     "latitud": "31.621822",
     "longitud": "-106.445774",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "way/750543525",
@@ -987,7 +987,7 @@
     "colonia": "",
     "latitud": "31.621339",
     "longitud": "-106.445768",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "way/750543527",
@@ -996,7 +996,7 @@
     "colonia": "",
     "latitud": "31.621417",
     "longitud": "-106.445988",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "way/753066837",
@@ -1014,7 +1014,7 @@
     "colonia": "",
     "latitud": "31.649997",
     "longitud": "-106.401688",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "way/787282934",
@@ -1023,7 +1023,7 @@
     "colonia": "",
     "latitud": "31.620712",
     "longitud": "-106.389448",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "way/787282980",
@@ -1032,7 +1032,7 @@
     "colonia": "",
     "latitud": "31.615049",
     "longitud": "-106.391633",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "way/788725397",
@@ -1041,7 +1041,7 @@
     "colonia": "",
     "latitud": "31.718608",
     "longitud": "-106.396406",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "way/790630089",
@@ -1050,7 +1050,7 @@
     "colonia": "",
     "latitud": "31.636400",
     "longitud": "-106.403692",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "way/790630098",
@@ -1059,7 +1059,7 @@
     "colonia": "",
     "latitud": "31.631585",
     "longitud": "-106.400553",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "way/790630110",
@@ -1068,7 +1068,7 @@
     "colonia": "",
     "latitud": "31.626713",
     "longitud": "-106.410649",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "way/790630112",
@@ -1077,7 +1077,7 @@
     "colonia": "",
     "latitud": "31.625549",
     "longitud": "-106.406032",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "way/792800318",
@@ -1086,7 +1086,7 @@
     "colonia": "",
     "latitud": "31.622395",
     "longitud": "-106.410984",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "way/793107174",
@@ -1095,7 +1095,7 @@
     "colonia": "",
     "latitud": "31.615268",
     "longitud": "-106.396316",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "way/793359319",
@@ -1104,7 +1104,7 @@
     "colonia": "",
     "latitud": "31.614383",
     "longitud": "-106.426981",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "way/807943341",
@@ -1122,7 +1122,7 @@
     "colonia": "",
     "latitud": "31.739128",
     "longitud": "-106.480646",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "way/815997625",
@@ -1131,7 +1131,7 @@
     "colonia": "",
     "latitud": "31.663561",
     "longitud": "-106.363326",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "way/849822693",
@@ -1140,7 +1140,7 @@
     "colonia": "",
     "latitud": "31.738098",
     "longitud": "-106.432740",
-    "activo": false
+    "activo": true
   },
   {
     "osm_id": "way/880004058",
@@ -1149,6 +1149,6 @@
     "colonia": "",
     "latitud": "31.608337",
     "longitud": "-106.685515",
-    "activo": false
+    "activo": true
   }
 ]

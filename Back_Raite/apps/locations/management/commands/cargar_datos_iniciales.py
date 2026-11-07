@@ -18,6 +18,14 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument("--campus", default=str(DATOS / "campus.json"))
         parser.add_argument("--puntos", default=str(DATOS / "puntos_referencia.json"))
+        parser.add_argument(
+            "--actualizar-estados",
+            action="store_true",
+            help=(
+                "También copia `activo` del JSON a los puntos que ya existen "
+                "(sobrescribe lo que se haya activado o desactivado en el admin)."
+            ),
+        )
 
     @transaction.atomic
     def handle(self, *args, **opciones):
@@ -35,13 +43,14 @@ class Command(BaseCommand):
             c_creados += creado
             c_actualizados += not creado
 
+        actualizar_estados = opciones["actualizar_estados"]
         p_creados = p_actualizados = 0
         for dato in puntos:
             obj = PuntoReferencia(
                 nombre=dato["nombre"], latitud=dato["latitud"], longitud=dato["longitud"]
             )
             obj.full_clean(exclude=["osm_id"], validate_unique=False)
-            # El estado `activo` solo se fija al crear: así no se pisan los cambios hechos en el admin.
+            # Por defecto `activo` solo se fija al crear, para no pisar lo editado en el admin.
             punto, creado = PuntoReferencia.objects.get_or_create(
                 osm_id=dato["osm_id"],
                 defaults={
@@ -55,7 +64,11 @@ class Command(BaseCommand):
                 p_creados += 1
             else:
                 punto.latitud, punto.longitud = dato["latitud"], dato["longitud"]
-                punto.save(update_fields=["latitud", "longitud", "updated_at"])
+                campos = ["latitud", "longitud", "updated_at"]
+                if actualizar_estados:
+                    punto.activo = dato.get("activo", True)
+                    campos.append("activo")
+                punto.save(update_fields=campos)
                 p_actualizados += 1
 
         self.stdout.write(

@@ -54,6 +54,6 @@ class Command(BaseCommand):
         inactivos = sum(1 for p in resultado if not p["activo"])
         self.stdout.write(
             self.style.SUCCESS(
-                f"Escritos {len(resultado)} puntos en {salida} ({inactivos} inactivos por falta de calle/colonia)."
+                f"Escritos {len(resultado)} puntos en {salida} ({inactivos} inactivos por falta de calle)."
             )
         )

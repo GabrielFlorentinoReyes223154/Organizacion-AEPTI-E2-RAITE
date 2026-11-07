@@ -23,7 +23,7 @@ Lo que **realmente** hay en el repo (los docs de diseño mencionan más cosas: P
 - Base de datos: **PostgreSQL local** de cada desarrollador (sin PostGIS). Ya no se usa el Postgres remoto. Se configura con `DATABASE_URL` en `Back_Raite/.env` (gitignored); no hay respaldo SQLite. El certificado `certs/ca.pem` solo se usa si se configura por variable de entorno. Hay un virtualenv local en `Back_Raite/.venv/`.
 - Variables de entorno (plantilla en `Back_Raite/.env.example`): `SECRET_KEY` y `DATABASE_URL` obligatorias; `DEBUG`, `ALLOWED_HOSTS`, `CORS_ALLOWED_ORIGINS`, `DB_SSL_ROOTCERT` (opcional) y las de correo (`EMAIL_BACKEND`, por defecto consola).
 - `LANGUAGE_CODE = es-mx`, `TIME_ZONE = America/Ciudad_Juarez`. Constantes de la app en `settings.py`: `CORREO_DOMINIO_PERMITIDO`, `CODIGO_VERIFICACION_MINUTOS`, `CODIGO_VERIFICACION_MAX_INTENTOS`.
-- Datos iniciales: `python manage.py cargar_datos_iniciales` (campus + puntos de referencia desde `apps/locations/data/*.json`; se puede repetir y no pisa lo editado en el admin).
+- Datos iniciales: `python manage.py cargar_datos_iniciales` (campus + puntos de referencia desde `apps/locations/data/*.json`; se puede repetir y no pisa lo editado en el admin, salvo `--actualizar-estados`, que copia `activo` del JSON).
 - Pasos completos para una máquina nueva: `README.md`.
 
 ```bash
@@ -196,7 +196,7 @@ Decididas el 2026-11-06. Tienen la misma prioridad que las reglas de negocio.
 2. **Sexo:** se mantienen `M`, `F` y `X`. "Mismo sexo" = mismo valor del campo `sexo`. Un usuario `X` con "mismo sexo" solo empata con otros `X`.
 3. **Correo institucional:** solo `@alumnos.uacj.mx`. La cuenta se activa con un código de verificación enviado por correo.
 4. **Contacto:** campo de teléfono/WhatsApp en el usuario, visible solo entre conductor y pasajero con raite confirmado.
-5. **Puntos de referencia:** modelo con nombre, latitud y longitud, administrado desde el admin de Django. Carga inicial desde `RaiteDocs/BD_PuntosMapa/Oxxo.json`. Sin PostGIS; cercanía con haversine en Python. Los puntos a los que Nominatim no les dio calle **y** colonia se cargan con `activo=False` para revisarlos en el admin (90 de 128, porque OSM casi no tiene colonias en Juárez).
+5. **Puntos de referencia:** modelo con nombre, latitud y longitud, administrado desde el admin de Django. Carga inicial desde `RaiteDocs/BD_PuntosMapa/Oxxo.json`. Sin PostGIS; cercanía con haversine en Python. Basta con la calle para que un punto quede activo (OSM casi no tiene colonias en Juárez); si Nominatim no dio ni calle, se carga con `activo=False` para revisarlo en el admin. Hoy los 128 tienen calle. Para aplicar un cambio de estados del JSON a una BD que ya tiene los puntos: `cargar_datos_iniciales --actualizar-estados`.
 6. **Campus:** CU, IIT, ICB, ICSA, IADA. Coordenadas tomadas de OSM; IIT e IADA comparten ubicación (por confirmar).
 7. **Mapa:** Leaflet + OpenStreetMap.
 8. **Notificaciones:** solo dentro de la app (modelo + consulta periódica). Sin push ni WebSockets.
