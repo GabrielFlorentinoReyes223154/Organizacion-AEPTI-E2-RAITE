@@ -97,7 +97,7 @@ const etiqueta = computed(() => {
   text-decoration: none;
   border-radius: 16px;
   &:hover {
-    background: #fafbfd;
+    background: var(--raite-blanco-hover);
   }
   &:focus-visible {
     outline-offset: -3px;

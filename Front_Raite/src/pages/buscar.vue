@@ -483,7 +483,7 @@ function arrastrar(evento: { isFinal?: boolean; offset?: { y: number } }) {
   padding: 0 16px 8px;
 }
 .buscar__filtros {
-  min-height: 36px;
+  min-height: 48px;
   max-width: 100%;
   font-size: 0.875rem;
   :deep(.q-btn__content) {

@@ -39,12 +39,12 @@ function elegir(papel: Papel) {
 .cambio-rol {
   display: inline-flex;
   flex-shrink: 0;
-  padding: 3px;
+  padding: 2px;
   border-radius: 12px;
   background: var(--raite-azul-hondo);
 }
 .cambio-rol__opcion {
-  height: 40px;
+  height: 44px;
   padding: 0 12px;
   border: 0;
   border-radius: 9px;

@@ -168,14 +168,14 @@ async function leerTodas() {
   text-align: left;
   cursor: pointer;
   &:hover {
-    background: #fafbfd;
+    background: var(--raite-blanco-hover);
   }
 }
 .aviso--nuevo {
   background: var(--raite-azul-tenue);
   border-color: transparent;
   &:hover {
-    background: #dde6f6;
+    background: var(--raite-azul-tenue-hover);
   }
 }
 .aviso__icono {

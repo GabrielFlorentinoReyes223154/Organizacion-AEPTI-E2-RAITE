@@ -133,7 +133,7 @@ onMounted(() => void cargar());
   font-weight: 700;
   text-decoration: none;
   &:hover {
-    background: #ffeb85;
+    background: var(--raite-amarillo-tenue-hover);
   }
   &:focus-visible {
     outline-offset: -3px;

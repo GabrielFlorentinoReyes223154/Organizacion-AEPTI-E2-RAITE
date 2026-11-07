@@ -61,6 +61,11 @@ Router.beforeEach(async (to) => {
   return true;
 });
 
+// Cada pantalla nombra la pestaña del navegador (WCAG 2.4.2).
+Router.afterEach((to) => {
+  document.title = to.meta.titulo ? `${to.meta.titulo} · Raite` : 'Raite';
+});
+
 if (import.meta.hot) {
   handleHotUpdate(Router);
 }

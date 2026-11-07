@@ -1,8 +1,8 @@
 {
   "name": "front-raite",
   "version": "0.0.1",
-  "description": "A Quasar Project",
-  "productName": "Raite App",
+  "description": "Raites entre alumnos de la UACJ",
+  "productName": "Raite",
   "type": "module",
   "private": true,
   "scripts": {

@@ -109,15 +109,25 @@ function dibujar() {
     );
   }
 
+  // Campus en el mismo lugar (hoy IIT e IADA) van en una sola placa para que no se tapen.
+  const porLugar = new Map<string, typeof props.campus>();
   for (const c of props.campus) {
+    const clave = `${c.latitud},${c.longitud}`;
+    porLugar.set(clave, [...(porLugar.get(clave) ?? []), c]);
+  }
+  for (const grupo of porLugar.values()) {
+    const primero = grupo[0];
+    if (!primero) continue;
+    const codigos = grupo.map((c) => c.codigo).join(' · ');
+    const nombres = grupo.map((c) => c.nombre).join(' y ');
     const icono = L.divIcon({
       className: 'mapa-raite__placa',
-      html: `<span>${escapar(c.codigo)}</span>`,
+      html: `<span>${escapar(codigos)}</span>`,
       iconSize: undefined,
       iconAnchor: [20, 14],
     });
     capa.addLayer(
-      L.marker(coord(c), { icon: icono, title: c.nombre, alt: c.nombre, keyboard: false }),
+      L.marker(coord(primero), { icon: icono, title: nombres, alt: nombres, keyboard: false }),
     );
   }
 
@@ -180,10 +190,12 @@ function encuadrar(elegido: PuntoReferencia | null, circulo: L.Circle | null) {
 
 onMounted(() => {
   if (!contenedor.value) return;
-  mapa = L.map(contenedor.value, { zoomControl: true, attributionControl: true }).setView(
-    JUAREZ,
-    12,
-  );
+  // Canvas con tolerancia: cada punto se puede tocar en un área de ~44 px aunque se dibuje de 14 px.
+  mapa = L.map(contenedor.value, {
+    zoomControl: true,
+    attributionControl: true,
+    renderer: L.canvas({ tolerance: 14 }),
+  }).setView(JUAREZ, 12);
   mapa.attributionControl.setPrefix(false);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,

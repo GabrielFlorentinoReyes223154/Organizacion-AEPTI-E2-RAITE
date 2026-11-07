@@ -133,7 +133,7 @@ onBeforeUnmount(() => avisos.detener());
 }
 .barra__marca {
   padding: 0 16px 0 8px;
-  color: #fff;
+  color: var(--raite-blanco);
   font-size: 1.375rem;
   font-weight: 700;
   letter-spacing: -0.01em;
@@ -164,9 +164,10 @@ onBeforeUnmount(() => avisos.detener());
   top: 2px;
   right: 2px;
   font-weight: 700;
-  font-size: 12px;
-  min-height: 20px;
-  min-width: 20px;
+  font-size: 14px;
+  min-height: 22px;
+  min-width: 22px;
+  padding: 0 5px;
 }
 .inferior {
   height: calc(64px + env(safe-area-inset-bottom));

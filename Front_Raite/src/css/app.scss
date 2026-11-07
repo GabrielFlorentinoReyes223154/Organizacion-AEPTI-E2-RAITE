@@ -59,6 +59,10 @@
   --raite-gris: #555559;
   --raite-blanco: #ffffff;
   --raite-fondo: #f3f5f9;
+  // Estados de hover (fondos apenas más oscuros; el texto encima conserva su contraste).
+  --raite-blanco-hover: #fafbfd;
+  --raite-azul-tenue-hover: #dde6f6;
+  --raite-amarillo-tenue-hover: #ffeb85;
   --raite-gris-tenue: #ecedf0;
   --raite-borde-sutil: #d5d8de;
   --raite-borde-campo: #8a8c93;
@@ -156,6 +160,23 @@ a {
     outline-color: var(--raite-amarillo);
   }
 }
+// Quasar quita el contorno de sus botones y solo los aclara; aquí se restituye el foco de DESIGN.md.
+.q-btn:focus-visible,
+.q-tab:focus-visible,
+.q-item:focus-visible {
+  outline: 2px solid var(--raite-azul) !important;
+  outline-offset: 2px;
+}
+.q-header,
+.q-footer,
+.raite-sobre-azul {
+  .q-btn:focus-visible,
+  .q-tab:focus-visible {
+    outline-color: var(--raite-amarillo) !important;
+    outline-offset: -2px;
+  }
+}
+
 // --- Sin MAYÚSCULAS (la regla sin gritos) ---
 .q-btn,
 .q-tab {
@@ -274,13 +295,17 @@ a {
 }
 
 // --- Movimiento ---
+// Sin desplazamientos ni transiciones; los indicadores de carga siguen girando para no parecer trabados.
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  *:not(.q-spinner):not(.q-spinner *) {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
   }
 }
 

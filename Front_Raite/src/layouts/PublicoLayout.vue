@@ -6,9 +6,9 @@
           <p class="publico__nombre">Raite</p>
           <p class="publico__lema">Raites entre alumnos de la UACJ</p>
         </header>
-        <main class="publico__tarjeta">
+        <div class="publico__tarjeta">
           <slot />
-        </main>
+        </div>
       </q-page>
     </q-page-container>
   </q-layout>
@@ -30,7 +30,7 @@
   width: 100%;
   max-width: 480px;
   padding: 40px 24px 32px;
-  color: #fff;
+  color: var(--raite-blanco);
 }
 .publico__nombre {
   display: inline-block;

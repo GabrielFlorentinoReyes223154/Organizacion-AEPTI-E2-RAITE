@@ -94,7 +94,8 @@ export function calificacion(valor: string | number | null | undefined): string 
 
 export function distancia(km: number | null | undefined): string | null {
   if (km === null || km === undefined) return null;
-  return km < 1 ? `a ${Math.round(km * 1000)} m` : `a ${km.toFixed(1)} km`;
+  if (km < 0.05) return 'en tu punto';
+  return km < 1 ? `a ${Math.round(km * 10) * 100} m` : `a ${km.toFixed(1)} km`;
 }
 
 export function lugares(libres: number, ofrecidos: number): string {
