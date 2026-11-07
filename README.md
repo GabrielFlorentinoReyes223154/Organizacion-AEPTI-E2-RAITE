@@ -98,5 +98,3 @@ Nominatim. Ver `Back_Raite/apps/locations/data/`.
 - `CLAUDE.md` — estado del proyecto, decisiones, reglas de negocio y convenciones.
 - `RaiteDocs/docs/2_SRS.md` — requerimientos (RF-xx, RNF-xx).
 
-El mejor integrante:
-Gabriel Florentino Reyes
