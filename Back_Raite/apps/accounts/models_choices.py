@@ -18,3 +18,9 @@ class Sexo(models.TextChoices):
     M = "M", "Masculino"
     F = "F", "Femenino"
     X = "X", "Otro"
+
+class PreferenciaCompatibilidad(models.TextChoices):
+    """Solo se puede elegir mismo sexo o mixto: nadie puede pedir exclusivamente el sexo opuesto."""
+
+    MISMO_SEXO = "MISMO_SEXO", "Mismo sexo"
+    MIXTO = "MIXTO", "Mixto"

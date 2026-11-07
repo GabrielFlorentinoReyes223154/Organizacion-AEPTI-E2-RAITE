@@ -1,13 +1,31 @@
+import secrets
 import uuid
+from datetime import timedelta
 from decimal import Decimal
 
+from django.conf import settings
+from django.contrib.auth.hashers import check_password, make_password
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.core.exceptions import ValidationError
-from django.core.validators import MaxValueValidator, MinValueValidator
+from django.core.validators import MaxValueValidator, MinValueValidator, RegexValidator
 from django.db import models
 from django.db.models import Q
+from django.utils import timezone
 
-from .models_choices import Rol, Sexo, TipoVehiculo
+from .models_choices import PreferenciaCompatibilidad, Rol, Sexo, TipoVehiculo
+
+ASIENTOS_MIN = 1
+ASIENTOS_MAX = 5
+
+validar_telefono = RegexValidator(
+    regex=r"^\d{10}$",
+    message="El teléfono debe tener exactamente 10 dígitos, sin espacios ni guiones.",
+)
+
+
+def correo_es_institucional(correo: str) -> bool:
+    dominio = settings.CORREO_DOMINIO_PERMITIDO.lower()
+    return (correo or "").strip().lower().endswith("@" + dominio)
 
 
 class UsuarioManager(BaseUserManager):
@@ -38,6 +56,7 @@ class UsuarioManager(BaseUserManager):
         if extra_fields.get("is_superuser") is not True:
             raise ValueError("Superuser must have is_superuser=True.")
 
+        extra_fields.setdefault("correo_verificado", True)
         user = self.model(correo=self.normalize_email(correo), rol=Rol.ADMIN, **extra_fields)
         user.is_staff = False
         user.is_superuser = False
@@ -63,6 +82,22 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
         max_length=20, choices=Sexo.choices
     )
     carrera = models.CharField(max_length=120, default="")
+    telefono = models.CharField(
+        "teléfono / WhatsApp",
+        max_length=10,
+        validators=[validar_telefono],
+        help_text="10 dígitos. Solo se muestra al conductor/pasajero de un raite confirmado.",
+    )
+    preferencia_compatibilidad = models.CharField(
+        max_length=12,
+        choices=PreferenciaCompatibilidad.choices,
+        default=PreferenciaCompatibilidad.MIXTO,
+        help_text="Preferencia por defecto; se copia a cada viaje o solicitud.",
+    )
+    correo_verificado = models.BooleanField(
+        default=False,
+        help_text="Se activa al confirmar el código enviado al correo institucional.",
+    )
     calificacion = models.DecimalField(
         max_digits=3,
         decimal_places=2,
@@ -70,20 +105,9 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
         validators=[MinValueValidator(Decimal("0.00")), MaxValueValidator(Decimal("5.00"))],
     )
     rol = models.PositiveSmallIntegerField(choices=Rol.choices, default=Rol.PASAJERO)
-    activo = models.BooleanField(default=False)
-    """CACHÉ: True = el usuario está OCUPADO en un Raite activo.
-    NO significa "cuenta habilitada" (eso es `is_active`). Lo escribe exclusivamente
-    Raite.sincronizar_cuenta_activa() en la fase 3."""
-
-    cuenta_activa = models.PositiveSmallIntegerField(default=0)
-    """CACHÉ: nº de Raites activos del usuario. Invariante 0..1. Integer, no Boolean."""
-
     suspendido = models.BooleanField(default=False)
-    """SANCIÓN, no caché: no se refresca desde Raite ni se borra al liberar raites.
-    Lo activa el Admin o la regla MAX_TICKETS_SUSPENSION=3 tickets RESUELTOS en contra
-    (derivada por COUNT sobre TicketRevision; sin contador almacenado).
-    Bloquea crear() y aceptar() por igual; el login sigue permitido.
-    Solo el Admin puede levantarlo."""
+    """Sanción que pone el admin (por ejemplo, tras un reporte). Impide publicar viajes
+    y solicitar lugares; el login sigue permitido. Solo el admin puede quitarla."""
 
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
@@ -97,7 +121,7 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
     updated_at = models.DateTimeField(auto_now=True)
 
     USERNAME_FIELD = "correo"
-    REQUIRED_FIELDS = ["nombre", "apellidos", "edad", "sexo", "carrera"]
+    REQUIRED_FIELDS = ["nombre", "apellidos", "edad", "sexo", "carrera", "telefono"]
 
     objects = UsuarioManager()
 
@@ -111,6 +135,13 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return f"{self.nombre_completo} <{self.correo}>"
+
+    def clean(self):
+        super().clean()
+        if self.correo and not self.es_admin and not correo_es_institucional(self.correo):
+            raise ValidationError(
+                {"correo": f"Usa tu correo institucional @{settings.CORREO_DOMINIO_PERMITIDO}."}
+            )
 
     def save(self, *args, **kwargs):
         if self.is_staff or self.is_superuser:
@@ -144,24 +175,16 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
     def vehiculo_valido(self) -> bool:
         return hasattr(self, "vehiculo") and self.vehiculo.es_valido_para_conducir()
 
-    def no_tiene_raite_en_curso(self) -> bool:
-        """Invariante: cuenta_activa <= 1. Lee la caché, no consulta Raite.
-        La exclusión de carrera (índice único parcial o lock pesimista) se implementa en
-        Raite.crear()/Raite.aceptar() en la fase 3; un `if` aquí NO es suficiente por sí solo."""
-        return self.cuenta_activa == 0
+    def puede_solicitar_lugar(self) -> bool:
+        """Requisitos de cuenta para pedir lugar en un viaje (los cruces de horario se revisan en servicios)."""
+        return self.es_pasajero and self.correo_verificado and not self.suspendido
 
-    def puede_crear_raite(self) -> bool:
-        return (
-            self.es_pasajero
-            and not self.suspendido
-            and self.no_tiene_raite_en_curso()
-        )
-
-    def puede_aceptar_raite(self) -> bool:
+    def puede_publicar_viaje(self) -> bool:
+        """Requisitos de cuenta para publicar un viaje."""
         return (
             self.es_conductor
+            and self.correo_verificado
             and not self.suspendido
-            and self.no_tiene_raite_en_curso()
             and self.vehiculo_valido
         )
 
@@ -177,9 +200,21 @@ class Vehiculo(models.Model):
     color = models.CharField(max_length=40)
     placas = models.CharField(max_length=12, unique=True)
     tipo = models.CharField(max_length=12, choices=TipoVehiculo.choices)
-    asientos_disponibles = models.PositiveSmallIntegerField()
+    asientos_disponibles = models.PositiveSmallIntegerField(
+        validators=[MinValueValidator(ASIENTOS_MIN), MaxValueValidator(ASIENTOS_MAX)],
+        help_text="Lugares para pasajeros (1 a 5).",
+    )
     activo = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                condition=Q(asientos_disponibles__gte=ASIENTOS_MIN)
+                & Q(asientos_disponibles__lte=ASIENTOS_MAX),
+                name="vehiculo_asientos_1_a_5",
+            ),
+        ]
 
     def __str__(self):
         return f"{self.marca} {self.modelo} ({self.placas})"
@@ -189,3 +224,55 @@ class Vehiculo(models.Model):
 
     def tiene_capacidad(self, requeridos: int) -> bool:
         return self.asientos_disponibles >= requeridos
+
+
+class CodigoVerificacion(models.Model):
+    """Código de 6 dígitos enviado al correo institucional para activar la cuenta.
+
+    El código se guarda con hash; en claro solo existe al generarlo (para enviarlo).
+    """
+
+    usuario = models.ForeignKey(
+        Usuario, on_delete=models.CASCADE, related_name="codigos_verificacion"
+    )
+    codigo_hash = models.CharField(max_length=128)
+    creado_en = models.DateTimeField(auto_now_add=True)
+    expira_en = models.DateTimeField()
+    intentos = models.PositiveSmallIntegerField(default=0)
+    usado = models.BooleanField(default=False)
+
+    class Meta:
+        verbose_name = "código de verificación"
+        verbose_name_plural = "códigos de verificación"
+        ordering = ["-creado_en"]
+
+    def __str__(self):
+        return f"Código de {self.usuario.correo} ({self.creado_en:%Y-%m-%d %H:%M})"
+
+    @classmethod
+    def generar(cls, usuario) -> tuple["CodigoVerificacion", str]:
+        """Crea un código nuevo y devuelve (registro, código en claro)."""
+        codigo = f"{secrets.randbelow(10**6):06d}"
+        registro = cls.objects.create(
+            usuario=usuario,
+            codigo_hash=make_password(codigo),
+            expira_en=timezone.now() + timedelta(minutes=settings.CODIGO_VERIFICACION_MINUTOS),
+        )
+        return registro, codigo
+
+    def intentos_agotados(self) -> bool:
+        return self.intentos >= settings.CODIGO_VERIFICACION_MAX_INTENTOS
+
+    def esta_vigente(self) -> bool:
+        return not self.usado and not self.intentos_agotados() and timezone.now() < self.expira_en
+
+    def comprobar(self, codigo: str) -> bool:
+        """Cuenta un intento y dice si el código es correcto y sigue vigente.
+
+        No marca el código como usado ni verifica al usuario: eso lo hace el servicio de la Capa 2.
+        """
+        if not self.esta_vigente():
+            return False
+        self.intentos += 1
+        self.save(update_fields=["intentos"])
+        return check_password(codigo or "", self.codigo_hash)

@@ -19,19 +19,29 @@ from datetime import timedelta
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Load environment variables from .env file
-load_dotenv()
+# Variables de entorno desde Back_Raite/.env (plantilla en .env.example)
+load_dotenv(BASE_DIR / '.env')
+
+
+def env_bool(nombre, por_defecto=False):
+    valor = os.getenv(nombre)
+    if valor is None:
+        return por_defecto
+    return valor.strip().lower() in ('1', 'true', 'yes', 'si', 'sí', 'on')
+
+
+def env_list(nombre, por_defecto=''):
+    return [v.strip() for v in os.getenv(nombre, por_defecto).split(',') if v.strip()]
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-i8ogyk4ssr=_-c&6d+9#!03%34laj^#v+4#733+ew0x+(%mnx='
+SECRET_KEY = os.environ['SECRET_KEY']
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env_bool('DEBUG', False)
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'testserver']
+ALLOWED_HOSTS = env_list('ALLOWED_HOSTS', 'localhost,127.0.0.1,testserver')
 
 
 # Application definition
@@ -48,6 +58,11 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt.token_blacklist',
     'corsheaders',
     'apps.accounts',
+    'apps.locations',
+    'apps.rides',
+    'apps.notifications',
+    'apps.ratings',
+    'apps.reports',
 ]
 
 MIDDLEWARE = [
@@ -84,13 +99,18 @@ WSGI_APPLICATION = 'Raite_DjangoRest.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.1/ref/settings/#databases
 
+# PostgreSQL local de cada desarrollador, configurado solo con DATABASE_URL.
 DATABASES = {
-    'default': dj_database_url.config(default=os.getenv('DATABASE_URL'))
-    # 'default': {
-    #     # 'ENGINE': 'django.db.backends.sqlite3',
-    #     # 'NAME': BASE_DIR / 'db.sqlite3',
-    # }
+    'default': dj_database_url.parse(os.environ['DATABASE_URL'], conn_max_age=600),
 }
+
+# Certificado opcional, solo para bases remotas que lo pidan (ej. certs/ca.pem).
+DB_SSL_ROOTCERT = os.getenv('DB_SSL_ROOTCERT')
+if DB_SSL_ROOTCERT:
+    DATABASES['default'].setdefault('OPTIONS', {}).update({
+        'sslmode': 'verify-full',
+        'sslrootcert': str(BASE_DIR / DB_SSL_ROOTCERT),
+    })
 
 
 # Password validation
@@ -115,9 +135,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/6.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'es-mx'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Ciudad_Juarez'
 
 USE_I18N = True
 
@@ -133,13 +153,24 @@ STATIC_URL = 'static/'
 # Email
 # https://docs.djangoproject.com/en/6.1/topics/email/#topic-email-configuration
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# Por defecto los correos (códigos de verificación) se imprimen en la terminal.
+EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend')
+EMAIL_HOST = os.getenv('EMAIL_HOST', 'localhost')
+EMAIL_PORT = int(os.getenv('EMAIL_PORT', '25'))
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
+EMAIL_USE_TLS = env_bool('EMAIL_USE_TLS', False)
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'Raite <no-reply@localhost>')
 
 AUTH_USER_MODEL = 'accounts.Usuario'
 
 # Autenticación por correo: USERNAME_FIELD = "correo" en Usuario permite que
-# ModelBackend autentique con correo+password sin backend custom.
-# El commit 907f0c5 menciona "EmailBackend" que no existe; no es necesario.
+# ModelBackend autentique con correo+password sin backend propio.
+
+# Reglas de la app
+CORREO_DOMINIO_PERMITIDO = 'alumnos.uacj.mx'
+CODIGO_VERIFICACION_MINUTOS = 15
+CODIGO_VERIFICACION_MAX_INTENTOS = 5
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -154,7 +185,4 @@ SIMPLE_JWT = {
     'BLACKLIST_AFTER_ROTATION': True,
 }
 
-CORS_ALLOWED_ORIGINS = [
-    'http://localhost:9000',
-    'http://localhost:9002',
-]
+CORS_ALLOWED_ORIGINS = env_list('CORS_ALLOWED_ORIGINS', 'http://localhost:9000,http://localhost:9002')

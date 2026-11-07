@@ -3,7 +3,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User as AuthUser
 
-from .models import Usuario
+from .models import CodigoVerificacion, Usuario, Vehiculo
 
 try:
     admin.site.unregister(AuthUser)
@@ -19,7 +19,7 @@ class UsuarioCreationForm(forms.ModelForm):
 
     class Meta:
         model = Usuario
-        fields = ("correo", "nombre", "apellidos", "edad", "sexo", "carrera", "rol")
+        fields = ("correo", "nombre", "apellidos", "edad", "sexo", "carrera", "telefono", "rol")
 
     def clean_password2(self):
         password1 = self.cleaned_data.get("password1")
@@ -42,8 +42,15 @@ class UsuarioChangeForm(forms.ModelForm):
         fields = "__all__"
 
 
+class VehiculoInline(admin.StackedInline):
+    model = Vehiculo
+    extra = 0
+    can_delete = False
+
+
 @admin.register(Usuario)
 class UsuarioAdmin(BaseUserAdmin):
+    inlines = [VehiculoInline]
     form = UsuarioChangeForm
     add_form = UsuarioCreationForm
     add_form_template = "admin/auth/user/add_form.html"
@@ -52,11 +59,22 @@ class UsuarioAdmin(BaseUserAdmin):
         (None, {"fields": ("correo", "password")}),
         (
             "Datos personales",
-            {"fields": ("nombre", "apellidos", "edad", "sexo", "carrera", "rol")},
+            {
+                "fields": (
+                    "nombre",
+                    "apellidos",
+                    "edad",
+                    "sexo",
+                    "carrera",
+                    "telefono",
+                    "preferencia_compatibilidad",
+                    "rol",
+                )
+            },
         ),
         (
             "Estado en Raite",
-            {"fields": ("activo", "cuenta_activa", "suspendido", "calificacion")},
+            {"fields": ("correo_verificado", "suspendido", "calificacion")},
         ),
         (
             "Permisos",
@@ -94,6 +112,7 @@ class UsuarioAdmin(BaseUserAdmin):
                     "edad",
                     "sexo",
                     "carrera",
+                    "telefono",
                     "rol",
                     "password1",
                     "password2",
@@ -108,16 +127,14 @@ class UsuarioAdmin(BaseUserAdmin):
         "apellidos",
         "rol",
         "calificacion",
-        "activo",
-        "cuenta_activa",
+        "correo_verificado",
         "suspendido",
         "is_staff",
     )
     list_filter = (
         "rol",
         "sexo",
-        "activo",
-        "cuenta_activa",
+        "correo_verificado",
         "suspendido",
         "is_active",
         "is_staff",
@@ -131,6 +148,28 @@ class UsuarioAdmin(BaseUserAdmin):
         "created_at",
         "updated_at",
         "calificacion",
-        "activo",
-        "cuenta_activa",
     )
+
+
+@admin.register(Vehiculo)
+class VehiculoAdmin(admin.ModelAdmin):
+    list_display = ("placas", "marca", "modelo", "color", "tipo", "asientos_disponibles", "usuario", "activo")
+    list_filter = ("tipo", "activo")
+    search_fields = ("placas", "marca", "modelo", "usuario__correo")
+    autocomplete_fields = ("usuario",)
+
+
+@admin.register(CodigoVerificacion)
+class CodigoVerificacionAdmin(admin.ModelAdmin):
+    """Solo lectura: los códigos se generan desde el API."""
+
+    list_display = ("usuario", "creado_en", "expira_en", "intentos", "usado")
+    list_filter = ("usado",)
+    search_fields = ("usuario__correo",)
+    readonly_fields = ("usuario", "codigo_hash", "creado_en", "expira_en", "intentos", "usado")
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False

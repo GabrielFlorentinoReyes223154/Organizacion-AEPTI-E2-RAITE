@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Usuario, Vehiculo
+from .models import ASIENTOS_MAX, ASIENTOS_MIN, Usuario, Vehiculo
 from .models_choices import Rol, TipoVehiculo
 
 
@@ -22,9 +22,10 @@ class UsuarioSerializer(serializers.ModelSerializer):
             "edad",
             "sexo",
             "carrera",
+            "telefono",
+            "preferencia_compatibilidad",
             "calificacion",
-            "activo",
-            "cuenta_activa",
+            "correo_verificado",
             "suspendido",
             "rol",
             "rol_display",
@@ -32,7 +33,7 @@ class UsuarioSerializer(serializers.ModelSerializer):
             "es_conductor",
             "es_admin",
         ]
-        read_only_fields = ["id", "calificacion", "activo", "cuenta_activa", "suspendido"]
+        read_only_fields = ["id", "calificacion", "correo_verificado", "suspendido"]
 
 
 class RegistroSerializer(serializers.ModelSerializer):
@@ -49,12 +50,14 @@ class RegistroSerializer(serializers.ModelSerializer):
             "edad",
             "sexo",
             "carrera",
+            "telefono",
             "rol",
         ]
         extra_kwargs = {
             "edad": {"required": True},
             "sexo": {"required": True},
             "carrera": {"required": True},
+            "telefono": {"required": True},
         }
 
     def validate_correo(self, value):
@@ -87,7 +90,7 @@ class VehiculoRegistroSerializer(serializers.Serializer):
     color = serializers.CharField(max_length=40)
     placas = serializers.CharField(max_length=12)
     tipo = serializers.ChoiceField(choices=[TipoVehiculo.CAMIONETA, TipoVehiculo.COCHE, TipoVehiculo.TROCA])
-    asientos_disponibles = serializers.IntegerField(min_value=1, max_value=8)
+    asientos_disponibles = serializers.IntegerField(min_value=ASIENTOS_MIN, max_value=ASIENTOS_MAX)
 
     def validate_placas(self, value):
         normalized = value.upper().replace("-", "").replace(" ", "")

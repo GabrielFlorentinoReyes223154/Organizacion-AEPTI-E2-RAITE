@@ -11,20 +11,21 @@ class AuthAPITests(TestCase):
         self.client = APIClient()
         self.User = get_user_model()
         self.user = self.User.objects.create_user(
-            correo="test@uacj.mx",
+            correo="test@alumnos.uacj.mx",
             password="password123",
             nombre="Test",
             apellidos="User",
             edad=20,
             sexo=Sexo.F,
             carrera="Ingeniería",
+            telefono="6561234567",
             rol=Rol.PASAJERO,
         )
 
     def test_obtener_token_login_valido(self):
         response = self.client.post(
             "/api/auth/token/",
-            {"correo": "test@uacj.mx", "password": "password123"},
+            {"correo": "test@alumnos.uacj.mx", "password": "password123"},
             format="json",
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -34,7 +35,7 @@ class AuthAPITests(TestCase):
     def test_login_contraseña_incorrecta(self):
         response = self.client.post(
             "/api/auth/token/",
-            {"correo": "test@uacj.mx", "password": "wrongpassword"},
+            {"correo": "test@alumnos.uacj.mx", "password": "wrongpassword"},
             format="json",
         )
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
@@ -42,7 +43,7 @@ class AuthAPITests(TestCase):
     def test_login_campo_email_rechazado(self):
         response = self.client.post(
             "/api/auth/token/",
-            {"email": "test@uacj.mx", "password": "password123"},
+            {"email": "test@alumnos.uacj.mx", "password": "password123"},
             format="json",
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -50,14 +51,14 @@ class AuthAPITests(TestCase):
     def test_me_endpoint_autenticado(self):
         response = self.client.post(
             "/api/auth/token/",
-            {"correo": "test@uacj.mx", "password": "password123"},
+            {"correo": "test@alumnos.uacj.mx", "password": "password123"},
             format="json",
         )
         token = response.data["access"]
         self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {token}")
         response = self.client.get("/api/auth/me/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["correo"], "test@uacj.mx")
+        self.assertEqual(response.data["correo"], "test@alumnos.uacj.mx")
         self.assertEqual(response.data["nombre"], "Test")
         self.assertEqual(response.data["apellidos"], "User")
         self.assertIn("nombre_completo", response.data)
@@ -73,7 +74,7 @@ class AuthAPITests(TestCase):
     def test_blacklist_refresh_token(self):
         response = self.client.post(
             "/api/auth/token/",
-            {"correo": "test@uacj.mx", "password": "password123"},
+            {"correo": "test@alumnos.uacj.mx", "password": "password123"},
             format="json",
         )
         refresh = response.data["refresh"]
@@ -96,17 +97,18 @@ class AuthAPITests(TestCase):
             {
                 "nombre": "Pasajero",
                 "apellidos": "Test",
-                "correo": "pasajero@uacj.mx",
+                "correo": "pasajero@alumnos.uacj.mx",
                 "password": "password123",
                 "edad": 20,
                 "sexo": "M",
                 "carrera": "Ingeniería",
+                "telefono": "6567654321",
                 "rol": Rol.PASAJERO,
             },
             format="json",
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        user = self.User.objects.get(correo="pasajero@uacj.mx")
+        user = self.User.objects.get(correo="pasajero@alumnos.uacj.mx")
         self.assertEqual(user.rol, Rol.PASAJERO)
         self.assertTrue(user.es_pasajero)
         self.assertFalse(user.es_conductor)
@@ -117,17 +119,18 @@ class AuthAPITests(TestCase):
             {
                 "nombre": "Conductor",
                 "apellidos": "Test",
-                "correo": "conductor@uacj.mx",
+                "correo": "conductor@alumnos.uacj.mx",
                 "password": "password123",
                 "edad": 20,
                 "sexo": "M",
                 "carrera": "Ingeniería",
+                "telefono": "6567654321",
                 "rol": Rol.CONDUCTOR,
             },
             format="json",
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        user = self.User.objects.get(correo="conductor@uacj.mx")
+        user = self.User.objects.get(correo="conductor@alumnos.uacj.mx")
         self.assertEqual(user.rol, Rol.CONDUCTOR)
         self.assertTrue(user.es_conductor)
         self.assertFalse(user.es_pasajero)
@@ -138,16 +141,17 @@ class AuthAPITests(TestCase):
             {
                 "nombre": "Default",
                 "apellidos": "Test",
-                "correo": "default@uacj.mx",
+                "correo": "default@alumnos.uacj.mx",
                 "password": "password123",
                 "edad": 20,
                 "sexo": "M",
                 "carrera": "Ingeniería",
+                "telefono": "6567654321",
             },
             format="json",
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        user = self.User.objects.get(correo="default@uacj.mx")
+        user = self.User.objects.get(correo="default@alumnos.uacj.mx")
         self.assertEqual(user.rol, Rol.PASAJERO)
         self.assertTrue(user.es_pasajero)
 
@@ -157,11 +161,12 @@ class AuthAPITests(TestCase):
             {
                 "nombre": "Admin",
                 "apellidos": "Test",
-                "correo": "admin@uacj.mx",
+                "correo": "admin@alumnos.uacj.mx",
                 "password": "password123",
                 "edad": 20,
                 "sexo": "M",
                 "carrera": "Ingeniería",
+                "telefono": "6567654321",
                 "rol": Rol.ADMIN,
             },
             format="json",
@@ -175,11 +180,12 @@ class AuthAPITests(TestCase):
             {
                 "nombre": "Conductor",
                 "apellidos": "Test",
-                "correo": "conductor@uacj.mx",
+                "correo": "conductor@alumnos.uacj.mx",
                 "password": "password123",
                 "edad": 20,
                 "sexo": "M",
                 "carrera": "Ingeniería",
+                "telefono": "6567654321",
                 "rol": Rol.CONDUCTOR,
             },
             format="json",
@@ -194,11 +200,12 @@ class AuthAPITests(TestCase):
             {
                 "nombre": "Pasajero",
                 "apellidos": "Test",
-                "correo": "pasajero@uacj.mx",
+                "correo": "pasajero@alumnos.uacj.mx",
                 "password": "password123",
                 "edad": 20,
                 "sexo": "F",
                 "carrera": "Ingeniería",
+                "telefono": "6567654321",
                 "rol": Rol.PASAJERO,
             },
             format="json",
