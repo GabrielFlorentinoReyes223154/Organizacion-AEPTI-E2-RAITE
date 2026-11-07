@@ -138,6 +138,8 @@ stateDiagram-v2
 
 "Lleno" no es un estado: un viaje está lleno cuando sus solicitudes aceptadas igualan `lugares_ofrecidos`.
 
+"Vencido" tampoco es un estado: un viaje `PUBLICADO` cuya hora pasó hace más de 2 h (`VENCIMIENTO_HORAS`) se considera vencido. Solo se puede cancelar, no aparece en búsquedas y no cuenta para cruces de horario. Iniciar solo se permite desde 30 min antes de la hora (`INICIO_ANTICIPACION_MINUTOS`).
+
 ## Estados de la solicitud
 
 ```mermaid
@@ -169,6 +171,6 @@ stateDiagram-v2
 | Calificar solo viajes finalizados, solo conductor ↔ pasajero aceptado, una vez | `Calificacion.clean()` + restricciones |
 | Reportar solo entre participantes del viaje | `Reporte.clean()` |
 
-Las reglas de negocio que dependen de varios registros se aplican en la Capa 2 (servicios):
+Las reglas de negocio que dependen de varios registros se aplican en la Capa 2 (`services.py` de cada app; ver `RaiteDocs/API.md`):
 compatibilidad por sexo, cupo al aceptar, visibilidad de contacto y placas, quién puede cambiar cada estado,
 envío del código de verificación y recálculo de `Usuario.calificacion`.

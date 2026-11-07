@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Fuente de verdad del proyecto para Claude Code. Última revisión: 2026-11-06 (Paso 0 y Capa 1 terminados).
+Fuente de verdad del proyecto para Claude Code. Última revisión: 2026-11-06 (Capa 2 terminada).
 Si algo de aquí contradice al código, revisa el código y actualiza este archivo.
 
 > **Nombre del proyecto:** [NOMBRE] — pendiente de confirmar (aparece como "Raite" en el SRS y en el código, "UniGo-UACJ" en la carta y "RutaClara" en el encabezado del PDF de la carta). En el código se mantiene "Raite": no renombrar nada hasta que se pida.
@@ -22,7 +22,7 @@ Lo que **realmente** hay en el repo (los docs de diseño mencionan más cosas: P
 - Django 6.1.1, Django REST Framework 3.18, `djangorestframework-simplejwt` 5.5 (con `token_blacklist`), `django-cors-headers`, `dj-database-url`, `python-dotenv`, `psycopg2-binary`.
 - Base de datos: **PostgreSQL local** de cada desarrollador (sin PostGIS). Ya no se usa el Postgres remoto. Se configura con `DATABASE_URL` en `Back_Raite/.env` (gitignored); no hay respaldo SQLite. El certificado `certs/ca.pem` solo se usa si se configura por variable de entorno. Hay un virtualenv local en `Back_Raite/.venv/`.
 - Variables de entorno (plantilla en `Back_Raite/.env.example`): `SECRET_KEY` y `DATABASE_URL` obligatorias; `DEBUG`, `ALLOWED_HOSTS`, `CORS_ALLOWED_ORIGINS`, `DB_SSL_ROOTCERT` (opcional) y las de correo (`EMAIL_BACKEND`, por defecto consola).
-- `LANGUAGE_CODE = es-mx`, `TIME_ZONE = America/Ciudad_Juarez`. Constantes de la app en `settings.py`: `CORREO_DOMINIO_PERMITIDO`, `CODIGO_VERIFICACION_MINUTOS`, `CODIGO_VERIFICACION_MAX_INTENTOS`.
+- `LANGUAGE_CODE = es-mx`, `TIME_ZONE = America/Ciudad_Juarez`. Constantes de la app en `settings.py`: `CORREO_DOMINIO_PERMITIDO`, `CODIGO_VERIFICACION_MINUTOS` (15), `CODIGO_VERIFICACION_MAX_INTENTOS` (5), `CODIGO_REENVIO_SEGUNDOS` (60), `BUSQUEDA_RADIO_KM` (3) / `BUSQUEDA_RADIO_MAX_KM` (15), `VENTANA_CRUCE_MINUTOS` (60), `INICIO_ANTICIPACION_MINUTOS` (30), `VENCIMIENTO_HORAS` (2).
 - Datos iniciales: `python manage.py cargar_datos_iniciales` (campus + puntos de referencia desde `apps/locations/data/*.json`; se puede repetir y no pisa lo editado en el admin, salvo `--actualizar-estados`, que copia `activo` del JSON).
 - Pasos completos para una máquina nueva: `README.md`.
 
@@ -63,8 +63,7 @@ pnpm typecheck    # vue-tsc --noEmit
 ### Decidido, aún no instalado
 
 - Mapas: Leaflet + OpenStreetMap (se instala en la Capa 3).
-- Notificaciones: solo dentro de la app (modelo + consulta periódica desde el frontend). Sin push ni WebSockets.
-- Cercanía geográfica: fórmula de haversine en Python. Sin PostGIS.
+- Notificaciones: la consulta periódica desde el frontend (a `GET /api/notificaciones/conteo/`) se hace en la Capa 3. Sin push ni WebSockets.
 
 ### Por definir
 
@@ -81,12 +80,12 @@ Raite/
 │   ├── manage.py
 │   ├── requirements.txt
 │   ├── certs/ca.pem     # CA del antiguo Postgres remoto (opcional, por variable)
-│   ├── Raite_DjangoRest/  # paquete del proyecto: settings.py, urls.py, wsgi/asgi
+│   ├── Raite_DjangoRest/  # paquete del proyecto: settings.py, urls.py, api.py (errores comunes), wsgi/asgi
 │   ├── .env.example     # plantilla de variables de entorno
-│   └── apps/            # cada app: models.py, models_choices.py, admin.py, migrations/, tests/
-│       ├── accounts/    # Usuario, Vehiculo, CodigoVerificacion + auth JWT (views, serializers, urls_auth)
-│       ├── locations/   # Campus, PuntoReferencia; data/*.json; comandos cargar_datos_iniciales y generar_puntos_osm
-│       ├── rides/       # Viaje, Solicitud (estados y transiciones en models_choices.py)
+│   └── apps/            # cada app: models.py, models_choices.py, services.py, serializers.py, views.py, urls.py, admin.py, migrations/, tests/
+│       ├── accounts/    # Usuario, Vehiculo, CodigoVerificacion + auth JWT y verificación de correo (urls_auth.py, permissions.py)
+│       ├── locations/   # Campus, PuntoReferencia, geo.py (haversine); data/*.json; comandos cargar_datos_iniciales y generar_puntos_osm
+│       ├── rides/       # Viaje, Solicitud, compatibilidad.py; búsqueda e historial (estados y transiciones en models_choices.py)
 │       ├── notifications/ # Notificacion
 │       ├── ratings/     # Calificacion
 │       └── reports/     # Reporte
@@ -104,6 +103,7 @@ Raite/
 │   ├── Design/          # UI_UX.md, layouts_team.md, imágenes y PDF de diseño
 │   ├── Context/         # system_solutions_context.md
 │   ├── Modelo-ER.md     # diagrama ER y de estados de la Capa 1 (fuente de verdad del modelo)
+│   ├── API.md           # lista de endpoints de la Capa 2 (método, URL, quién, qué hace)
 │   ├── BD_PuntosMapa/   # Oxxo.json (export crudo de Overpass; incluye puntos de Juárez, N.L. que se descartan)
 │   ├── Sketches/, TeamTasks/
 │   └── Raite-*.md, tecnologias.md, uml_*.mmd, …  # diseño técnico del equipo anterior
@@ -120,14 +120,19 @@ Raite/
 - `Usuario` además tiene `telefono` (10 dígitos), `preferencia_compatibilidad` (`MISMO_SEXO`/`MIXTO`, por defecto `MIXTO`), `correo_verificado` y `suspendido`. El dominio `@alumnos.uacj.mx` se valida en `Usuario.clean()` (el ADMIN queda exento). Las cachés antiguas `activo`/`cuenta_activa` se eliminaron.
 - `Sexo`: `M`, `F`, `X` ("Otro"). Se mantienen los tres (ver Decisiones tomadas).
 - `Vehiculo` (1 a 1 con el usuario): marca, modelo, color, placas (únicas), tipo (`COCHE`/`CAMIONETA`/`TROCA`), `asientos_disponibles` 1–5.
-- Modelo completo, estados y qué regla vive en cada modelo: **`RaiteDocs/Modelo-ER.md`**. En la Capa 1 solo hay validaciones de un registro (`clean()`, validadores, restricciones de BD); las reglas entre varios registros van en servicios (Capa 2).
-- Endpoints actuales (`/api/auth/`): `token/`, `token/refresh/`, `token/blacklist/`, `me/` (GET), `register/` (POST, paso 1; pide `telefono`; responde `requiere_vehiculo`), `vehicle/` (POST, paso 2, solo conductores). Además `admin/` de Django. Aún no hay endpoints de viajes (Capa 2).
+- Modelo completo, estados y qué regla vive en cada modelo: **`RaiteDocs/Modelo-ER.md`**. Endpoints: **`RaiteDocs/API.md`**.
+- **Dónde va cada cosa:** los modelos solo validan un registro (`clean()`, validadores, restricciones de BD). Las reglas entre varios registros están en `services.py` de cada app: funciones dentro de `transaction.atomic()` que llaman `full_clean()` antes de guardar y crean las notificaciones con `apps/notifications/services.notificar()`. Los serializers solo dan forma a la entrada y la salida; las vistas son delgadas.
+- **Errores:** los servicios lanzan `ValidationError` de Django (el manejador de `Raite_DjangoRest/api.py` la convierte en 400), `PermissionDenied` (403), `Http404` o `Conflicto` (409, para conflictos de estado).
+- **Permisos:** por defecto todo el API pide sesión y `correo_verificado` (`CorreoVerificado`); los endpoints públicos declaran `AllowAny`. Otras clases en `accounts/permissions.py`: `PuedePublicar`, `PuedeSolicitar`, `IsDriver`, `IsPassenger`. Quién es dueño del viaje o de la solicitud se revisa en el servicio.
+- **Cupo:** aceptar una solicitud bloquea la fila del viaje (`select_for_update`). Hay una prueba con dos hilos que solo funciona en PostgreSQL.
+- **Viaje vencido:** un `PUBLICADO` con más de 2 h de retraso. Se calcula (`Viaje.esta_vencido`, `Viaje.objects.vencidos()` / `vigentes()`), no se guarda: solo se puede cancelar y no cuenta para cruces ni búsquedas.
+- Paginación de 20 en los listados; los catálogos y las calificaciones pendientes no se paginan.
 - JWT: acceso 30 min, refresh 1 día, rotación + blacklist.
 - Migraciones de `accounts`: 0001–0012 vienen del equipo anterior (la 0009 se corrigió para que funcione en un PostgreSQL vacío); 0013 es de la Capa 1.
 
 ### Detalles del frontend que importan
 
-- **El registro del frontend está desfasado**: no envía `telefono` ni valida `@alumnos.uacj.mx`. Se corrige en la Capa 3.
+- **El registro del frontend está desfasado**: no envía `telefono`, no valida `@alumnos.uacj.mx` y no tiene pantalla para el código de verificación. Como el login ahora responde 403 si el correo no está verificado, las cuentas nuevas no pueden entrar desde el frontend hasta la Capa 3. Para probar antes, marca `correo_verificado` desde el admin.
 - Rutas por archivo (`filenameBasedRouting: true`), modo **`history`**. Páginas: `/login/LoginPage`, `/login/SignUpPage`, `/home` (elige vista según rol; con rol AMBOS abre `RoleSelectionModal` para elegir rol activo), `/home-pasajero` y `/home-conductor` (solo un título y botón de cerrar sesión), y restos de plantilla (`index.vue`, `index/(index).vue`, `index/second.vue`, `login/MainPage.vue`, `login/ErrorNotFound.vue`, `[...path].vue`).
 - Guarda global en `router/index.ts`: todo fuera de `/login*` requiere sesión; con sesión, `/login*` y `/` redirigen a `/home`.
 - Tokens en `localStorage`. Usa el alias `@/` para `src/`.
@@ -135,35 +140,35 @@ Raite/
 
 ## Requerimientos
 
-Fuente: `RaiteDocs/docs/2_SRS.md`. Estado según el código al 2026-11-06 (tras la Capa 1). 🟡 = hay modelo, falta API y/o pantalla.
+Fuente: `RaiteDocs/docs/2_SRS.md`. Estado según el código al 2026-11-06 (tras la Capa 2). 🟡 = backend listo (modelo + API + tests), falta la pantalla (Capa 3).
 ✅ hecho · 🟡 parcial · ⬜ pendiente
 
 ### Funcionales
 
 | ID | Requerimiento | Estado | Notas |
 |----|---------------|--------|-------|
-| RF-01 | Registro de usuario e identificación con correo institucional | 🟡 | Registro, login, logout y `/me` funcionan. Modelo listo: dominio `@alumnos.uacj.mx`, `telefono`, `correo_verificado`, `CodigoVerificacion`. Falta: endpoints de verificación, bloquear login sin verificar, pantalla del vehículo. |
-| RF-02 | Conductor publica viaje (punto de referencia de origen, campus destino, horario, lugares) | 🟡 | Modelo `Viaje` + 5 campus y 128 puntos de referencia cargados. Falta API y pantalla. |
-| RF-03 | Conductor configura cuántos lugares ofrece | 🟡 | `Viaje.lugares_ofrecidos` 1–5 sin superar los asientos del vehículo. Falta API y pantalla. |
-| RF-04 | Pasajero busca viajes por punto de referencia, horario y campus | 🟡 | Índice `(estado, campus, fecha_hora)`. Falta búsqueda (con haversine y compatibilidad) y pantalla. |
-| RF-05 | Pasajero solicita un lugar en un viaje publicado | 🟡 | Modelo `Solicitud` (una activa por viaje y pasajero). Falta API y pantalla. |
-| RF-06 | Conductor confirma o rechaza solicitudes | 🟡 | Estados y transiciones definidos. Falta servicio (cupo, compatibilidad) y API. |
-| RF-07 | Preferencias de compatibilidad (mixto / mismo sexo) | 🟡 | `preferencia_compatibilidad` en usuario, viaje y solicitud. La regla de empate se aplica en la Capa 2. |
-| RF-08 | Mapa interactivo con rutas y puntos de encuentro | 🟡 | Coordenadas de campus y puntos listas. Falta Leaflet (Capa 3). |
-| RF-09 | Notificaciones de solicitudes, confirmaciones, cambios y cancelaciones | 🟡 | Modelo `Notificacion` con sus tipos. Falta crearlas desde los servicios y el endpoint de consulta. |
-| RF-10 | Calificación mutua al terminar el viaje | 🟡 | Modelo `Calificacion`. Falta API y recálculo de `Usuario.calificacion`. |
-| RF-11 | Historial de viajes por usuario | 🟡 | Se obtiene de `Viaje` + `Solicitud` (sin modelo propio). Falta endpoint y pantalla. |
-| RF-12 | Reportar comportamiento inadecuado | 🟡 | Modelo `Reporte`; el admin ya puede resolver, descartar y suspender. Falta API y pantalla. |
+| RF-01 | Registro de usuario e identificación con correo institucional | 🟡 | API completa: registro con `@alumnos.uacj.mx` y código por correo, `verificar/`, `reenviar-codigo/`, login bloqueado sin verificar, perfil y vehículo. Falta pantalla. |
+| RF-02 | Conductor publica viaje (punto de referencia de origen, campus destino, horario, lugares) | 🟡 | `POST /api/viajes/` (sin cruces de horario), edición, cancelar/iniciar/finalizar y catálogos `campus/` y `puntos/`. Falta pantalla. |
+| RF-03 | Conductor configura cuántos lugares ofrece | 🟡 | `lugares_ofrecidos` 1–5, sin superar los asientos ni bajar de los aceptados (al publicar y al editar). Falta pantalla. |
+| RF-04 | Pasajero busca viajes por punto de referencia, horario y campus | 🟡 | `GET /api/viajes/` con radio por haversine, campus, sentido y horario, filtrando por compatibilidad. Falta pantalla. |
+| RF-05 | Pasajero solicita un lugar en un viaje publicado | 🟡 | `POST /api/viajes/{id}/solicitudes/` y `GET /api/solicitudes/mias/`; cancelar. Falta pantalla. |
+| RF-06 | Conductor confirma o rechaza solicitudes | 🟡 | Aceptar/rechazar con bloqueo del viaje para no rebasar el cupo. Falta pantalla. |
+| RF-07 | Preferencias de compatibilidad (mixto / mismo sexo) | 🟡 | `PATCH /api/auth/me/`; regla aplicada al buscar, solicitar, aceptar y editar el viaje. Falta pantalla. |
+| RF-08 | Mapa interactivo con rutas y puntos de encuentro | 🟡 | El API da coordenadas de campus y puntos (y `distancia_km`). Falta Leaflet (Capa 3). |
+| RF-09 | Notificaciones de solicitudes, confirmaciones, cambios y cancelaciones | 🟡 | Se crean en cada cambio de estado; endpoints para listar, contar y marcar leídas. Falta la consulta periódica y la pantalla. |
+| RF-10 | Calificación mutua al terminar el viaje | 🟡 | `POST /api/viajes/{id}/calificaciones/` con recálculo de `Usuario.calificacion`; pendientes por calificar. Falta pantalla. |
+| RF-11 | Historial de viajes por usuario | 🟡 | `GET /api/historial/` como conductor y como pasajero. Falta pantalla. |
+| RF-12 | Reportar comportamiento inadecuado | 🟡 | `POST /api/reportes/` y `GET /api/reportes/mios/`; el admin resuelve y suspende. Falta pantalla. |
 
 ### No funcionales
 
 | ID | Requerimiento | Estado | Notas |
 |----|---------------|--------|-------|
 | RNF-01 | Usabilidad: interfaz simple, puntos de referencia en vez de direcciones | 🟡 | Catálogo de puntos de referencia listo. Faltan las pantallas. |
-| RNF-02 | Seguridad: datos de contacto visibles solo entre conductor y pasajero tras confirmar | 🟡 | JWT; secretos por variable de entorno; existe `telefono`. Falta la regla de visibilidad (Capa 2). |
+| RNF-02 | Seguridad: datos de contacto visibles solo entre conductor y pasajero tras confirmar | 🟡 | Teléfono y placas solo con solicitud `ACEPTADA` (probado). JWT, permisos por rol y secretos por variable de entorno. Falta revisar en pantallas. |
 | RNF-03 | Disponibilidad | ⬜ | Sin despliegue. |
 | RNF-04 | Compatibilidad: diseño responsivo móvil/escritorio | 🟡 | Quasar es responsivo; solo existen login y registro. |
-| RNF-05 | Escalabilidad: poder agregar usuarios y funciones | 🟡 | Backend en 6 apps Django con índices en las consultas principales. |
+| RNF-05 | Escalabilidad: poder agregar usuarios y funciones | 🟡 | 6 apps Django con servicios separados de las vistas; índices en las consultas principales; paginación. |
 | RNF-06 | Rendimiento en búsqueda y mapa | ⬜ | No aplica aún. |
 
 ## Reglas de negocio
@@ -213,11 +218,11 @@ Se construye **por capas, no por funcionalidad**. El objetivo es dejar una base 
    - Todos los modelos que cubren RF-01 a RF-12 y las reglas de negocio: usuarios, vehículo, campus, puntos de referencia, viajes, solicitudes, notificaciones, calificaciones, reportes, verificación de correo.
    - Validaciones a nivel modelo, migraciones, registro en el admin de Django y tests de modelo.
    - Diagrama entidad-relación en Mermaid dentro de `RaiteDocs/`.
-2. **Capa 2 — Lógica** (serializers, views del API y servicios) ⬜ ← siguiente
-   - Endpoints y reglas de negocio: compatibilidad por sexo, cupo de lugares, visibilidad de contacto, estados del viaje y de la solicitud, verificación de correo.
-   - También: validar `@alumnos.uacj.mx` en el registro (llamar `full_clean()`), bloquear login sin `correo_verificado`, crear notificaciones en cada cambio de estado, recalcular `Usuario.calificacion`, evitar viajes/solicitudes que se crucen en horario, cercanía con haversine.
-   - Tests de API.
-3. **Capa 3 — Vistas** (páginas de Quasar) ⬜
+2. **Capa 2 — Lógica** ✅ (268 tests pasando en PostgreSQL; endpoints en `RaiteDocs/API.md`)
+   - Servicios, serializers y vistas para todos los RF; reglas de compatibilidad, cupo con bloqueo, visibilidad de contacto, transiciones, vencimiento calculado, verificación de correo, notificaciones, promedio de calificación, historial y reportes.
+   - Tests de API por endpoint, incluida la concurrencia al aceptar.
+3. **Capa 3 — Vistas** (páginas de Quasar) ⬜ ← siguiente
+   - Primero: registro con teléfono y pantalla del código de verificación (el login ya lo exige), y manejo de `correo_no_verificado`.
    - Pantallas que consumen el API. Sin bocetos: diseño simple y funcional con componentes de Quasar.
 
 Al terminar cada capa, actualizar aquí su estado y la tabla de requerimientos.
