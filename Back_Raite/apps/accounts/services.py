@@ -116,15 +116,10 @@ def registrar_vehiculo(usuario: Usuario, datos: dict) -> Vehiculo:
 @transaction.atomic
 def actualizar_vehiculo(vehiculo: Vehiculo, datos: dict) -> Vehiculo:
     from apps.rides.models import Viaje
-    from apps.rides.models_choices import EstadoViaje
 
     nuevos_asientos = datos.get("asientos_disponibles")
     if nuevos_asientos is not None:
-        excedidos = Viaje.objects.filter(
-            vehiculo=vehiculo,
-            estado__in=(EstadoViaje.PUBLICADO, EstadoViaje.EN_CURSO),
-            lugares_ofrecidos__gt=nuevos_asientos,
-        )
+        excedidos = Viaje.objects.vigentes().filter(vehiculo=vehiculo, lugares_ofrecidos__gt=nuevos_asientos)
         if excedidos.exists():
             raise ValidationError(
                 {"asientos_disponibles": "Tienes viajes vigentes que ofrecen más lugares que eso."}
