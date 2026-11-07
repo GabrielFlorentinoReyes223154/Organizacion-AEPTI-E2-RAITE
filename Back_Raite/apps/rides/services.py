@@ -350,6 +350,39 @@ def viajes_del_conductor(conductor, estado=None):
     return viajes.filter(Q(estado=EstadoViaje.PUBLICADO) | Q(estado=EstadoViaje.EN_CURSO))
 
 
+# --- Historial (RF-11) ---
+
+PAPEL_CONDUCTOR, PAPEL_PASAJERO = "conductor", "pasajero"
+
+
+def historial(usuario, papel=None):
+    """Viajes FINALIZADO o CANCELADO en los que participó, del más reciente al más viejo.
+
+    Como pasajero: finalizados con su lugar ACEPTADO y cancelados donde su solicitud quedó
+    CANCELADA (al cancelarse el viaje sus solicitudes activas pasan a ese estado).
+    """
+    como_conductor = Q(conductor=usuario)
+    como_pasajero = Q(
+        estado=EstadoViaje.FINALIZADO,
+        solicitudes__pasajero=usuario,
+        solicitudes__estado=EstadoSolicitud.ACEPTADA,
+    ) | Q(
+        estado=EstadoViaje.CANCELADO,
+        solicitudes__pasajero=usuario,
+        solicitudes__estado=EstadoSolicitud.CANCELADA,
+    )
+    condicion = {PAPEL_CONDUCTOR: como_conductor, PAPEL_PASAJERO: como_pasajero}.get(
+        papel, como_conductor | como_pasajero
+    )
+    return (
+        Viaje.objects.filter(estado__in=(EstadoViaje.FINALIZADO, EstadoViaje.CANCELADO))
+        .filter(condicion)
+        .distinct()
+        .select_related("conductor", "vehiculo", "punto_referencia", "campus")
+        .order_by("-fecha_hora")
+    )
+
+
 # --- Búsqueda (RF-04) ---
 
 

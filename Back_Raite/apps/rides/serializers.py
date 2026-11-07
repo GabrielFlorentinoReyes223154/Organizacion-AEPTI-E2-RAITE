@@ -155,6 +155,20 @@ class BusquedaSerializer(serializers.Serializer):
         return attrs
 
 
+class HistorialSerializer(ViajeSerializer):
+    mi_papel = serializers.SerializerMethodField()
+
+    class Meta(ViajeSerializer.Meta):
+        fields = [*ViajeSerializer.Meta.fields, "mi_papel"]
+        read_only_fields = fields
+
+    def _contacto_visible(self, viaje) -> bool:
+        return viaje.pk in self.context.get("contacto_visible", set())
+
+    def get_mi_papel(self, viaje):
+        return "conductor" if viaje.conductor_id == self.context["request"].user.pk else "pasajero"
+
+
 class ViajeDetalleSerializer(ViajeSerializer):
     """Detalle: agrega la solicitud propia y, para el conductor, sus pasajeros confirmados."""
 

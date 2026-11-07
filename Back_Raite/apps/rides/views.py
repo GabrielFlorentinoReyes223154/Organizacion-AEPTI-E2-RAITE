@@ -13,6 +13,7 @@ from .models import Viaje
 from .models_choices import EstadoSolicitud, EstadoViaje
 from .serializers import (
     BusquedaSerializer,
+    HistorialSerializer,
     MiSolicitudSerializer,
     SolicitudSerializer,
     ViajeDetalleSerializer,
@@ -170,3 +171,27 @@ class RechazarSolicitudView(AccionSolicitudView):
 class CancelarSolicitudView(AccionSolicitudView):
     accion = services.cancelar_solicitud
     salida = MiSolicitudSerializer
+
+
+class HistorialView(generics.ListAPIView):
+    """Viajes finalizados o cancelados en los que participó (RF-11). `?rol=conductor|pasajero`."""
+
+    serializer_class = HistorialSerializer
+
+    def get_queryset(self):
+        papel = self.request.query_params.get("rol")
+        if papel and papel not in (services.PAPEL_CONDUCTOR, services.PAPEL_PASAJERO):
+            raise ValidationError({"rol": "Usa conductor o pasajero."})
+        return services.historial(self.request.user, papel)
+
+    def get_serializer_context(self):
+        # Contacto visible en los viajes que condujo o donde tuvo lugar confirmado.
+        usuario = self.request.user
+        visibles = set(
+            Viaje.objects.filter(conductor=usuario).values_list("pk", flat=True)
+        ) | set(
+            Viaje.objects.filter(
+                solicitudes__pasajero=usuario, solicitudes__estado=EstadoSolicitud.ACEPTADA
+            ).values_list("pk", flat=True)
+        )
+        return {**super().get_serializer_context(), "contacto_visible": visibles}
