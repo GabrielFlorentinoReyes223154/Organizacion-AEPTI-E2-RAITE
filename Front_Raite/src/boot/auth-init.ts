@@ -1,6 +1,6 @@
-import { useAuthStore } from '@/stores/auth-store';
+import { useSesionStore } from '@/stores/sesion';
 
+// Recupera la sesión guardada antes de la primera navegación.
 export default async () => {
-  const authStore = useAuthStore();
-  await authStore.initializeAuth();
+  await useSesionStore().iniciar();
 };

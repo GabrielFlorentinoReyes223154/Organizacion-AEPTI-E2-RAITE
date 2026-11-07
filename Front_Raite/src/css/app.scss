@@ -283,3 +283,112 @@ a {
     transition-duration: 0.01ms !important;
   }
 }
+
+// --- Páginas ---
+// Contenedor centrado (DESIGN.md, Layout): márgenes de 16 / 24 / 32 px y máximo de 1120 px.
+.raite-contenedor {
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 16px;
+  box-sizing: border-box;
+  @media (min-width: 600px) {
+    padding: 24px;
+  }
+  @media (min-width: 1024px) {
+    padding: 32px;
+  }
+}
+.raite-contenedor--angosto {
+  max-width: 720px;
+}
+.raite-contenedor--formulario {
+  max-width: 544px; // 480 px de formulario + márgenes
+}
+// En escritorio el título va en la página; en celular lo lleva el encabezado.
+.raite-titulo {
+  margin: 0 0 24px;
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+.raite-seccion {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+.raite-pila {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.raite-pila--grupos {
+  gap: 24px;
+}
+.raite-ayuda {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  color: var(--raite-gris);
+}
+// Las páginas con BarraAccion dejan espacio abajo para que nada quede tapado.
+.con-barra {
+  padding-bottom: 120px !important;
+}
+.raite-tarjeta {
+  background: var(--raite-blanco);
+  border: 1px solid var(--raite-borde-sutil);
+  border-radius: 16px;
+  padding: 16px;
+}
+
+// Botones de opción (q-btn-toggle): borde de campo, la opción elegida en azul.
+.raite-opciones.q-btn-group {
+  display: grid;
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
+  gap: 8px;
+  box-shadow: none;
+  border-radius: 0;
+  > .q-btn-item {
+    min-height: 48px;
+    padding: 0 8px;
+    border-radius: 12px !important;
+    border: 1px solid var(--raite-borde-campo);
+    background: var(--raite-blanco);
+    color: var(--raite-negro);
+    font-weight: 700;
+    &.bg-primary {
+      border-color: var(--raite-azul);
+    }
+    &.disabled {
+      border-color: transparent;
+    }
+  }
+  &.raite-opciones--envolver {
+    grid-auto-flow: row;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  }
+}
+
+// Solo para lectores de pantalla.
+.sr-only {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+// En celular los avisos van por encima de la barra inferior (DESIGN.md, Avisos).
+@media (max-width: 1023px) {
+  .q-notifications__list--bottom {
+    padding-bottom: calc(72px + env(safe-area-inset-bottom));
+  }
+}
