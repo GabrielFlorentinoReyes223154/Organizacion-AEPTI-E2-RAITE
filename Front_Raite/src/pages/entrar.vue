@@ -1,6 +1,9 @@
 <template>
   <q-form class="raite-pila raite-pila--grupos" novalidate @submit="enviar">
-    <h1 class="raite-titulo q-mb-none">Entrar</h1>
+    <div>
+      <h1 class="raite-titulo raite-titulo--marca entrar__titulo">¡Qué onda!</h1>
+      <p class="entrar__subtitulo">Entra con tu correo institucional.</p>
+    </div>
 
     <div>
       <label for="entrar-correo" class="raite-etiqueta">Correo institucional</label>
@@ -54,15 +57,19 @@
       no-caps
       label="Entrar"
       :loading="enviando"
-      class="full-width"
+      class="full-width raite-btn-xl q-mt-sm"
     />
 
-    <p class="raite-ayuda text-center">
-      ¿Aún no tienes cuenta?
-      <router-link to="/registro" class="text-weight-bold"
-        >Regístrate con tu correo de la UACJ</router-link
-      >
-    </p>
+    <div class="entrar__division">¿Primera vez?</div>
+
+    <q-btn
+      outline
+      color="primary"
+      no-caps
+      label="Crea tu cuenta"
+      to="/registro"
+      class="full-width"
+    />
   </q-form>
 </template>
 
@@ -122,3 +129,28 @@ async function enviar() {
   }
 }
 </script>
+
+<style scoped lang="scss">
+.entrar__titulo {
+  margin-bottom: 4px;
+}
+.entrar__subtitulo {
+  margin: 0;
+  font-size: 1rem;
+  color: var(--raite-gris);
+}
+.entrar__division {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.875rem;
+  color: var(--raite-gris);
+  &::before,
+  &::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--raite-borde-sutil);
+  }
+}
+</style>
