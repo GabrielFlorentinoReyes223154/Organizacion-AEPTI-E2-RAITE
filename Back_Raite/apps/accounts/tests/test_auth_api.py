@@ -68,6 +68,16 @@ class AuthAPITests(TestCase):
         self.assertNotIn("password", response.data)
         self.assertNotIn("is_superuser", response.data)
 
+    def test_login_sin_verificar_es_403(self):
+        self.user.correo_verificado = False
+        self.user.save()
+        response = self.client.post(
+            "/api/auth/token/",
+            {"correo": "test@alumnos.uacj.mx", "password": "password123"},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
     def test_me_endpoint_sin_token(self):
         response = self.client.get("/api/auth/me/")
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
