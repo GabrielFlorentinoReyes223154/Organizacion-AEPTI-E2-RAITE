@@ -104,9 +104,10 @@ class UsuarioModelTests(TestCase):
         crear_usuario(telefono="6561234567").full_clean()
 
     def test_telefono_invalido(self):
+        user = crear_usuario()
         for telefono in ("", "656123456", "65612345678", "656-123-456", "abcdefghij"):
             with self.subTest(telefono=telefono):
-                user = crear_usuario(telefono=telefono)
+                user.telefono = telefono  # sin guardar: en PostgreSQL 11 caracteres no caben en la columna
                 with self.assertRaises(ValidationError) as ctx:
                     user.full_clean()
                 self.assertIn("telefono", ctx.exception.message_dict)

@@ -11,6 +11,20 @@ def convertir_cuenta_activa_boolean_a_entero(apps, schema_editor):
     print(f"C3: Convertidas {count_true} filas True->1 y {count_false} filas False->0 en cuenta_activa")
 
 
+def cambiar_tipo_en_postgres(apps, schema_editor):
+    # PostgreSQL no convierte boolean -> smallint con el USING que genera AlterField.
+    # Se hace aquí con un cast válido; después AlterField solo agrega el CHECK >= 0.
+    if schema_editor.connection.vendor != "postgresql":
+        return
+    schema_editor.execute(
+        'ALTER TABLE "accounts_usuario" ALTER COLUMN "cuenta_activa" DROP DEFAULT'
+    )
+    schema_editor.execute(
+        'ALTER TABLE "accounts_usuario" ALTER COLUMN "cuenta_activa" '
+        'TYPE smallint USING "cuenta_activa"::integer'
+    )
+
+
 def reverse_conversion(apps, schema_editor):
     # No se puede recuperar exactamente, se asume 0->False, >0->True
     Usuario = apps.get_model("accounts", "Usuario")
@@ -31,6 +45,7 @@ class Migration(migrations.Migration):
             field=models.BooleanField(default=False),
         ),
         migrations.RunPython(convertir_cuenta_activa_boolean_a_entero, reverse_conversion),
+        migrations.RunPython(cambiar_tipo_en_postgres, migrations.RunPython.noop),
         migrations.AlterField(
             model_name="usuario",
             name="cuenta_activa",
