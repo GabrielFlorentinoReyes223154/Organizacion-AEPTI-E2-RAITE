@@ -12,6 +12,7 @@ from . import services
 from .models import Viaje
 from .models_choices import EstadoViaje
 from .serializers import (
+    BusquedaSerializer,
     ViajeDetalleSerializer,
     ViajeEdicionSerializer,
     ViajeEntradaSerializer,
@@ -29,13 +30,22 @@ def respuesta_viaje(request, viaje, codigo=status.HTTP_200_OK):
     return Response(ViajeDetalleSerializer(viaje, context=contexto).data, status=codigo)
 
 
-class ViajesView(APIView):
-    """POST: publicar un viaje (RF-02, RF-03)."""
+class ViajesView(generics.GenericAPIView):
+    """GET: buscar viajes (RF-04, RF-07). POST: publicar un viaje (RF-02, RF-03)."""
+
+    serializer_class = ViajeSerializer
 
     def get_permissions(self):
         if self.request.method == "POST":
             return [IsAuthenticated(), CorreoVerificado(), PuedePublicar()]
         return super().get_permissions()
+
+    def get(self, request):
+        filtros = BusquedaSerializer(data=request.query_params)
+        filtros.is_valid(raise_exception=True)
+        viajes = services.buscar_viajes(request.user, filtros.validated_data)
+        pagina = self.paginate_queryset(viajes)
+        return self.get_paginated_response(self.get_serializer(pagina, many=True).data)
 
     def post(self, request):
         entrada = ViajeEntradaSerializer(data=request.data)

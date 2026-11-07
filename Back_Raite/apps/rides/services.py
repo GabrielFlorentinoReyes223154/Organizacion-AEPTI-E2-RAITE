@@ -9,14 +9,16 @@ from datetime import timedelta
 from django.conf import settings
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import transaction
-from django.db.models import Q
+from django.http import Http404
+from django.db.models import Prefetch, Q
 from django.utils import timezone
 
+from apps.locations.geo import filtro_recuadro, haversine_km
 from apps.notifications.models_choices import TipoNotificacion
 from apps.notifications.services import describir_viaje, notificar
 from Raite_DjangoRest.api import Conflicto
 
-from .compatibilidad import MISMO_SEXO, grupo_compatible, integrantes_del_viaje
+from .compatibilidad import MISMO_SEXO, es_compatible, grupo_compatible, integrantes_del_viaje
 from .models import Solicitud, Viaje
 from .models_choices import ESTADOS_SOLICITUD_ACTIVOS, EstadoSolicitud, EstadoViaje
 
@@ -28,8 +30,6 @@ def bloquear_viaje(viaje_id) -> Viaje:
     try:
         return Viaje.objects.select_for_update().get(pk=viaje_id)
     except Viaje.DoesNotExist:
-        from django.http import Http404
-
         raise Http404("No existe el viaje.")
 
 
@@ -218,3 +218,62 @@ def viajes_del_conductor(conductor, estado=None):
     if estado:
         return viajes.filter(estado=estado)
     return viajes.filter(Q(estado=EstadoViaje.PUBLICADO) | Q(estado=EstadoViaje.EN_CURSO))
+
+
+# --- Búsqueda (RF-04) ---
+
+
+def buscar_viajes(usuario, filtros: dict) -> list[Viaje]:
+    """Viajes PUBLICADO a futuro (los vencidos quedan fuera), con lugar libre, que no sean del
+    usuario y compatibles con él. Si hay punto o lat/lon, filtra por radio y ordena por distancia.
+
+    `filtros`: punto, lat, lon, radio_km, campus, sentido, desde, hasta (todos opcionales).
+    """
+    viajes = (
+        Viaje.objects.filter(estado=EstadoViaje.PUBLICADO, fecha_hora__gt=timezone.now())
+        .exclude(conductor=usuario)
+        .select_related("conductor", "vehiculo", "punto_referencia", "campus")
+        .prefetch_related(
+            Prefetch(
+                "solicitudes",
+                queryset=Solicitud.objects.filter(estado=EstadoSolicitud.ACEPTADA).select_related("pasajero"),
+                to_attr="aceptadas_cache",
+            )
+        )
+    )
+    if filtros.get("campus"):
+        viajes = viajes.filter(campus=filtros["campus"])
+    if filtros.get("sentido"):
+        viajes = viajes.filter(sentido=filtros["sentido"])
+    if filtros.get("desde"):
+        viajes = viajes.filter(fecha_hora__gte=filtros["desde"])
+    if filtros.get("hasta"):
+        viajes = viajes.filter(fecha_hora__lte=filtros["hasta"])
+
+    centro = None
+    if filtros.get("punto"):
+        centro = (filtros["punto"].latitud, filtros["punto"].longitud)
+    elif filtros.get("lat") is not None:
+        centro = (filtros["lat"], filtros["lon"])
+    radio = filtros.get("radio_km") or settings.BUSQUEDA_RADIO_KM
+    if centro:
+        viajes = viajes.filter(**filtro_recuadro(*centro, radio, prefijo="punto_referencia__"))
+
+    resultado = []
+    for viaje in viajes:
+        aceptadas = viaje.aceptadas_cache
+        if len(aceptadas) >= viaje.lugares_ofrecidos:
+            continue
+        if not es_compatible(viaje, usuario, aceptadas=aceptadas):
+            continue
+        if centro:
+            viaje.distancia_km = haversine_km(*centro, viaje.punto_referencia.latitud, viaje.punto_referencia.longitud)
+            if viaje.distancia_km > radio:
+                continue
+        resultado.append(viaje)
+
+    if centro:
+        resultado.sort(key=lambda v: (v.distancia_km, v.fecha_hora))
+    else:
+        resultado.sort(key=lambda v: v.fecha_hora)
+    return resultado

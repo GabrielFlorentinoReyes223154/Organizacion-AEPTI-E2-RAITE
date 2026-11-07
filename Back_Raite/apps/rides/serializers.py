@@ -5,6 +5,7 @@ La vista pasa en el contexto `contacto_visible` (ids de viajes donde quien consu
 lugar confirmado) y `es_conductor` (True si quien consulta es el conductor del viaje).
 """
 
+from django.conf import settings
 from rest_framework import serializers
 
 from apps.accounts.models import Usuario
@@ -12,6 +13,7 @@ from apps.locations.models import Campus, PuntoReferencia
 from apps.locations.serializers import CampusSerializer, PuntoReferenciaSerializer
 
 from .models import Solicitud, Viaje
+from .models_choices import SentidoViaje
 
 
 class UsuarioPublicoSerializer(serializers.ModelSerializer):
@@ -67,7 +69,7 @@ class ViajeSerializer(serializers.ModelSerializer):
     campus = CampusSerializer(read_only=True)
     estado_display = serializers.CharField(source="get_estado_display", read_only=True)
     sentido_display = serializers.CharField(source="get_sentido_display", read_only=True)
-    lugares_disponibles = serializers.IntegerField(read_only=True)
+    lugares_disponibles = serializers.SerializerMethodField()
     esta_vencido = serializers.BooleanField(read_only=True)
     inicio_permitido_desde = serializers.DateTimeField(read_only=True)
     distancia_km = serializers.SerializerMethodField()
@@ -117,6 +119,40 @@ class ViajeSerializer(serializers.ModelSerializer):
     def get_distancia_km(self, viaje):
         distancia = getattr(viaje, "distancia_km", None)
         return round(distancia, 2) if distancia is not None else None
+
+    def get_lugares_disponibles(self, viaje) -> int:
+        aceptadas = getattr(viaje, "aceptadas_cache", None)  # la búsqueda ya las trae
+        if aceptadas is None:
+            return viaje.lugares_disponibles
+        return max(viaje.lugares_ofrecidos - len(aceptadas), 0)
+
+
+class BusquedaSerializer(serializers.Serializer):
+    """Filtros de `GET /api/viajes/`. Horas en ISO 8601 (sin zona = hora de Juárez)."""
+
+    punto = serializers.PrimaryKeyRelatedField(queryset=PuntoReferencia.objects.filter(activo=True), required=False)
+    lat = serializers.FloatField(required=False, min_value=-90, max_value=90)
+    lon = serializers.FloatField(required=False, min_value=-180, max_value=180)
+    radio_km = serializers.FloatField(required=False, min_value=0.1)
+    campus = serializers.PrimaryKeyRelatedField(queryset=Campus.objects.filter(activo=True), required=False)
+    sentido = serializers.ChoiceField(choices=SentidoViaje.choices, required=False)
+    desde = serializers.DateTimeField(required=False)
+    hasta = serializers.DateTimeField(required=False)
+
+    def validate_radio_km(self, valor):
+        maximo = settings.BUSQUEDA_RADIO_MAX_KM
+        if valor > maximo:
+            raise serializers.ValidationError(f"El radio máximo es {maximo} km.")
+        return valor
+
+    def validate(self, attrs):
+        if ("lat" in attrs) != ("lon" in attrs):
+            raise serializers.ValidationError("Envía lat y lon juntos.")
+        if "punto" in attrs and "lat" in attrs:
+            raise serializers.ValidationError("Usa punto o lat/lon, no ambos.")
+        if attrs.get("desde") and attrs.get("hasta") and attrs["desde"] > attrs["hasta"]:
+            raise serializers.ValidationError({"hasta": "Debe ser posterior a desde."})
+        return attrs
 
 
 class ViajeDetalleSerializer(ViajeSerializer):
