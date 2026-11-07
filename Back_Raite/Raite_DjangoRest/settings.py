@@ -171,11 +171,25 @@ AUTH_USER_MODEL = 'accounts.Usuario'
 CORREO_DOMINIO_PERMITIDO = 'alumnos.uacj.mx'
 CODIGO_VERIFICACION_MINUTOS = 15
 CODIGO_VERIFICACION_MAX_INTENTOS = 5
+CODIGO_REENVIO_SEGUNDOS = 60       # espera mínima entre reenvíos del código
+BUSQUEDA_RADIO_KM = 3              # radio por defecto al buscar viajes
+BUSQUEDA_RADIO_MAX_KM = 15
+VENTANA_CRUCE_MINUTOS = 60         # separación mínima entre dos viajes/solicitudes activos del mismo usuario
+INICIO_ANTICIPACION_MINUTOS = 30   # un viaje se puede iniciar desde este tiempo antes de su hora
+VENCIMIENTO_HORAS = 2              # un viaje PUBLICADO vence cuando su hora pasó hace más de esto
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
+    # Todo el API pide sesión y correo verificado; los endpoints públicos lo declaran.
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+        'apps.accounts.permissions.CorreoVerificado',
+    ),
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 20,
+    'EXCEPTION_HANDLER': 'Raite_DjangoRest.api.manejar_excepcion',
 }
 
 SIMPLE_JWT = {

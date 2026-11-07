@@ -1,15 +1,33 @@
+"""Forma de entrada/salida del API de cuentas. Las reglas de negocio viven en services.py."""
+
 from rest_framework import serializers
+from rest_framework.exceptions import APIException
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 from .models import ASIENTOS_MAX, ASIENTOS_MIN, Usuario, Vehiculo
 from .models_choices import Rol, TipoVehiculo
 
 
+class VehiculoSerializer(serializers.ModelSerializer):
+    """Vehículo propio (con placas). Para otros usuarios ver apps.rides.serializers."""
+
+    tipo_display = serializers.CharField(source="get_tipo_display", read_only=True)
+
+    class Meta:
+        model = Vehiculo
+        fields = ["id", "marca", "modelo", "color", "placas", "tipo", "tipo_display", "asientos_disponibles", "activo"]
+        read_only_fields = ["id", "placas", "tipo", "activo"]
+
+
 class UsuarioSerializer(serializers.ModelSerializer):
+    """Perfil propio (`/api/auth/me/`)."""
+
     nombre_completo = serializers.CharField(read_only=True)
     es_pasajero = serializers.BooleanField(read_only=True)
     es_conductor = serializers.BooleanField(read_only=True)
     es_admin = serializers.BooleanField(read_only=True)
     rol_display = serializers.CharField(source="get_rol_display", read_only=True)
+    vehiculo = serializers.SerializerMethodField()
 
     class Meta:
         model = Usuario
@@ -32,8 +50,21 @@ class UsuarioSerializer(serializers.ModelSerializer):
             "es_pasajero",
             "es_conductor",
             "es_admin",
+            "vehiculo",
         ]
-        read_only_fields = ["id", "calificacion", "correo_verificado", "suspendido"]
+        read_only_fields = fields
+
+    def get_vehiculo(self, usuario):
+        vehiculo = getattr(usuario, "vehiculo", None)
+        return VehiculoSerializer(vehiculo).data if vehiculo else None
+
+
+class PerfilEditableSerializer(serializers.ModelSerializer):
+    """Lo que el usuario puede cambiar de su perfil. Correo, sexo y rol no se editan."""
+
+    class Meta:
+        model = Usuario
+        fields = ["telefono", "carrera", "preferencia_compatibilidad"]
 
 
 class RegistroSerializer(serializers.ModelSerializer):
@@ -51,6 +82,7 @@ class RegistroSerializer(serializers.ModelSerializer):
             "sexo",
             "carrera",
             "telefono",
+            "preferencia_compatibilidad",
             "rol",
         ]
         extra_kwargs = {
@@ -58,6 +90,8 @@ class RegistroSerializer(serializers.ModelSerializer):
             "sexo": {"required": True},
             "carrera": {"required": True},
             "telefono": {"required": True},
+            # La unicidad se revisa en validate_correo (sin distinguir mayúsculas).
+            "correo": {"validators": []},
         }
 
     def validate_correo(self, value):
@@ -70,18 +104,47 @@ class RegistroSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("El rol ADMIN no se otorga en el registro público.")
         return value
 
-    def create(self, validated_data):
-        password = validated_data.pop("password")
-        rol = validated_data.pop("rol", None)
-        return Usuario.objects.create_user(password=password, rol=rol, **validated_data)
-
 
 class RegistroResponseSerializer(serializers.Serializer):
     id = serializers.UUIDField()
+    correo = serializers.EmailField()
     rol = serializers.IntegerField()
     rol_display = serializers.CharField()
     suspendido = serializers.BooleanField()
     requiere_vehiculo = serializers.BooleanField()
+    requiere_verificacion = serializers.BooleanField()
+
+
+class VerificarCorreoSerializer(serializers.Serializer):
+    correo = serializers.EmailField()
+    codigo = serializers.RegexField(r"^\d{6}$", error_messages={"invalid": "El código tiene 6 dígitos."})
+
+
+class CorreoSerializer(serializers.Serializer):
+    correo = serializers.EmailField()
+
+
+class CorreoNoVerificado(APIException):
+    status_code = 403
+    default_code = "correo_no_verificado"
+
+    def __init__(self):
+        super().__init__(
+            {
+                "detail": "Verifica tu correo institucional antes de iniciar sesión.",
+                "codigo": "correo_no_verificado",
+            }
+        )
+
+
+class LoginSerializer(TokenObtainPairSerializer):
+    """Login normal de SimpleJWT, pero sin tokens si el correo no está verificado."""
+
+    def validate(self, attrs):
+        data = super().validate(attrs)
+        if not self.user.correo_verificado:
+            raise CorreoNoVerificado()
+        return data
 
 
 class VehiculoRegistroSerializer(serializers.Serializer):
@@ -97,6 +160,13 @@ class VehiculoRegistroSerializer(serializers.Serializer):
         if Vehiculo.objects.filter(placas=normalized).exists():
             raise serializers.ValidationError("Esta placa ya está registrada.")
         return normalized
+
+
+class VehiculoEditableSerializer(serializers.Serializer):
+    marca = serializers.CharField(max_length=60, required=False)
+    modelo = serializers.CharField(max_length=60, required=False)
+    color = serializers.CharField(max_length=40, required=False)
+    asientos_disponibles = serializers.IntegerField(min_value=ASIENTOS_MIN, max_value=ASIENTOS_MAX, required=False)
 
 
 class VehiculoRegistroResponseSerializer(serializers.Serializer):

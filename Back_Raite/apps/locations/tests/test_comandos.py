@@ -59,10 +59,14 @@ class NombrarPuntosTests(SimpleTestCase):
         self.assertEqual(resultado[0]["nombre"], "Oxxo – Av. de las Torres, Col. Las Dunas")
         self.assertTrue(resultado[0]["activo"])
 
-    def test_sin_calle_o_colonia_queda_inactivo(self):
+    def test_basta_la_calle_para_quedar_activo(self):
+        resultado = osm.nombrar_puntos(self.puntos[:1], lambda lat, lon: respuesta(calle="Av. Tecnológico"))
+        self.assertEqual(resultado[0]["nombre"], "Oxxo – Av. Tecnológico")
+        self.assertTrue(resultado[0]["activo"])
+
+    def test_sin_calle_queda_inactivo(self):
         casos = [
             (respuesta(), "Oxxo – (sin calle)"),
-            (respuesta(calle="Av. Tecnológico"), "Oxxo – Av. Tecnológico"),
             (respuesta(colonia="Centro"), "Oxxo – Col. Centro"),
         ]
         for resp, nombre in casos:
@@ -139,6 +143,24 @@ class CargarDatosInicialesTests(TestCase):
             self.assertEqual((punto.nombre, punto.activo), ("Oxxo Dunas", True))
             self.assertIn("0 creados, 5 actualizados", salida.getvalue())
 
+    def test_actualizar_estados_copia_activo_a_puntos_existentes(self):
+        puntos = [
+            {"osm_id": "node/1", "nombre": "Oxxo – A", "latitud": "31.70", "longitud": "-106.40", "activo": True},
+            {"osm_id": "node/2", "nombre": "Oxxo – (sin calle)", "latitud": "31.71", "longitud": "-106.41", "activo": False},
+        ]
+        with tempfile.TemporaryDirectory() as tmp:
+            args = {"campus": self.escribir(tmp, "c.json", []), "puntos": self.escribir(tmp, "p.json", puntos)}
+            call_command("cargar_datos_iniciales", stdout=StringIO(), **args)
+            PuntoReferencia.objects.filter(osm_id="node/1").update(activo=False, nombre="Oxxo Dunas")
+            PuntoReferencia.objects.filter(osm_id="node/2").update(activo=True)
+
+            call_command("cargar_datos_iniciales", actualizar_estados=True, stdout=StringIO(), **args)
+
+        estados = dict(PuntoReferencia.objects.values_list("osm_id", "activo"))
+        self.assertEqual(estados, {"node/1": True, "node/2": False})
+        # El nombre editado en el admin se conserva
+        self.assertEqual(PuntoReferencia.objects.get(osm_id="node/1").nombre, "Oxxo Dunas")
+
     def test_rechaza_coordenadas_fuera_de_juarez(self):
         from django.core.exceptions import ValidationError
 
@@ -156,3 +178,9 @@ class CargarDatosInicialesTests(TestCase):
             set(Campus.objects.values_list("codigo", flat=True)), {"CU", "IIT", "ICB", "ICSA", "IADA"}
         )
         self.assertGreater(PuntoReferencia.objects.count(), 100)
+
+    def test_json_versionado_sigue_la_regla_de_activo(self):
+        datos = json.loads((DATOS_REALES / "puntos_referencia.json").read_text(encoding="utf-8"))
+        for punto in datos:
+            with self.subTest(osm_id=punto["osm_id"]):
+                self.assertEqual(punto["activo"], osm.es_activo(punto["calle"], punto["colonia"]))

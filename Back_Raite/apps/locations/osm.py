@@ -86,11 +86,16 @@ def desambiguar(puntos: list[dict]) -> None:
                 punto["nombre"] = f"{nombre} ({vistos[nombre]})"
 
 
-def nombrar_puntos(puntos: list[dict], geocodificar) -> list[dict]:
-    """Agrega nombre, calle, colonia y activo a cada punto usando `geocodificar(lat, lon)`.
+def es_activo(calle: str, colonia: str) -> bool:
+    """Basta con la calle para mostrar el punto; sin calle queda inactivo para revisarlo en el admin.
 
-    Un punto sin calle o sin colonia queda con activo=False para revisarlo en el admin.
+    La colonia no se exige porque OSM casi no tiene colonias en Ciudad Juárez.
     """
+    return bool(calle)
+
+
+def nombrar_puntos(puntos: list[dict], geocodificar) -> list[dict]:
+    """Agrega nombre, calle, colonia y activo a cada punto usando `geocodificar(lat, lon)`."""
     resultado = []
     for punto in puntos:
         try:
@@ -106,7 +111,7 @@ def nombrar_puntos(puntos: list[dict], geocodificar) -> list[dict]:
                 "colonia": colonia,
                 "latitud": punto["latitud"],
                 "longitud": punto["longitud"],
-                "activo": bool(calle and colonia),
+                "activo": es_activo(calle, colonia),
             }
         )
     desambiguar(resultado)

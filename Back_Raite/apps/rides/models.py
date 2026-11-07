@@ -1,4 +1,5 @@
 import uuid
+from datetime import timedelta
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -18,6 +19,24 @@ from .models_choices import (
     EstadoViaje,
     SentidoViaje,
 )
+
+
+def limite_vencimiento():
+    """Un viaje PUBLICADO cuya hora es anterior a esto está vencido."""
+    return timezone.now() - timedelta(hours=settings.VENCIMIENTO_HORAS)
+
+
+class ViajeQuerySet(models.QuerySet):
+    def vencidos(self):
+        """PUBLICADO cuya hora pasó hace más de VENCIMIENTO_HORAS. Solo se pueden cancelar."""
+        return self.filter(estado=EstadoViaje.PUBLICADO, fecha_hora__lt=limite_vencimiento())
+
+    def vigentes(self):
+        """PUBLICADO sin vencer o EN_CURSO: los que cuentan para cruces de horario."""
+        return self.filter(
+            Q(estado=EstadoViaje.PUBLICADO, fecha_hora__gte=limite_vencimiento())
+            | Q(estado=EstadoViaje.EN_CURSO)
+        )
 
 
 class Viaje(models.Model):
@@ -60,6 +79,8 @@ class Viaje(models.Model):
     estado = models.CharField(max_length=12, choices=EstadoViaje.choices, default=EstadoViaje.PUBLICADO)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    objects = ViajeQuerySet.as_manager()
 
     class Meta:
         ordering = ["fecha_hora"]
@@ -147,6 +168,15 @@ class Viaje(models.Model):
 
     def puede_cambiar_a(self, estado) -> bool:
         return estado in TRANSICIONES_VIAJE[self.estado]
+
+    @property
+    def esta_vencido(self) -> bool:
+        """Calculado con la fecha; no es un estado guardado."""
+        return self.estado == EstadoViaje.PUBLICADO and self.fecha_hora < limite_vencimiento()
+
+    @property
+    def inicio_permitido_desde(self):
+        return self.fecha_hora - timedelta(minutes=settings.INICIO_ANTICIPACION_MINUTOS)
 
 
 class Solicitud(models.Model):
