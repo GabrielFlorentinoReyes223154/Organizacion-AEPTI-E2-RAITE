@@ -82,7 +82,7 @@ $overline: (
 
 // --- Forma ---
 $generic-border-radius: 12px;
-$button-border-radius: 12px;
+$button-border-radius: 999px; // Botones tipo píldora (rediseño 2026-11)
 $button-padding: 0 24px;
 $button-font-size: 16px;
 $button-font-weight: 700;
