@@ -1,372 +1,275 @@
 from decimal import Decimal
 
-from django.contrib.auth import get_user_model
+from django.contrib.auth import authenticate, get_user_model
 from django.core.exceptions import ValidationError
-from django.db import IntegrityError
+from django.db import IntegrityError, transaction
 from django.test import TestCase
 
-from apps.accounts.models import Rol, Sexo, Usuario
+from apps.accounts.models import Rol, Sexo, Vehiculo
+from apps.accounts.models_choices import PreferenciaCompatibilidad
+from apps.accounts.tests.factories import crear_conductor, crear_usuario, crear_vehiculo
 
 
 class UsuarioModelTests(TestCase):
     def setUp(self):
         self.User = get_user_model()
 
+    def crear_admin(self, **datos):
+        valores = {
+            "correo": "admin@ejemplo.com",
+            "password": "password123",
+            "nombre": "Admin",
+            "apellidos": "Raite",
+            "edad": 30,
+            "sexo": Sexo.M,
+            "carrera": "Administración",
+            "telefono": "6560000000",
+        }
+        valores.update(datos)
+        return self.User.objects.create_superuser(**valores)
+
+    # --- Creación y valores por defecto ---
+
     def test_crear_usuario_con_datos_validos(self):
-        user = self.User.objects.create_user(
-            correo="test@uacj.mx",
-            password="password123",
+        user = crear_usuario(
+            correo="juan@alumnos.uacj.mx",
             nombre="Juan",
             apellidos="Pérez",
-            edad=20,
             sexo=Sexo.M,
-            carrera="Ingeniería",
-            rol=Rol.PASAJERO,
+            telefono="6561234567",
+            correo_verificado=False,
         )
-        self.assertEqual(user.correo, "test@uacj.mx")
-        self.assertEqual(user.nombre, "Juan")
-        self.assertEqual(user.apellidos, "Pérez")
-        self.assertEqual(user.edad, 20)
-        self.assertEqual(user.sexo, Sexo.M)
-        self.assertEqual(user.carrera, "Ingeniería")
+        user.full_clean()
+        self.assertEqual(user.correo, "juan@alumnos.uacj.mx")
+        self.assertEqual(user.telefono, "6561234567")
+        self.assertEqual(user.rol, Rol.PASAJERO)
         self.assertTrue(user.es_pasajero)
         self.assertFalse(user.es_conductor)
-        self.assertEqual(user.cuenta_activa, 0)
-        self.assertFalse(user.activo)
         self.assertFalse(user.suspendido)
         self.assertEqual(user.calificacion, Decimal("0.00"))
-        self.assertEqual(user.rol, Rol.PASAJERO)
 
-    def test_crear_usuario_rol_default_pasajero(self):
+    def test_valores_por_defecto(self):
         user = self.User.objects.create_user(
-            correo="default@uacj.mx",
+            correo="defecto@alumnos.uacj.mx",
             password="password123",
-            nombre="Default",
+            nombre="Defecto",
             apellidos="Test",
-            edad=20,
-            sexo=Sexo.M,
-            carrera="Ingeniería",
+            sexo=Sexo.F,
+            carrera="Derecho",
+            telefono="6561112233",
         )
         self.assertEqual(user.rol, Rol.PASAJERO)
-        self.assertTrue(user.es_pasajero)
+        self.assertFalse(user.correo_verificado)
+        self.assertEqual(user.preferencia_compatibilidad, PreferenciaCompatibilidad.MIXTO)
 
     def test_edad_fuera_de_rango_falla(self):
-        with self.assertRaises(Exception):
-            self.User.objects.create_user(
-                correo="edad_menor@uacj.mx",
-                password="password123",
-                nombre="Menor",
-                apellidos="Test",
-                edad=16,
-                sexo=Sexo.F,
-                carrera="Ingeniería",
-            )
-        with self.assertRaises(Exception):
-            self.User.objects.create_user(
-                correo="edad_mayor@uacj.mx",
-                password="password123",
-                nombre="Mayor",
-                apellidos="Test",
-                edad=71,
-                sexo=Sexo.F,
-                carrera="Ingeniería",
-            )
+        for edad in (16, 71):
+            with self.subTest(edad=edad), self.assertRaises(Exception), transaction.atomic():
+                crear_usuario(edad=edad)
 
     def test_edad_en_limites_funciona(self):
-        user_min = self.User.objects.create_user(
-            correo="edad_17@uacj.mx",
-            password="password123",
-            nombre="Edad17",
-            apellidos="Test",
-            edad=17,
-            sexo=Sexo.M,
-            carrera="Ingeniería",
-        )
-        self.assertEqual(user_min.edad, 17)
-
-        user_max = self.User.objects.create_user(
-            correo="edad_70@uacj.mx",
-            password="password123",
-            nombre="Edad70",
-            apellidos="Test",
-            edad=70,
-            sexo=Sexo.M,
-            carrera="Ingeniería",
-        )
-        self.assertEqual(user_max.edad, 70)
+        self.assertEqual(crear_usuario(edad=17).edad, 17)
+        self.assertEqual(crear_usuario(edad=70).edad, 70)
 
     def test_correo_unico(self):
-        self.User.objects.create_user(
-            correo="duplicado@uacj.mx",
-            password="password123",
-            nombre="Uno",
-            apellidos="Test",
-            edad=20,
-            sexo=Sexo.M,
-            carrera="Ingeniería",
-        )
+        crear_usuario(correo="duplicado@alumnos.uacj.mx")
         with self.assertRaises(IntegrityError):
-            self.User.objects.create_user(
-                correo="duplicado@uacj.mx",
-                password="password456",
-                nombre="Dos",
-                apellidos="Test",
-                edad=20,
-                sexo=Sexo.F,
-                carrera="Medicina",
-            )
+            crear_usuario(correo="duplicado@alumnos.uacj.mx")
+
+    def test_nombre_completo(self):
+        self.assertEqual(crear_usuario(nombre="Ana", apellidos="López").nombre_completo, "Ana López")
+
+    # --- Correo institucional ---
+
+    def test_correo_institucional_valido(self):
+        crear_usuario(correo="ok@alumnos.uacj.mx").full_clean()
+
+    def test_correo_no_institucional_rechazado(self):
+        for correo in ("alguien@gmail.com", "profe@uacj.mx", "x@alumnos.uacj.mx.com"):
+            with self.subTest(correo=correo):
+                user = crear_usuario(correo=correo)
+                with self.assertRaises(ValidationError) as ctx:
+                    user.full_clean()
+                self.assertIn("correo", ctx.exception.message_dict)
+
+    def test_correo_institucional_ignora_mayusculas(self):
+        crear_usuario(correo="Mayus@Alumnos.UACJ.mx").full_clean()
+
+    def test_admin_puede_tener_cualquier_correo(self):
+        self.crear_admin(correo="coordinacion@gmail.com").full_clean()
+
+    # --- Teléfono ---
+
+    def test_telefono_valido(self):
+        crear_usuario(telefono="6561234567").full_clean()
+
+    def test_telefono_invalido(self):
+        for telefono in ("", "656123456", "65612345678", "656-123-456", "abcdefghij"):
+            with self.subTest(telefono=telefono):
+                user = crear_usuario(telefono=telefono)
+                with self.assertRaises(ValidationError) as ctx:
+                    user.full_clean()
+                self.assertIn("telefono", ctx.exception.message_dict)
+
+    # --- Sexo y preferencia ---
+
+    def test_sexo_es_obligatorio(self):
+        field = self.User._meta.get_field("sexo")
+        self.assertFalse(field.has_default())
+        user = crear_usuario()
+        user.sexo = ""
+        with self.assertRaises(ValidationError):
+            user.full_clean()
+
+    def test_sexo_acepta_m_f_x(self):
+        for sexo in (Sexo.M, Sexo.F, Sexo.X):
+            with self.subTest(sexo=sexo):
+                crear_usuario(sexo=sexo).full_clean()
+
+    def test_sexo_no_tiene_prefiere_no_decir(self):
+        self.assertEqual({c[0] for c in Sexo.choices}, {"M", "F", "X"})
+
+    def test_preferencia_solo_mismo_sexo_o_mixto(self):
+        self.assertEqual(
+            {c[0] for c in PreferenciaCompatibilidad.choices}, {"MISMO_SEXO", "MIXTO"}
+        )
+        user = crear_usuario()
+        user.preferencia_compatibilidad = "SEXO_OPUESTO"
+        with self.assertRaises(ValidationError):
+            user.full_clean()
+
+    # --- Roles ---
 
     def test_es_pasajero_es_conductor_es_admin(self):
-        user_pasajero = self.User.objects.create_user(
-            correo="pasajero@uacj.mx",
-            password="password123",
-            nombre="Pasajero",
-            apellidos="Test",
-            edad=20,
-            sexo=Sexo.F,
-            carrera="Ingeniería",
-            rol=Rol.PASAJERO,
-        )
-        user_conductor = self.User.objects.create_user(
-            correo="conductor@uacj.mx",
-            password="password123",
-            nombre="Conductor",
-            apellidos="Test",
-            edad=22,
-            sexo=Sexo.M,
-            carrera="Ingeniería",
-            rol=Rol.CONDUCTOR,
-        )
-        user_admin = self.User.objects.create_superuser(
-            correo="admin@uacj.mx",
-            password="password123",
-            nombre="Admin",
-            apellidos="Test",
-            edad=25,
-            sexo=Sexo.M,
-            carrera="Ingeniería",
-        )
-        self.assertTrue(user_pasajero.es_pasajero)
-        self.assertFalse(user_pasajero.es_conductor)
-        self.assertFalse(user_pasajero.es_admin)
+        pasajero = crear_usuario(rol=Rol.PASAJERO)
+        conductor = crear_usuario(rol=Rol.CONDUCTOR)
+        ambos = crear_usuario(rol=Rol.AMBOS)
+        admin = self.crear_admin()
 
-        self.assertFalse(user_conductor.es_pasajero)
-        self.assertTrue(user_conductor.es_conductor)
-        self.assertFalse(user_conductor.es_admin)
+        self.assertEqual((pasajero.es_pasajero, pasajero.es_conductor, pasajero.es_admin), (True, False, False))
+        self.assertEqual((conductor.es_pasajero, conductor.es_conductor, conductor.es_admin), (False, True, False))
+        self.assertEqual((ambos.es_pasajero, ambos.es_conductor, ambos.es_admin), (True, True, False))
+        self.assertEqual((admin.es_pasajero, admin.es_conductor, admin.es_admin), (False, False, True))
 
-        self.assertFalse(user_admin.es_pasajero)
-        self.assertFalse(user_admin.es_conductor)
-        self.assertTrue(user_admin.es_admin)
+    def test_tiene_rol(self):
+        user = crear_usuario(rol=Rol.PASAJERO)
+        self.assertTrue(user.tiene_rol(Rol.PASAJERO))
+        self.assertFalse(user.tiene_rol(Rol.CONDUCTOR))
 
     def test_no_se_puede_crear_usuario_con_rol_admin_via_create_user(self):
         with self.assertRaises(ValueError):
-            self.User.objects.create_user(
-                correo="admin_falso@uacj.mx",
-                password="password123",
-                nombre="Admin",
-                apellidos="Falso",
-                edad=25,
-                sexo=Sexo.M,
-                carrera="Ingeniería",
-                rol=Rol.ADMIN,
-            )
-
-    def test_nombre_completo(self):
-        user = self.User.objects.create_user(
-            correo="nombre@uacj.mx",
-            password="password123",
-            nombre="Ana",
-            apellidos="López",
-            edad=19,
-            sexo=Sexo.F,
-            carrera="Derecho",
-        )
-        self.assertEqual(user.nombre_completo, "Ana López")
-
-    def test_puede_crear_raite(self):
-        user = self.User.objects.create_user(
-            correo="crear@uacj.mx",
-            password="password123",
-            nombre="Crea",
-            apellidos="Raite",
-            edad=20,
-            sexo=Sexo.F,
-            carrera="Ingeniería",
-            rol=Rol.PASAJERO,
-        )
-        self.assertTrue(user.puede_crear_raite())
-        user.cuenta_activa = 1
-        user.save()
-        self.assertFalse(user.puede_crear_raite())
-        user.cuenta_activa = 0
-        user.suspendido = True
-        user.save()
-        self.assertFalse(user.puede_crear_raite())
-
-    def test_puede_aceptar_raite(self):
-        user = self.User.objects.create_user(
-            correo="aceptar@uacj.mx",
-            password="password123",
-            nombre="Acepta",
-            apellidos="Raite",
-            edad=22,
-            sexo=Sexo.M,
-            carrera="Ingeniería",
-            rol=Rol.CONDUCTOR,
-        )
-        self.assertFalse(user.puede_aceptar_raite())
-        from apps.accounts.models import Vehiculo
-        vehiculo = Vehiculo.objects.create(
-            usuario=user,
-            marca="Toyota",
-            modelo="Corolla",
-            color="Blanco",
-            placas="ABC1234",
-            tipo="COCHE",
-            asientos_disponibles=4,
-            activo=True,
-        )
-        self.assertTrue(user.puede_aceptar_raite())
-        user.cuenta_activa = 1
-        user.save()
-        self.assertFalse(user.puede_aceptar_raite())
-
-    def test_authenticate_por_correo(self):
-        self.User.objects.create_user(
-            correo="auth@uacj.mx",
-            password="password123",
-            nombre="Auth",
-            apellidos="Test",
-            edad=20,
-            sexo=Sexo.M,
-            carrera="Ingeniería",
-        )
-        from django.contrib.auth import authenticate
-        user = authenticate(request=None, correo="auth@uacj.mx", password="password123")
-        self.assertIsNotNone(user)
-        self.assertEqual(user.correo, "auth@uacj.mx")
-        user_fail = authenticate(request=None, correo="auth@uacj.mx", password="wrong")
-        self.assertIsNone(user_fail)
-
-    def test_tiene_rol(self):
-        user_pasajero = self.User.objects.create_user(
-            correo="tiene_rol@uacj.mx",
-            password="password123",
-            nombre="Tiene",
-            apellidos="Rol",
-            edad=20,
-            sexo=Sexo.M,
-            carrera="Ingeniería",
-            rol=Rol.PASAJERO,
-        )
-        self.assertTrue(user_pasajero.tiene_rol(Rol.PASAJERO))
-        self.assertFalse(user_pasajero.tiene_rol(Rol.CONDUCTOR))
-        self.assertFalse(user_pasajero.tiene_rol(Rol.ADMIN))
+            crear_usuario(rol=Rol.ADMIN)
 
     def test_is_staff_requiere_rol_admin(self):
-        user = self.User.objects.create_user(
-            correo="staff@uacj.mx",
-            password="password123",
-            nombre="Staff",
-            apellidos="Test",
-            edad=20,
-            sexo=Sexo.M,
-            carrera="Ingeniería",
-            rol=Rol.PASAJERO,
-        )
+        user = crear_usuario()
         user.is_staff = True
         with self.assertRaises(ValidationError):
             user.save()
 
-    def test_create_superuser_crea_rol_admin(self):
-        user = self.User.objects.create_superuser(
-            correo="super@uacj.mx",
-            password="password123",
-            nombre="Super",
-            apellidos="User",
-            edad=25,
-            sexo=Sexo.M,
-            carrera="Ingeniería",
-        )
+    def test_create_superuser_crea_admin_verificado(self):
+        user = self.crear_admin()
         self.assertTrue(user.is_staff)
         self.assertTrue(user.is_superuser)
-        self.assertTrue(user.es_admin)
         self.assertEqual(user.rol, Rol.ADMIN)
-
-    def test_admin_no_deriva_pasajero(self):
-        user = self.User.objects.create_superuser(
-            correo="admin2@uacj.mx",
-            password="password123",
-            nombre="Admin",
-            apellidos="Two",
-            edad=25,
-            sexo=Sexo.M,
-            carrera="Ingeniería",
-        )
-        self.assertEqual(user.rol, Rol.ADMIN)
+        self.assertTrue(user.correo_verificado)
         self.assertFalse(user.es_pasajero)
         self.assertFalse(user.es_conductor)
 
-    def test_suspendido_bloquea_crear_y_aceptar(self):
-        user = self.User.objects.create_user(
-            correo="suspendido@uacj.mx",
-            password="password123",
-            nombre="Suspendido",
-            apellidos="Test",
-            edad=20,
-            sexo=Sexo.M,
-            carrera="Ingeniería",
-            rol=Rol.CONDUCTOR,
-        )
-        from apps.accounts.models import Vehiculo
-        Vehiculo.objects.create(
-            usuario=user,
-            marca="Toyota",
-            modelo="Corolla",
-            color="Blanco",
-            placas="ABC1234",
-            tipo="COCHE",
-            asientos_disponibles=4,
-            activo=True,
-        )
-        self.assertTrue(user.puede_aceptar_raite())
+    # --- Permisos de cuenta para viajes ---
+
+    def test_puede_solicitar_lugar(self):
+        user = crear_usuario(rol=Rol.PASAJERO)
+        self.assertTrue(user.puede_solicitar_lugar())
+
+        user.correo_verificado = False
+        self.assertFalse(user.puede_solicitar_lugar())
+
+        user.correo_verificado = True
         user.suspendido = True
-        user.save()
-        self.assertFalse(user.puede_aceptar_raite())
+        self.assertFalse(user.puede_solicitar_lugar())
+
+    def test_conductor_puro_no_puede_solicitar_lugar(self):
+        self.assertFalse(crear_conductor().puede_solicitar_lugar())
+
+    def test_puede_publicar_viaje(self):
+        user = crear_conductor(con_vehiculo=False)
+        self.assertFalse(user.puede_publicar_viaje())  # sin vehículo
+
+        vehiculo = crear_vehiculo(user)
+        user.refresh_from_db()
+        self.assertTrue(user.puede_publicar_viaje())
+
+        user.correo_verificado = False
+        self.assertFalse(user.puede_publicar_viaje())
+        user.correo_verificado = True
+
+        user.suspendido = True
+        self.assertFalse(user.puede_publicar_viaje())
+        user.suspendido = False
+
+        vehiculo.activo = False
+        vehiculo.save()
+        user.refresh_from_db()
+        self.assertFalse(user.puede_publicar_viaje())
+
+    def test_pasajero_puro_no_puede_publicar_viaje(self):
+        user = crear_usuario(rol=Rol.PASAJERO)
+        crear_vehiculo(user)
+        user.refresh_from_db()
+        self.assertFalse(user.puede_publicar_viaje())
+
+    def test_rol_ambos_puede_publicar_y_solicitar(self):
+        user = crear_conductor(rol=Rol.AMBOS)
+        self.assertTrue(user.puede_publicar_viaje())
+        self.assertTrue(user.puede_solicitar_lugar())
+
+    # --- Login ---
+
+    def test_authenticate_por_correo(self):
+        crear_usuario(correo="auth@alumnos.uacj.mx")
+        self.assertIsNotNone(authenticate(request=None, correo="auth@alumnos.uacj.mx", password="password123"))
+        self.assertIsNone(authenticate(request=None, correo="auth@alumnos.uacj.mx", password="mala"))
 
     def test_suspendido_permite_login(self):
-        self.User.objects.create_user(
-            correo="login@uacj.mx",
-            password="password123",
-            nombre="Login",
-            apellidos="Test",
-            edad=20,
-            sexo=Sexo.M,
-            carrera="Ingeniería",
-            rol=Rol.PASAJERO,
-            suspendido=True,
-        )
-        from django.contrib.auth import authenticate
-        user = authenticate(request=None, correo="login@uacj.mx", password="password123")
+        crear_usuario(correo="login@alumnos.uacj.mx", suspendido=True)
+        user = authenticate(request=None, correo="login@alumnos.uacj.mx", password="password123")
         self.assertIsNotNone(user)
         self.assertTrue(user.suspendido)
 
-    def test_sexo_es_obligatorio(self):
-        from django.db import connection
-        field = self.User._meta.get_field('sexo')
-        self.assertFalse(field.has_default())
-        if connection.vendor == 'postgresql':
-            user = self.User(
-                correo="sin_sexo@uacj.mx",
-                password="password123",
-                nombre="Sin",
-                apellidos="Sexo",
-                edad=20,
-                carrera="Ingeniería",
-            )
-            user.set_password("password123")
-            with self.assertRaises(IntegrityError):
-                user.save()
 
-    def test_sexo_no_tiene_prefiere_no_decir(self):
-        self.assertFalse(hasattr(Sexo, "PREFIERE_NO_DECIR"))
+class VehiculoModelTests(TestCase):
+    def test_asientos_en_limites_validos(self):
+        for asientos in (1, 5):
+            with self.subTest(asientos=asientos):
+                crear_vehiculo(crear_conductor(con_vehiculo=False), asientos_disponibles=asientos).full_clean()
+
+    def test_asientos_fuera_de_rango_no_pasan_validacion(self):
+        for asientos in (0, 6, 8):
+            with self.subTest(asientos=asientos):
+                vehiculo = Vehiculo(
+                    usuario=crear_conductor(con_vehiculo=False),
+                    marca="Ford",
+                    modelo="Ranger",
+                    color="Negro",
+                    placas=f"ZZZ{asientos:04d}",
+                    tipo="TROCA",
+                    asientos_disponibles=asientos,
+                )
+                with self.assertRaises(ValidationError) as ctx:
+                    vehiculo.full_clean()
+                self.assertIn("asientos_disponibles", ctx.exception.message_dict)
+
+    def test_asientos_fuera_de_rango_bloqueado_en_bd(self):
+        with self.assertRaises(IntegrityError):
+            crear_vehiculo(crear_conductor(con_vehiculo=False), asientos_disponibles=6)
+
+    def test_placas_unicas(self):
+        crear_vehiculo(crear_conductor(con_vehiculo=False), placas="DUP0001")
+        with self.assertRaises(IntegrityError):
+            crear_vehiculo(crear_conductor(con_vehiculo=False), placas="DUP0001")
+
+    def test_tiene_capacidad(self):
+        vehiculo = crear_vehiculo(crear_conductor(con_vehiculo=False), asientos_disponibles=3)
+        self.assertTrue(vehiculo.tiene_capacidad(3))
+        self.assertFalse(vehiculo.tiene_capacidad(4))
+
