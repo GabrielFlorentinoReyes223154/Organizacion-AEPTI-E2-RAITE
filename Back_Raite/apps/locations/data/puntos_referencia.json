@@ -1,0 +1,1154 @@
+[
+  {
+    "osm_id": "node/10627366465",
+    "nombre": "Oxxo – Camino a la Rosita",
+    "calle": "Camino a la Rosita",
+    "colonia": "",
+    "latitud": "31.673539",
+    "longitud": "-106.369050",
+    "activo": false
+  },
+  {
+    "osm_id": "node/10664271606",
+    "nombre": "Oxxo – Avenida Licenciado Adolfo López Mateos",
+    "calle": "Avenida Licenciado Adolfo López Mateos",
+    "colonia": "",
+    "latitud": "31.746792",
+    "longitud": "-106.448822",
+    "activo": false
+  },
+  {
+    "osm_id": "node/11727698042",
+    "nombre": "Oxxo – Calle Del 57, Col. Anexas",
+    "calle": "Calle Del 57",
+    "colonia": "Anexas",
+    "latitud": "31.726443",
+    "longitud": "-106.485886",
+    "activo": true
+  },
+  {
+    "osm_id": "node/11920174658",
+    "nombre": "Oxxo – Calle Del 57, Col. Anexas (2)",
+    "calle": "Calle Del 57",
+    "colonia": "Anexas",
+    "latitud": "31.729928",
+    "longitud": "-106.498492",
+    "activo": true
+  },
+  {
+    "osm_id": "node/11962850901",
+    "nombre": "Oxxo – Boulevard Campos Eliseos",
+    "calle": "Boulevard Campos Eliseos",
+    "colonia": "",
+    "latitud": "31.706185",
+    "longitud": "-106.388783",
+    "activo": false
+  },
+  {
+    "osm_id": "node/12872664301",
+    "nombre": "Oxxo – Avenida Agua Caliente, Col. Pradera Dorada",
+    "calle": "Avenida Agua Caliente",
+    "colonia": "Pradera Dorada",
+    "latitud": "31.701210",
+    "longitud": "-106.422971",
+    "activo": true
+  },
+  {
+    "osm_id": "node/13043557812",
+    "nombre": "Oxxo Gas – Camino a Villa Ahumada, Col. Urbivilla del Cedro",
+    "calle": "Camino a Villa Ahumada",
+    "colonia": "Urbivilla del Cedro",
+    "latitud": "31.562663",
+    "longitud": "-106.339863",
+    "activo": true
+  },
+  {
+    "osm_id": "node/13043558479",
+    "nombre": "Oxxo – Calle Volcán San Martín",
+    "calle": "Calle Volcán San Martín",
+    "colonia": "",
+    "latitud": "31.587455",
+    "longitud": "-106.350766",
+    "activo": false
+  },
+  {
+    "osm_id": "node/13259700489",
+    "nombre": "Oxxo – Calle Otto Campbell",
+    "calle": "Calle Otto Campbell",
+    "colonia": "",
+    "latitud": "31.610071",
+    "longitud": "-106.381767",
+    "activo": false
+  },
+  {
+    "osm_id": "node/13339687031",
+    "nombre": "Oxxo – Avenida Manuel Gómez Morín",
+    "calle": "Avenida Manuel Gómez Morín",
+    "colonia": "",
+    "latitud": "31.674508",
+    "longitud": "-106.367833",
+    "activo": false
+  },
+  {
+    "osm_id": "node/13353916541",
+    "nombre": "Oxxo – Calle Rivera De Sicomoro",
+    "calle": "Calle Rivera De Sicomoro",
+    "colonia": "",
+    "latitud": "31.597915",
+    "longitud": "-106.305265",
+    "activo": false
+  },
+  {
+    "osm_id": "node/13453454860",
+    "nombre": "Oxxo Gas – Calle Nayarit",
+    "calle": "Calle Nayarit",
+    "colonia": "",
+    "latitud": "31.664618",
+    "longitud": "-106.426978",
+    "activo": false
+  },
+  {
+    "osm_id": "node/13796366471",
+    "nombre": "Oxxo – Calle Román De La Torre",
+    "calle": "Calle Román De La Torre",
+    "colonia": "",
+    "latitud": "31.553645",
+    "longitud": "-106.281747",
+    "activo": false
+  },
+  {
+    "osm_id": "node/13808922864",
+    "nombre": "Oxxo – Calle Vistas del Manantial de las Flore",
+    "calle": "Calle Vistas del Manantial de las Flore",
+    "colonia": "",
+    "latitud": "31.682146",
+    "longitud": "-106.495224",
+    "activo": false
+  },
+  {
+    "osm_id": "node/13821827588",
+    "nombre": "Oxxo – Calle Hacienda Trojes",
+    "calle": "Calle Hacienda Trojes",
+    "colonia": "",
+    "latitud": "31.678923",
+    "longitud": "-106.363517",
+    "activo": false
+  },
+  {
+    "osm_id": "node/13885204723",
+    "nombre": "Oxxo – Calle Rivera Del Tíbet, Col. Riveras del Bravo",
+    "calle": "Calle Rivera Del Tíbet",
+    "colonia": "Riveras del Bravo",
+    "latitud": "31.603870",
+    "longitud": "-106.308905",
+    "activo": true
+  },
+  {
+    "osm_id": "node/13904718711",
+    "nombre": "Oxxo – Calle Profesora Elisa Griensen",
+    "calle": "Calle Profesora Elisa Griensen",
+    "colonia": "",
+    "latitud": "31.677221",
+    "longitud": "-106.476295",
+    "activo": false
+  },
+  {
+    "osm_id": "node/13905843914",
+    "nombre": "Oxxo – Calle Hidalgo del Parral",
+    "calle": "Calle Hidalgo del Parral",
+    "colonia": "",
+    "latitud": "31.653238",
+    "longitud": "-106.444063",
+    "activo": false
+  },
+  {
+    "osm_id": "node/13960544044",
+    "nombre": "Oxxo – Carretera Ciudad Juárez-El Porvenir",
+    "calle": "Carretera Ciudad Juárez-El Porvenir",
+    "colonia": "",
+    "latitud": "31.491737",
+    "longitud": "-106.236156",
+    "activo": false
+  },
+  {
+    "osm_id": "node/13962540475",
+    "nombre": "Oxxo – Calle Miguel Ahumada, Col. Durango",
+    "calle": "Calle Miguel Ahumada",
+    "colonia": "Durango",
+    "latitud": "31.736833",
+    "longitud": "-106.483362",
+    "activo": true
+  },
+  {
+    "osm_id": "node/14088298001",
+    "nombre": "Oxxo – Calle Paraguay",
+    "calle": "Calle Paraguay",
+    "colonia": "",
+    "latitud": "31.738061",
+    "longitud": "-106.463636",
+    "activo": false
+  },
+  {
+    "osm_id": "node/14142855334",
+    "nombre": "Oxxo – Calle Petatlán, Col. Anexas",
+    "calle": "Calle Petatlán",
+    "colonia": "Anexas",
+    "latitud": "31.716375",
+    "longitud": "-106.493365",
+    "activo": true
+  },
+  {
+    "osm_id": "node/14150152471",
+    "nombre": "Oxxo – Calle Paseo de la Victoria, Col. Pradera Dorada",
+    "calle": "Calle Paseo de la Victoria",
+    "colonia": "Pradera Dorada",
+    "latitud": "31.675532",
+    "longitud": "-106.406526",
+    "activo": true
+  },
+  {
+    "osm_id": "node/14160115306",
+    "nombre": "Oxxo – Calle Capulín, Col. El Granjero",
+    "calle": "Calle Capulín",
+    "colonia": "El Granjero",
+    "latitud": "31.646602",
+    "longitud": "-106.409593",
+    "activo": true
+  },
+  {
+    "osm_id": "node/14178384696",
+    "nombre": "Oxxo – Avenida Ponciano Arriaga",
+    "calle": "Avenida Ponciano Arriaga",
+    "colonia": "",
+    "latitud": "31.676820",
+    "longitud": "-106.451150",
+    "activo": false
+  },
+  {
+    "osm_id": "node/14193150918",
+    "nombre": "Oxxo – Calle Profesora Candelaria Díaz De Bustamante",
+    "calle": "Calle Profesora Candelaria Díaz De Bustamante",
+    "colonia": "",
+    "latitud": "31.683685",
+    "longitud": "-106.455015",
+    "activo": false
+  },
+  {
+    "osm_id": "node/14193150919",
+    "nombre": "Oxxo – Calle Profesora Candelaria Díaz De Bustamante (2)",
+    "calle": "Calle Profesora Candelaria Díaz De Bustamante",
+    "colonia": "",
+    "latitud": "31.681779",
+    "longitud": "-106.462448",
+    "activo": false
+  },
+  {
+    "osm_id": "node/14203827359",
+    "nombre": "Oxxo – Calle Carlos Marx",
+    "calle": "Calle Carlos Marx",
+    "colonia": "",
+    "latitud": "31.686998",
+    "longitud": "-106.456211",
+    "activo": false
+  },
+  {
+    "osm_id": "node/14206596473",
+    "nombre": "Oxxo – Calle Feldespato",
+    "calle": "Calle Feldespato",
+    "colonia": "",
+    "latitud": "31.684505",
+    "longitud": "-106.480176",
+    "activo": false
+  },
+  {
+    "osm_id": "node/14227649969",
+    "nombre": "Oxxo – Avenida Jilotepec",
+    "calle": "Avenida Jilotepec",
+    "colonia": "",
+    "latitud": "31.659261",
+    "longitud": "-106.380145",
+    "activo": false
+  },
+  {
+    "osm_id": "node/1438478064",
+    "nombre": "Oxxo – Carretera Ciudad Juárez-Ascensión, Col. Tesoro Escondido",
+    "calle": "Carretera Ciudad Juárez-Ascensión",
+    "colonia": "Tesoro Escondido",
+    "latitud": "31.614709",
+    "longitud": "-106.522065",
+    "activo": true
+  },
+  {
+    "osm_id": "node/1609784276",
+    "nombre": "Oxxo – Calle Rubén Posada Pompa",
+    "calle": "Calle Rubén Posada Pompa",
+    "colonia": "",
+    "latitud": "31.719425",
+    "longitud": "-106.443572",
+    "activo": false
+  },
+  {
+    "osm_id": "node/1906493367",
+    "nombre": "Oxxo – Calle Cataratas del Niágara",
+    "calle": "Calle Cataratas del Niágara",
+    "colonia": "",
+    "latitud": "31.716784",
+    "longitud": "-106.432801",
+    "activo": false
+  },
+  {
+    "osm_id": "node/3099728026",
+    "nombre": "Oxxo – Avenida Ejército Nacional, Col. Desarrollo Altozano",
+    "calle": "Avenida Ejército Nacional",
+    "colonia": "Desarrollo Altozano",
+    "latitud": "31.667530",
+    "longitud": "-106.349693",
+    "activo": true
+  },
+  {
+    "osm_id": "node/3119570912",
+    "nombre": "Oxxo – Calle Bosque del Álamo, Col. Pradera Dorada",
+    "calle": "Calle Bosque del Álamo",
+    "colonia": "Pradera Dorada",
+    "latitud": "31.698244",
+    "longitud": "-106.404058",
+    "activo": true
+  },
+  {
+    "osm_id": "node/3131679260",
+    "nombre": "Oxxo – Avenida Manuel Gómez Morín (2)",
+    "calle": "Avenida Manuel Gómez Morín",
+    "colonia": "",
+    "latitud": "31.687338",
+    "longitud": "-106.375295",
+    "activo": false
+  },
+  {
+    "osm_id": "node/3135135664",
+    "nombre": "Oxxo – Calle Ingeniero David Herrera, Col. Durango",
+    "calle": "Calle Ingeniero David Herrera",
+    "colonia": "Durango",
+    "latitud": "31.749107",
+    "longitud": "-106.464512",
+    "activo": true
+  },
+  {
+    "osm_id": "node/3165276848",
+    "nombre": "Oxxo – Avenida Ejército Nacional, Col. Pradera Dorada",
+    "calle": "Avenida Ejército Nacional",
+    "colonia": "Pradera Dorada",
+    "latitud": "31.692169",
+    "longitud": "-106.405623",
+    "activo": true
+  },
+  {
+    "osm_id": "node/3264659433",
+    "nombre": "Oxxo – Calle Playa De Acapulco",
+    "calle": "Calle Playa De Acapulco",
+    "colonia": "",
+    "latitud": "31.625202",
+    "longitud": "-106.461360",
+    "activo": false
+  },
+  {
+    "osm_id": "node/3264705910",
+    "nombre": "Oxxo – Calle Gladiola",
+    "calle": "Calle Gladiola",
+    "colonia": "",
+    "latitud": "31.595886",
+    "longitud": "-106.429910",
+    "activo": false
+  },
+  {
+    "osm_id": "node/3581474747",
+    "nombre": "Oxxo – Avenida Ejército Nacional",
+    "calle": "Avenida Ejército Nacional",
+    "colonia": "",
+    "latitud": "31.676566",
+    "longitud": "-106.379004",
+    "activo": false
+  },
+  {
+    "osm_id": "node/3581478107",
+    "nombre": "Oxxo – Prolongación Camino Ortiz Rubio",
+    "calle": "Prolongación Camino Ortiz Rubio",
+    "colonia": "",
+    "latitud": "31.665975",
+    "longitud": "-106.381425",
+    "activo": false
+  },
+  {
+    "osm_id": "node/3581494614",
+    "nombre": "Oxxo – Avenida Ejército Nacional (2)",
+    "calle": "Avenida Ejército Nacional",
+    "colonia": "",
+    "latitud": "31.680195",
+    "longitud": "-106.388735",
+    "activo": false
+  },
+  {
+    "osm_id": "node/3581501896",
+    "nombre": "Oxxo – Boulevard Ignacio Zaragoza",
+    "calle": "Boulevard Ignacio Zaragoza",
+    "colonia": "",
+    "latitud": "31.660141",
+    "longitud": "-106.443229",
+    "activo": false
+  },
+  {
+    "osm_id": "node/3780393557",
+    "nombre": "Oxxo – Calle Pussini",
+    "calle": "Calle Pussini",
+    "colonia": "",
+    "latitud": "31.728686",
+    "longitud": "-106.450598",
+    "activo": false
+  },
+  {
+    "osm_id": "node/3974633690",
+    "nombre": "Oxxo – Calle Luis Gonzaga Urbina",
+    "calle": "Calle Luis Gonzaga Urbina",
+    "colonia": "",
+    "latitud": "31.718063",
+    "longitud": "-106.462407",
+    "activo": false
+  },
+  {
+    "osm_id": "node/4045454121",
+    "nombre": "Oxxo – Carretera Ciudad Juárez-Miguel Ahumada",
+    "calle": "Carretera Ciudad Juárez-Miguel Ahumada",
+    "colonia": "",
+    "latitud": "31.606070",
+    "longitud": "-106.453246",
+    "activo": false
+  },
+  {
+    "osm_id": "node/4056293071",
+    "nombre": "Oxxo – Calle Hacienda De Claveles",
+    "calle": "Calle Hacienda De Claveles",
+    "colonia": "",
+    "latitud": "31.599320",
+    "longitud": "-106.427261",
+    "activo": false
+  },
+  {
+    "osm_id": "node/4131777630",
+    "nombre": "Oxxo – Aveinida Tapachula, Col. Granjas Polo Gamboa",
+    "calle": "Aveinida Tapachula",
+    "colonia": "Granjas Polo Gamboa",
+    "latitud": "31.599354",
+    "longitud": "-106.455849",
+    "activo": true
+  },
+  {
+    "osm_id": "node/4163651234",
+    "nombre": "Oxxo – Calle Valle del Sol",
+    "calle": "Calle Valle del Sol",
+    "colonia": "",
+    "latitud": "31.690186",
+    "longitud": "-106.354292",
+    "activo": false
+  },
+  {
+    "osm_id": "node/4542855531",
+    "nombre": "Oxxo – Camino a Villa Ahumada, Col. Urbivilla del Cedro",
+    "calle": "Camino a Villa Ahumada",
+    "colonia": "Urbivilla del Cedro",
+    "latitud": "31.562621",
+    "longitud": "-106.339652",
+    "activo": true
+  },
+  {
+    "osm_id": "node/4542855547",
+    "nombre": "Oxxo – Camino a Villa Ahumada, Col. Urbivilla del Cedro (2)",
+    "calle": "Camino a Villa Ahumada",
+    "colonia": "Urbivilla del Cedro",
+    "latitud": "31.570862",
+    "longitud": "-106.348856",
+    "activo": true
+  },
+  {
+    "osm_id": "node/4542855577",
+    "nombre": "Oxxo – Calle Mar del Sur",
+    "calle": "Calle Mar del Sur",
+    "colonia": "",
+    "latitud": "31.588253",
+    "longitud": "-106.372038",
+    "activo": false
+  },
+  {
+    "osm_id": "node/4783715332",
+    "nombre": "Oxxo – Carretera El Porvenir-Ciudad Juárez, Col. Desarrollo Altozano",
+    "calle": "Carretera El Porvenir-Ciudad Juárez",
+    "colonia": "Desarrollo Altozano",
+    "latitud": "31.623980",
+    "longitud": "-106.327259",
+    "activo": true
+  },
+  {
+    "osm_id": "node/4783734242",
+    "nombre": "Oxxo – Calle Anáhuac, Col. Riveras del Bravo",
+    "calle": "Calle Anáhuac",
+    "colonia": "Riveras del Bravo",
+    "latitud": "31.626598",
+    "longitud": "-106.324924",
+    "activo": true
+  },
+  {
+    "osm_id": "node/5950195016",
+    "nombre": "Oxxo Gas – Calle Hiedra",
+    "calle": "Calle Hiedra",
+    "colonia": "",
+    "latitud": "31.660067",
+    "longitud": "-106.391519",
+    "activo": false
+  },
+  {
+    "osm_id": "node/6428818265",
+    "nombre": "Oxxo – Calle Rivas Guillén, Col. Durango",
+    "calle": "Calle Rivas Guillén",
+    "colonia": "Durango",
+    "latitud": "31.742976",
+    "longitud": "-106.484074",
+    "activo": true
+  },
+  {
+    "osm_id": "node/6428818273",
+    "nombre": "Oxxo – Paso peatonal a desnivel 16 de Septiembre, Col. Durango",
+    "calle": "Paso peatonal a desnivel 16 de Septiembre",
+    "colonia": "Durango",
+    "latitud": "31.738801",
+    "longitud": "-106.483663",
+    "activo": true
+  },
+  {
+    "osm_id": "node/6485825985",
+    "nombre": "Oxxo – Avenida Simona Barba",
+    "calle": "Avenida Simona Barba",
+    "colonia": "",
+    "latitud": "31.721081",
+    "longitud": "-106.431193",
+    "activo": false
+  },
+  {
+    "osm_id": "node/7535530886",
+    "nombre": "Oxxo – Carretera Ciudad Juárez-El Porvenir, Col. Desarrollo Altozano",
+    "calle": "Carretera Ciudad Juárez-El Porvenir",
+    "colonia": "Desarrollo Altozano",
+    "latitud": "31.617255",
+    "longitud": "-106.320282",
+    "activo": true
+  },
+  {
+    "osm_id": "node/7969750788",
+    "nombre": "Oxxo – Avenida Ponciano Arriaga (2)",
+    "calle": "Avenida Ponciano Arriaga",
+    "colonia": "",
+    "latitud": "31.675786",
+    "longitud": "-106.446062",
+    "activo": false
+  },
+  {
+    "osm_id": "node/880963315",
+    "nombre": "Oxxo – Calle Valle del Sol (2)",
+    "calle": "Calle Valle del Sol",
+    "colonia": "",
+    "latitud": "31.693777",
+    "longitud": "-106.374282",
+    "activo": false
+  },
+  {
+    "osm_id": "node/9002564566",
+    "nombre": "Oxxo – Calle Ribera de Montecarlo, Col. Riveras del Bravo",
+    "calle": "Calle Ribera de Montecarlo",
+    "colonia": "Riveras del Bravo",
+    "latitud": "31.625579",
+    "longitud": "-106.318678",
+    "activo": true
+  },
+  {
+    "osm_id": "node/9143474455",
+    "nombre": "Oxxo – Calle Juan Balderas, Col. Las Marraneras",
+    "calle": "Calle Juan Balderas",
+    "colonia": "Las Marraneras",
+    "latitud": "31.732043",
+    "longitud": "-106.530144",
+    "activo": true
+  },
+  {
+    "osm_id": "node/9622975209",
+    "nombre": "Oxxo – Calle Rufino Tamayo 8413",
+    "calle": "Calle Rufino Tamayo 8413",
+    "colonia": "",
+    "latitud": "31.619810",
+    "longitud": "-106.413433",
+    "activo": false
+  },
+  {
+    "osm_id": "node/9958359985",
+    "nombre": "Oxxo – Calle Río Bravo, Col. Desarrollo Altozano",
+    "calle": "Calle Río Bravo",
+    "colonia": "Desarrollo Altozano",
+    "latitud": "31.670769",
+    "longitud": "-106.343037",
+    "activo": true
+  },
+  {
+    "osm_id": "way/1059431894",
+    "nombre": "Oxxo – Calle Zaragoza",
+    "calle": "Calle Zaragoza",
+    "colonia": "",
+    "latitud": "31.662764",
+    "longitud": "-106.473685",
+    "activo": false
+  },
+  {
+    "osm_id": "way/1147972306",
+    "nombre": "Oxxo – Carretera Ciudad Juárez-El Porvenir, Col. Desarrollo Altozano (2)",
+    "calle": "Carretera Ciudad Juárez-El Porvenir",
+    "colonia": "Desarrollo Altozano",
+    "latitud": "31.626296",
+    "longitud": "-106.331034",
+    "activo": true
+  },
+  {
+    "osm_id": "way/1188953931",
+    "nombre": "Oxxo – Calle Bario, Col. Durango",
+    "calle": "Calle Bario",
+    "colonia": "Durango",
+    "latitud": "31.748279",
+    "longitud": "-106.498802",
+    "activo": true
+  },
+  {
+    "osm_id": "way/1220063199",
+    "nombre": "Oxxo – Calle Tamaulipas",
+    "calle": "Calle Tamaulipas",
+    "colonia": "",
+    "latitud": "31.664763",
+    "longitud": "-106.418761",
+    "activo": false
+  },
+  {
+    "osm_id": "way/1249940257",
+    "nombre": "Oxxo – Calle Asbesto",
+    "calle": "Calle Asbesto",
+    "colonia": "",
+    "latitud": "31.680709",
+    "longitud": "-106.478025",
+    "activo": false
+  },
+  {
+    "osm_id": "way/1290261624",
+    "nombre": "Oxxo – Calle Paseo de Borja",
+    "calle": "Calle Paseo de Borja",
+    "colonia": "",
+    "latitud": "31.712521",
+    "longitud": "-106.377664",
+    "activo": false
+  },
+  {
+    "osm_id": "way/1337290087",
+    "nombre": "Oxxo – Calzada Delta",
+    "calle": "Calzada Delta",
+    "colonia": "",
+    "latitud": "31.717704",
+    "longitud": "-106.474331",
+    "activo": false
+  },
+  {
+    "osm_id": "way/1419729238",
+    "nombre": "Oxxo – Avenida L. Solís Barraza",
+    "calle": "Avenida L. Solís Barraza",
+    "colonia": "",
+    "latitud": "31.549479",
+    "longitud": "-106.349661",
+    "activo": false
+  },
+  {
+    "osm_id": "way/1452246394",
+    "nombre": "Oxxo – Avenida Granjas",
+    "calle": "Avenida Granjas",
+    "colonia": "",
+    "latitud": "31.607891",
+    "longitud": "-106.471241",
+    "activo": false
+  },
+  {
+    "osm_id": "way/1455530075",
+    "nombre": "Oxxo – Privada De Tonachi",
+    "calle": "Privada De Tonachi",
+    "colonia": "",
+    "latitud": "31.611749",
+    "longitud": "-106.432157",
+    "activo": false
+  },
+  {
+    "osm_id": "way/1488414966",
+    "nombre": "Oxxo – Calle Canuto Castro",
+    "calle": "Calle Canuto Castro",
+    "colonia": "",
+    "latitud": "31.606790",
+    "longitud": "-106.482975",
+    "activo": false
+  },
+  {
+    "osm_id": "way/252027861",
+    "nombre": "Oxxo – Avenida Panamericana",
+    "calle": "Avenida Panamericana",
+    "colonia": "",
+    "latitud": "31.733294",
+    "longitud": "-106.424192",
+    "activo": false
+  },
+  {
+    "osm_id": "way/252799946",
+    "nombre": "Oxxo – Avenida Simona Barba (2)",
+    "calle": "Avenida Simona Barba",
+    "colonia": "",
+    "latitud": "31.721497",
+    "longitud": "-106.442849",
+    "activo": false
+  },
+  {
+    "osm_id": "way/319642760",
+    "nombre": "Oxxo – Avenida Tecnológico",
+    "calle": "Avenida Tecnológico",
+    "colonia": "",
+    "latitud": "31.726053",
+    "longitud": "-106.424867",
+    "activo": false
+  },
+  {
+    "osm_id": "way/320752394",
+    "nombre": "Oxxo – Calle Montebello, Col. Pradera Dorada",
+    "calle": "Calle Montebello",
+    "colonia": "Pradera Dorada",
+    "latitud": "31.710446",
+    "longitud": "-106.409145",
+    "activo": true
+  },
+  {
+    "osm_id": "way/324669520",
+    "nombre": "Oxxo – Calle Planeador",
+    "calle": "Calle Planeador",
+    "colonia": "",
+    "latitud": "31.619307",
+    "longitud": "-106.438855",
+    "activo": false
+  },
+  {
+    "osm_id": "way/326320851",
+    "nombre": "Oxxo Gas – Avenida Manuel Gómez Morín",
+    "calle": "Avenida Manuel Gómez Morín",
+    "colonia": "",
+    "latitud": "31.723357",
+    "longitud": "-106.420050",
+    "activo": false
+  },
+  {
+    "osm_id": "way/337507167",
+    "nombre": "Oxxo – Carretera Ciudad Juárez-Miguel Ahumada (2)",
+    "calle": "Carretera Ciudad Juárez-Miguel Ahumada",
+    "colonia": "",
+    "latitud": "31.350250",
+    "longitud": "-106.470027",
+    "activo": false
+  },
+  {
+    "osm_id": "way/457772699",
+    "nombre": "Oxxo – Calle Marcos M. Flores",
+    "calle": "Calle Marcos M. Flores",
+    "colonia": "",
+    "latitud": "31.601931",
+    "longitud": "-106.386705",
+    "activo": false
+  },
+  {
+    "osm_id": "way/626053862",
+    "nombre": "Oxxo – Toledo",
+    "calle": "Toledo",
+    "colonia": "",
+    "latitud": "31.657921",
+    "longitud": "-106.464914",
+    "activo": false
+  },
+  {
+    "osm_id": "way/626069841",
+    "nombre": "Oxxo – Calle Manuel Doblado, Col. Durango",
+    "calle": "Calle Manuel Doblado",
+    "colonia": "Durango",
+    "latitud": "31.744305",
+    "longitud": "-106.485675",
+    "activo": true
+  },
+  {
+    "osm_id": "way/634087705",
+    "nombre": "Oxxo – Calle Argelia",
+    "calle": "Calle Argelia",
+    "colonia": "",
+    "latitud": "31.658687",
+    "longitud": "-106.428523",
+    "activo": false
+  },
+  {
+    "osm_id": "way/635493266",
+    "nombre": "Oxxo – Calle Paseo de los Verdines, Col. Fraccionamiento Paseos del Alba",
+    "calle": "Calle Paseo de los Verdines",
+    "colonia": "Fraccionamiento Paseos del Alba",
+    "latitud": "31.633516",
+    "longitud": "-106.420117",
+    "activo": true
+  },
+  {
+    "osm_id": "way/635493268",
+    "nombre": "Oxxo – Calle Paseo de las Palomas, Col. Fraccionamiento Paseos del Alba",
+    "calle": "Calle Paseo de las Palomas",
+    "colonia": "Fraccionamiento Paseos del Alba",
+    "latitud": "31.635259",
+    "longitud": "-106.416669",
+    "activo": true
+  },
+  {
+    "osm_id": "way/635493288",
+    "nombre": "Oxxo – Calle Enrique Pinocelli",
+    "calle": "Calle Enrique Pinocelli",
+    "colonia": "",
+    "latitud": "31.630272",
+    "longitud": "-106.419972",
+    "activo": false
+  },
+  {
+    "osm_id": "way/636752309",
+    "nombre": "Oxxo – Calle Aerojuárez 1",
+    "calle": "Calle Aerojuárez 1",
+    "colonia": "",
+    "latitud": "31.622446",
+    "longitud": "-106.417427",
+    "activo": false
+  },
+  {
+    "osm_id": "way/643165553",
+    "nombre": "Oxxo – Calle Miguel De La Madrid",
+    "calle": "Calle Miguel De La Madrid",
+    "colonia": "",
+    "latitud": "31.592632",
+    "longitud": "-106.420521",
+    "activo": false
+  },
+  {
+    "osm_id": "way/665367008",
+    "nombre": "Oxxo – Avenida Jilotepec, Col. Del Real",
+    "calle": "Avenida Jilotepec",
+    "colonia": "Del Real",
+    "latitud": "31.669137",
+    "longitud": "-106.417783",
+    "activo": true
+  },
+  {
+    "osm_id": "way/665632829",
+    "nombre": "Oxxo – Avenida Morelia, Col. Eréndira",
+    "calle": "Avenida Morelia",
+    "colonia": "Eréndira",
+    "latitud": "31.673459",
+    "longitud": "-106.416051",
+    "activo": true
+  },
+  {
+    "osm_id": "way/668193447",
+    "nombre": "Oxxo – Calle Jesús Nájera, Col. Durango",
+    "calle": "Calle Jesús Nájera",
+    "colonia": "Durango",
+    "latitud": "31.731678",
+    "longitud": "-106.485848",
+    "activo": true
+  },
+  {
+    "osm_id": "way/685754259",
+    "nombre": "Oxxo – Calle Henry Dunant",
+    "calle": "Calle Henry Dunant",
+    "colonia": "",
+    "latitud": "31.741720",
+    "longitud": "-106.441339",
+    "activo": false
+  },
+  {
+    "osm_id": "way/699784562",
+    "nombre": "Oxxo – Calle Santa Eulalia",
+    "calle": "Calle Santa Eulalia",
+    "colonia": "",
+    "latitud": "31.626802",
+    "longitud": "-106.397089",
+    "activo": false
+  },
+  {
+    "osm_id": "way/735009529",
+    "nombre": "Oxxo – Calle Playa de Antigua",
+    "calle": "Calle Playa de Antigua",
+    "colonia": "",
+    "latitud": "31.602907",
+    "longitud": "-106.399689",
+    "activo": false
+  },
+  {
+    "osm_id": "way/735012098",
+    "nombre": "Oxxo – Avenida Ramon Rayon",
+    "calle": "Avenida Ramon Rayon",
+    "colonia": "",
+    "latitud": "31.616520",
+    "longitud": "-106.380917",
+    "activo": false
+  },
+  {
+    "osm_id": "way/735012126",
+    "nombre": "Oxxo – Calle Pradera De Bocoyna",
+    "calle": "Calle Pradera De Bocoyna",
+    "colonia": "",
+    "latitud": "31.618343",
+    "longitud": "-106.404405",
+    "activo": false
+  },
+  {
+    "osm_id": "way/735014077",
+    "nombre": "Oxxo – Calle Neártica",
+    "calle": "Calle Neártica",
+    "colonia": "",
+    "latitud": "31.599152",
+    "longitud": "-106.397290",
+    "activo": false
+  },
+  {
+    "osm_id": "way/735383300",
+    "nombre": "Oxxo – Calle Júpiter",
+    "calle": "Calle Júpiter",
+    "colonia": "",
+    "latitud": "31.691895",
+    "longitud": "-106.360718",
+    "activo": false
+  },
+  {
+    "osm_id": "way/736159351",
+    "nombre": "Oxxo – Boulevard Ignacio Zaragoza (2)",
+    "calle": "Boulevard Ignacio Zaragoza",
+    "colonia": "",
+    "latitud": "31.660484",
+    "longitud": "-106.446896",
+    "activo": false
+  },
+  {
+    "osm_id": "way/736282570",
+    "nombre": "Oxxo Gas – Boulevard Zaragoza",
+    "calle": "Boulevard Zaragoza",
+    "colonia": "",
+    "latitud": "31.648399",
+    "longitud": "-106.391221",
+    "activo": false
+  },
+  {
+    "osm_id": "way/736354526",
+    "nombre": "Oxxo – Boulevard Independencia",
+    "calle": "Boulevard Independencia",
+    "colonia": "",
+    "latitud": "31.597305",
+    "longitud": "-106.382294",
+    "activo": false
+  },
+  {
+    "osm_id": "way/736371848",
+    "nombre": "Oxxo – Avenida Tecnológico, Col. Pradera Dorada",
+    "calle": "Avenida Tecnológico",
+    "colonia": "Pradera Dorada",
+    "latitud": "31.678803",
+    "longitud": "-106.424096",
+    "activo": true
+  },
+  {
+    "osm_id": "way/736371873",
+    "nombre": "Oxxo – Calle Zacatecas, Col. Lomas de San José",
+    "calle": "Calle Zacatecas",
+    "colonia": "Lomas de San José",
+    "latitud": "31.664611",
+    "longitud": "-106.427764",
+    "activo": true
+  },
+  {
+    "osm_id": "way/750543524",
+    "nombre": "Oxxo Gas – Carretera Panamericana",
+    "calle": "Carretera Panamericana",
+    "colonia": "",
+    "latitud": "31.621822",
+    "longitud": "-106.445774",
+    "activo": false
+  },
+  {
+    "osm_id": "way/750543525",
+    "nombre": "Oxxo Gas – Carretera Panamericana (2)",
+    "calle": "Carretera Panamericana",
+    "colonia": "",
+    "latitud": "31.621339",
+    "longitud": "-106.445768",
+    "activo": false
+  },
+  {
+    "osm_id": "way/750543527",
+    "nombre": "Oxxo – Avenida Santos Dumont",
+    "calle": "Avenida Santos Dumont",
+    "colonia": "",
+    "latitud": "31.621417",
+    "longitud": "-106.445988",
+    "activo": false
+  },
+  {
+    "osm_id": "way/753066837",
+    "nombre": "Oxxo – Calle Rivera Borde, Col. Riveras del Bravo",
+    "calle": "Calle Rivera Borde",
+    "colonia": "Riveras del Bravo",
+    "latitud": "31.626820",
+    "longitud": "-106.314364",
+    "activo": true
+  },
+  {
+    "osm_id": "way/778687795",
+    "nombre": "Oxxo – Boulevard Zaragoza",
+    "calle": "Boulevard Zaragoza",
+    "colonia": "",
+    "latitud": "31.649997",
+    "longitud": "-106.401688",
+    "activo": false
+  },
+  {
+    "osm_id": "way/787282934",
+    "nombre": "Oxxo – Calle Palacio de Tikal",
+    "calle": "Calle Palacio de Tikal",
+    "colonia": "",
+    "latitud": "31.620712",
+    "longitud": "-106.389448",
+    "activo": false
+  },
+  {
+    "osm_id": "way/787282980",
+    "nombre": "Oxxo – Calle Pradera De Los Torreones",
+    "calle": "Calle Pradera De Los Torreones",
+    "colonia": "",
+    "latitud": "31.615049",
+    "longitud": "-106.391633",
+    "activo": false
+  },
+  {
+    "osm_id": "way/788725397",
+    "nombre": "Oxxo – Boulevard Tomás Fernández",
+    "calle": "Boulevard Tomás Fernández",
+    "colonia": "",
+    "latitud": "31.718608",
+    "longitud": "-106.396406",
+    "activo": false
+  },
+  {
+    "osm_id": "way/790630089",
+    "nombre": "Oxxo – Avenida Santiago Troncoso",
+    "calle": "Avenida Santiago Troncoso",
+    "colonia": "",
+    "latitud": "31.636400",
+    "longitud": "-106.403692",
+    "activo": false
+  },
+  {
+    "osm_id": "way/790630098",
+    "nombre": "Oxxo – Calle Ramacoi",
+    "calle": "Calle Ramacoi",
+    "colonia": "",
+    "latitud": "31.631585",
+    "longitud": "-106.400553",
+    "activo": false
+  },
+  {
+    "osm_id": "way/790630110",
+    "nombre": "Oxxo – Calle Manuel Martínez",
+    "calle": "Calle Manuel Martínez",
+    "colonia": "",
+    "latitud": "31.626713",
+    "longitud": "-106.410649",
+    "activo": false
+  },
+  {
+    "osm_id": "way/790630112",
+    "nombre": "Oxxo – Calle Antonio Canova",
+    "calle": "Calle Antonio Canova",
+    "colonia": "",
+    "latitud": "31.625549",
+    "longitud": "-106.406032",
+    "activo": false
+  },
+  {
+    "osm_id": "way/792800318",
+    "nombre": "Oxxo – Calle Lucero",
+    "calle": "Calle Lucero",
+    "colonia": "",
+    "latitud": "31.622395",
+    "longitud": "-106.410984",
+    "activo": false
+  },
+  {
+    "osm_id": "way/793107174",
+    "nombre": "Oxxo – Calle Hacienda de las Torres",
+    "calle": "Calle Hacienda de las Torres",
+    "colonia": "",
+    "latitud": "31.615268",
+    "longitud": "-106.396316",
+    "activo": false
+  },
+  {
+    "osm_id": "way/793359319",
+    "nombre": "Oxxo – Privada De Navarro",
+    "calle": "Privada De Navarro",
+    "colonia": "",
+    "latitud": "31.614383",
+    "longitud": "-106.426981",
+    "activo": false
+  },
+  {
+    "osm_id": "way/807943341",
+    "nombre": "Oxxo – Avenida Francisco Villa, Col. Centro",
+    "calle": "Avenida Francisco Villa",
+    "colonia": "Centro",
+    "latitud": "31.736782",
+    "longitud": "-106.481900",
+    "activo": true
+  },
+  {
+    "osm_id": "way/807943367",
+    "nombre": "Oxxo – Avenida 16 de Septiembre",
+    "calle": "Avenida 16 de Septiembre",
+    "colonia": "",
+    "latitud": "31.739128",
+    "longitud": "-106.480646",
+    "activo": false
+  },
+  {
+    "osm_id": "way/815997625",
+    "nombre": "Oxxo – Prolongación Teófilo Borunda",
+    "calle": "Prolongación Teófilo Borunda",
+    "colonia": "",
+    "latitud": "31.663561",
+    "longitud": "-106.363326",
+    "activo": false
+  },
+  {
+    "osm_id": "way/849822693",
+    "nombre": "Oxxo – Avenida Paseo Triunfo de la República",
+    "calle": "Avenida Paseo Triunfo de la República",
+    "colonia": "",
+    "latitud": "31.738098",
+    "longitud": "-106.432740",
+    "activo": false
+  },
+  {
+    "osm_id": "way/880004058",
+    "nombre": "Oxxo – Carretera Ascensión-Ciudad Juárez",
+    "calle": "Carretera Ascensión-Ciudad Juárez",
+    "colonia": "",
+    "latitud": "31.608337",
+    "longitud": "-106.685515",
+    "activo": false
+  }
+]

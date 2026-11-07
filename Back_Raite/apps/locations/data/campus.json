@@ -1,0 +1,7 @@
+[
+  {"codigo": "CU", "nombre": "Ciudad Universitaria", "latitud": "31.489920", "longitud": "-106.414574"},
+  {"codigo": "IIT", "nombre": "Instituto de Ingeniería y Tecnología", "latitud": "31.742765", "longitud": "-106.431511"},
+  {"codigo": "ICB", "nombre": "Instituto de Ciencias Biomédicas", "latitud": "31.746385", "longitud": "-106.443162"},
+  {"codigo": "ICSA", "nombre": "Instituto de Ciencias Sociales y Administración", "latitud": "31.756756", "longitud": "-106.449914"},
+  {"codigo": "IADA", "nombre": "Instituto de Arquitectura, Diseño y Arte", "latitud": "31.742765", "longitud": "-106.431511"}
+]
