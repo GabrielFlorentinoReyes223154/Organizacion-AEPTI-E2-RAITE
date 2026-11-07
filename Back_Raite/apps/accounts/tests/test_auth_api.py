@@ -20,6 +20,7 @@ class AuthAPITests(TestCase):
             carrera="Ingeniería",
             telefono="6561234567",
             rol=Rol.PASAJERO,
+            correo_verificado=True,
         )
 
     def test_obtener_token_login_valido(self):

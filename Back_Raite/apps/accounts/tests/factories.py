@@ -49,3 +49,13 @@ def crear_vehiculo(usuario, **datos):
     }
     valores.update(datos)
     return Vehiculo.objects.create(usuario=usuario, **valores)
+
+
+def cliente_para(usuario=None):
+    """APIClient autenticado como `usuario` (o anónimo si es None)."""
+    from rest_framework.test import APIClient
+
+    cliente = APIClient()
+    if usuario is not None:
+        cliente.force_authenticate(usuario)
+    return cliente

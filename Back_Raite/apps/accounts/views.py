@@ -1,5 +1,5 @@
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -14,7 +14,6 @@ from .serializers import (
 
 
 class MeView(APIView):
-    permission_classes = [IsAuthenticated]
 
     def get(self, request):
         return Response(UsuarioSerializer(request.user).data)
@@ -22,6 +21,8 @@ class MeView(APIView):
 
 class RegistroView(APIView):
     """Paso 1: Crea usuario y rol. Si tiene CONDUCTOR, devuelve requiere_vehiculo=True."""
+
+    permission_classes = [AllowAny]
 
     def post(self, request):
         serializer = RegistroSerializer(data=request.data)
@@ -43,8 +44,6 @@ class RegistroView(APIView):
 
 class VehiculoRegistroView(APIView):
     """Paso 2 (condicional): Crea vehículo para usuarios con rol CONDUCTOR."""
-
-    permission_classes = [IsAuthenticated]
 
     def post(self, request):
         user = request.user
