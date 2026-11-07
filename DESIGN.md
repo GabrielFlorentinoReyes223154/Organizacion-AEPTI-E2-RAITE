@@ -1,0 +1,499 @@
+---
+name: Raite
+description: Raites entre alumnos de la UACJ, con los colores institucionales y legible a pleno sol.
+colors:
+  azul-uacj: "#003CA6"
+  amarillo-uacj: "#FFD600"
+  gris-uacj: "#555559"
+  negro-uacj: "#231F20"
+  azul-hondo: "#002C7A"
+  azul-noche: "#001F57"
+  azul-niebla: "#DCE5F7"
+  azul-tenue: "#E6EDF9"
+  amarillo-hondo: "#E8C200"
+  amarillo-tenue: "#FFF3B0"
+  blanco: "#FFFFFF"
+  fondo: "#F3F5F9"
+  gris-tenue: "#ECEDF0"
+  borde-sutil: "#D5D8DE"
+  borde-campo: "#8A8C93"
+  gris-placeholder: "#6B6B70"
+  gris-deshabilitado: "#6E7076"
+  verde: "#1E6B34"
+  verde-texto: "#14532D"
+  verde-tenue: "#E2F2E6"
+  rojo: "#B3261E"
+  rojo-texto: "#8C1D18"
+  rojo-tenue: "#FCE8E6"
+typography:
+  headline:
+    fontFamily: "Atkinson Hyperlegible Next, system-ui, sans-serif"
+    fontSize: "1.5rem"
+    fontWeight: 700
+    lineHeight: 1.2
+    letterSpacing: "-0.01em"
+  title:
+    fontFamily: "Atkinson Hyperlegible Next, system-ui, sans-serif"
+    fontSize: "1.125rem"
+    fontWeight: 700
+    lineHeight: 1.3
+    letterSpacing: "0em"
+  body:
+    fontFamily: "Atkinson Hyperlegible Next, system-ui, sans-serif"
+    fontSize: "1rem"
+    fontWeight: 400
+    lineHeight: 1.5
+    letterSpacing: "0em"
+  label:
+    fontFamily: "Atkinson Hyperlegible Next, system-ui, sans-serif"
+    fontSize: "0.875rem"
+    fontWeight: 600
+    lineHeight: 1.3
+    letterSpacing: "0.01em"
+  button:
+    fontFamily: "Atkinson Hyperlegible Next, system-ui, sans-serif"
+    fontSize: "1rem"
+    fontWeight: 700
+    lineHeight: 1.2
+    letterSpacing: "0em"
+  hora:
+    fontFamily: "Atkinson Hyperlegible Mono, ui-monospace, monospace"
+    fontSize: "1.75rem"
+    fontWeight: 700
+    lineHeight: 1.1
+    letterSpacing: "-0.02em"
+  dato:
+    fontFamily: "Atkinson Hyperlegible Mono, ui-monospace, monospace"
+    fontSize: "1.25rem"
+    fontWeight: 600
+    lineHeight: 1.2
+    letterSpacing: "0.08em"
+rounded:
+  md: "12px"
+  lg: "16px"
+  xl: "24px"
+  pill: "999px"
+spacing:
+  xs: "4px"
+  sm: "8px"
+  md: "16px"
+  lg: "24px"
+  xl: "48px"
+components:
+  button-primary:
+    backgroundColor: "{colors.azul-uacj}"
+    textColor: "{colors.blanco}"
+    typography: "{typography.button}"
+    rounded: "{rounded.md}"
+    padding: "0 24px"
+    height: "48px"
+  button-primary-hover:
+    backgroundColor: "{colors.azul-hondo}"
+  button-primary-active:
+    backgroundColor: "{colors.azul-noche}"
+  button-acento:
+    backgroundColor: "{colors.amarillo-uacj}"
+    textColor: "{colors.negro-uacj}"
+    typography: "{typography.button}"
+    rounded: "{rounded.md}"
+    padding: "0 24px"
+    height: "48px"
+  button-acento-hover:
+    backgroundColor: "{colors.amarillo-hondo}"
+  button-secundario:
+    backgroundColor: "{colors.blanco}"
+    textColor: "{colors.azul-uacj}"
+    typography: "{typography.button}"
+    rounded: "{rounded.md}"
+    padding: "0 24px"
+    height: "48px"
+  button-peligro:
+    backgroundColor: "{colors.rojo}"
+    textColor: "{colors.blanco}"
+    typography: "{typography.button}"
+    rounded: "{rounded.md}"
+    height: "48px"
+  button-deshabilitado:
+    backgroundColor: "{colors.gris-tenue}"
+    textColor: "{colors.gris-deshabilitado}"
+  card-viaje:
+    backgroundColor: "{colors.blanco}"
+    textColor: "{colors.negro-uacj}"
+    rounded: "{rounded.lg}"
+    padding: "16px"
+  placa-campus:
+    backgroundColor: "{colors.azul-uacj}"
+    textColor: "{colors.blanco}"
+    typography: "{typography.label}"
+    rounded: "{rounded.md}"
+    padding: "4px 8px"
+  chip-publicado:
+    backgroundColor: "{colors.azul-tenue}"
+    textColor: "{colors.azul-uacj}"
+    typography: "{typography.label}"
+    rounded: "{rounded.pill}"
+    height: "32px"
+  chip-en-curso:
+    backgroundColor: "{colors.amarillo-uacj}"
+    textColor: "{colors.negro-uacj}"
+    typography: "{typography.label}"
+    rounded: "{rounded.pill}"
+    height: "32px"
+  chip-finalizado:
+    backgroundColor: "{colors.blanco}"
+    textColor: "{colors.negro-uacj}"
+    typography: "{typography.label}"
+    rounded: "{rounded.pill}"
+    height: "32px"
+  chip-pendiente:
+    backgroundColor: "{colors.amarillo-tenue}"
+    textColor: "{colors.negro-uacj}"
+    typography: "{typography.label}"
+    rounded: "{rounded.pill}"
+    height: "32px"
+  chip-aceptada:
+    backgroundColor: "{colors.verde-tenue}"
+    textColor: "{colors.verde-texto}"
+    typography: "{typography.label}"
+    rounded: "{rounded.pill}"
+    height: "32px"
+  chip-rechazada:
+    backgroundColor: "{colors.rojo-tenue}"
+    textColor: "{colors.rojo-texto}"
+    typography: "{typography.label}"
+    rounded: "{rounded.pill}"
+    height: "32px"
+  chip-cancelado:
+    backgroundColor: "{colors.gris-tenue}"
+    textColor: "{colors.gris-uacj}"
+    typography: "{typography.label}"
+    rounded: "{rounded.pill}"
+    height: "32px"
+  chip-vencido:
+    backgroundColor: "{colors.gris-tenue}"
+    textColor: "{colors.negro-uacj}"
+    typography: "{typography.label}"
+    rounded: "{rounded.pill}"
+    height: "32px"
+  input:
+    backgroundColor: "{colors.blanco}"
+    textColor: "{colors.negro-uacj}"
+    typography: "{typography.body}"
+    rounded: "{rounded.md}"
+    height: "56px"
+  header:
+    backgroundColor: "{colors.azul-uacj}"
+    textColor: "{colors.blanco}"
+    typography: "{typography.title}"
+    height: "56px"
+  nav-inferior:
+    backgroundColor: "{colors.azul-uacj}"
+    textColor: "{colors.azul-niebla}"
+    typography: "{typography.label}"
+    height: "64px"
+  nav-inferior-activo:
+    backgroundColor: "{colors.azul-hondo}"
+    textColor: "{colors.blanco}"
+---
+
+# Design System: Raite
+
+> Propuesta del 2026-11-06. Todavía no está aplicada en el código: es el contrato para la Capa 3. Al implementarla, si algo no funciona en Quasar o con contenido real, se corrige aquí primero.
+
+## Overview
+
+**Creative North Star: "El letrero de la parada"**
+
+Raite se ve como la señalización de una parada de transporte en Juárez: un azul sólido que ubica, un amarillo que marca lo que importa ahora y texto negro grande sobre blanco, hecho para leerse de lejos, de reojo y a pleno sol. Se usa con prisa y con una mano, así que manda la claridad: cada pantalla tiene una tarea principal, un estado que se entiende de un vistazo y una sola acción destacada.
+
+Los colores son los institucionales de la UACJ (azul 293 C, amarillo 012 C, gris Cool Gray 11 C y negro). El azul es la estructura: encabezado, barra de navegación y acción principal. El amarillo es escaso y siempre va sobre azul o con texto negro encima. El gris y el negro se encargan del texto. No se usa el escudo ni el logotipo de la universidad.
+
+La interfaz es clara a propósito. El uso principal es en exteriores, de día, y un fondo blanco con texto casi negro da el mayor contraste bajo el sol. La densidad es media: las tarjetas de viaje muestran lo indispensable para decidir (hora, punto de referencia, campus, lugares libres y calificación del conductor), y el resto vive en el detalle.
+
+**Key Characteristics:**
+- El encabezado y la barra inferior son azules: el azul es el marco que se reconoce al instante.
+- Una sola acción destacada por pantalla.
+- Texto de lectura con contraste de 7:1 o más; nada por debajo de 4.5:1.
+- Plano por defecto: la profundidad se marca con bordes y fondos, no con sombras.
+- Las horas, las placas y el código de verificación usan una fuente monoespaciada para que se lean sin errores.
+- Todo se construye con componentes de Quasar y su tema; no hay componentes visuales propios fuera de la tarjeta de viaje.
+
+## Colors
+
+Azul institucional como estructura, amarillo como señal, negro y gris para leer, y tonos derivados solo para fondos, bordes y estados.
+
+### Primary
+- **Azul UACJ** (#003CA6): encabezado, barra de navegación inferior, botón principal, enlaces, íconos activos, foco sobre fondo claro y la placa de campus. Contra blanco da 9.56:1, así que sirve como texto en títulos y enlaces.
+- **Azul hondo** (#002C7A): hover del botón principal, pestaña activa de la barra inferior y color `info`.
+- **Azul noche** (#001F57): botón principal presionado.
+- **Azul tenue** (#E6EDF9): fondo de un elemento seleccionado (punto elegido en una lista, filtro activo) y del chip "Publicado".
+- **Azul niebla** (#DCE5F7): etiquetas inactivas de la barra inferior y texto secundario sobre azul (7.55:1 sobre el azul UACJ).
+
+### Secondary
+- **Amarillo UACJ** (#FFD600): es el acento. Se usa en el botón de acento (solo sobre superficies azules), el indicador de la pestaña activa, la barra de la placa de campus, el foco sobre superficies azules, el chip "En curso" y la selección de texto. Lleva texto negro encima (11.54:1) o va sobre azul (6.77:1).
+- **Amarillo hondo** (#E8C200): hover del botón de acento.
+- **Amarillo tenue** (#FFF3B0): fondo del chip "Pendiente" y de los avisos de advertencia, siempre con texto negro (14.51:1).
+
+### Neutral
+- **Negro UACJ** (#231F20): todo el texto principal. Contra blanco da 16.30:1. No se usa `#000`.
+- **Gris UACJ** (#555559): texto secundario (fechas, contadores, ayudas de campo, etiquetas). Contra blanco da 7.42:1 y contra el fondo 6.80:1.
+- **Blanco** (#FFFFFF): tarjetas, campos y hojas.
+- **Fondo** (#F3F5F9): fondo de página. Es un gris azulado muy claro para que las tarjetas blancas se distingan sin sombra.
+- **Gris tenue** (#ECEDF0): fondo de chips cancelados o vencidos y de botones deshabilitados.
+- **Hover** (`--raite-blanco-hover` #FAFBFD, `--raite-azul-tenue-hover` #DDE6F6, `--raite-amarillo-tenue-hover` #FFEB85): fondos apenas más oscuros al pasar el puntero sobre tarjetas, avisos y el aviso de solicitudes pendientes. El texto encima no cambia.
+- **Borde sutil** (#D5D8DE): borde de tarjetas y separadores. Es decorativo; nunca es lo único que delimita un control.
+- **Borde de campo** (#8A8C93): borde de los campos de formulario. Contra blanco da 3.36:1, lo que cumple el mínimo de 3:1 para componentes.
+- **Gris de placeholder** (#6B6B70): texto de ejemplo dentro de un campo (5.30:1).
+- **Gris deshabilitado** (#6E7076): texto de un control deshabilitado (4.23:1 sobre gris tenue; WCAG no exige contraste aquí, pero se mantiene legible).
+
+### Estados
+- **Verde** (#1E6B34): fondo de botones o avisos de éxito con texto blanco (6.55:1). **Verde texto** (#14532D) sobre **verde tenue** (#E2F2E6): chip "Aceptada" (7.84:1).
+- **Rojo** (#B3261E): botones de cancelar o rechazar, borde de campo con error y fondo con texto blanco (6.54:1). **Rojo texto** (#8C1D18): mensajes de error y chip "Rechazada" sobre **rojo tenue** (#FCE8E6) (7.74:1).
+
+### Tabla de contraste
+
+Combinaciones permitidas de texto sobre fondo (WCAG 2.1, calculado con la fórmula de luminancia relativa). Si una combinación no está aquí, no se usa.
+
+| Texto | Fondo | Contraste | Uso |
+|---|---|---|---|
+| Negro #231F20 | Blanco #FFFFFF | 16.30:1 | Texto principal |
+| Negro #231F20 | Fondo #F3F5F9 | 14.93:1 | Texto directo sobre la página |
+| Negro #231F20 | Amarillo #FFD600 | 11.54:1 | Botón de acento, chip "En curso" |
+| Negro #231F20 | Amarillo hondo #E8C200 | 9.43:1 | Hover del botón de acento |
+| Negro #231F20 | Amarillo tenue #FFF3B0 | 14.51:1 | Chip "Pendiente", aviso |
+| Negro #231F20 | Gris tenue #ECEDF0 | 13.92:1 | Chip "Vencido" |
+| Gris #555559 | Blanco #FFFFFF | 7.42:1 | Texto secundario |
+| Gris #555559 | Fondo #F3F5F9 | 6.80:1 | Texto secundario sobre la página |
+| Gris #555559 | Gris tenue #ECEDF0 | 6.34:1 | Chip "Cancelado" |
+| Azul #003CA6 | Blanco #FFFFFF | 9.56:1 | Enlaces, títulos, botón secundario |
+| Azul #003CA6 | Azul tenue #E6EDF9 | 8.12:1 | Chip "Publicado", elemento seleccionado |
+| Blanco #FFFFFF | Azul #003CA6 | 9.56:1 | Botón principal, encabezado, placa de campus |
+| Blanco #FFFFFF | Azul hondo #002C7A | 12.79:1 | Hover, pestaña activa |
+| Amarillo #FFD600 | Azul #003CA6 | 6.77:1 | Acento sobre azul |
+| Amarillo #FFD600 | Azul hondo #002C7A | 9.06:1 | Acento sobre azul hondo |
+| Azul niebla #DCE5F7 | Azul #003CA6 | 7.55:1 | Pestañas inactivas, subtítulo del encabezado |
+| Verde texto #14532D | Verde tenue #E2F2E6 | 7.84:1 | Chip "Aceptada" |
+| Blanco #FFFFFF | Verde #1E6B34 | 6.55:1 | Aviso o botón de éxito |
+| Rojo texto #8C1D18 | Rojo tenue #FCE8E6 | 7.74:1 | Chip "Rechazada", aviso de error |
+| Rojo texto #8C1D18 | Blanco #FFFFFF | 9.11:1 | Mensaje de error de campo |
+| Blanco #FFFFFF | Rojo #B3261E | 6.54:1 | Botón de peligro |
+| Gris placeholder #6B6B70 | Blanco #FFFFFF | 5.30:1 | Placeholder |
+
+Combinaciones **prohibidas**: amarillo sobre blanco (1.41:1), amarillo sobre fondo (1.29:1) y cualquier texto amarillo sobre una superficie clara.
+
+### Named Rules
+
+**La regla de la señal.** El amarillo nunca es texto ni borde sobre fondo claro. Va sobre azul (indicador, foco, barra de la placa, botón de acento) o como fondo con texto negro encima. Se usa poco: es lo que importa ahora en la pantalla.
+
+**La regla del sol.** El texto de lectura (párrafos, nombres, horas, puntos de referencia) va a 7:1 o más. Las etiquetas y los chips van a 6:1 o más. Nada baja de 4.5:1. El color nunca es la única señal: cada estado lleva además ícono y texto.
+
+**La regla del azul que enmarca.** El azul institucional es para la estructura (encabezado, navegación) y para la acción principal. No se usa como fondo de tarjetas ni de secciones de contenido.
+
+## Typography
+
+**Fuente de interfaz:** Atkinson Hyperlegible Next (respaldo: `system-ui, sans-serif`)
+**Fuente de datos:** Atkinson Hyperlegible Mono (respaldo: `ui-monospace, monospace`)
+
+**Carácter:** Atkinson Hyperlegible la diseñó el Braille Institute para que cada letra se distinga de las demás (l/I/1, O/0, rn/m) aun con poca visión o con reflejo. La versión Mono, de la misma familia, se usa para los datos que se copian o se comparan: horas, placas, teléfono y código de verificación. Las dos tienen acentos y ñ.
+
+Las dos están en Google Fonts con licencia OFL. Se auto-hospedan como `woff2` variables (un archivo cubre todos los pesos) en `Front_Raite/src/css/fonts/`, con `font-display: swap`, para no depender de una petición externa en la calle con mala señal.
+
+### Hierarchy
+- **Headline** (700, 1.5rem en celular / 1.75rem desde 1024px, interlineado 1.2): título de la pantalla ("Buscar raite", "Mis viajes"). Uno por pantalla.
+- **Title** (700, 1.125rem, 1.3): títulos de sección, nombre del punto de referencia en la tarjeta y encabezados de diálogo.
+- **Body** (400, 1rem, 1.5): todo el texto corrido, descripciones y mensajes. Medida máxima de 65ch en textos largos (reportes, ayuda).
+- **Label** (600, 0.875rem, 1.3, +0.01em): etiquetas de campo, chips, pestañas y metadatos. Es el tamaño mínimo de toda la interfaz: no hay texto de menos de 14px.
+- **Button** (700, 1rem, 1.2): texto de botones, en minúsculas normales (sin MAYÚSCULAS).
+- **Hora** (Mono 700, 1.75rem, 1.1, cifras tabulares): la hora de salida en la tarjeta de viaje y en el detalle. Formato de 24 horas, "07:30".
+- **Dato** (Mono 600, 1.25rem, +0.08em): placas ("ABC-123-D"), teléfono ("656 123 4567") y el código de verificación de 6 dígitos (este último a 1.75rem).
+
+### Named Rules
+
+**La regla de los 16.** El texto base es de 16px (Quasar trae 14px por defecto: se cambia). Así se lee al sol y evita que iOS haga zoom al enfocar un campo.
+
+**La regla sin gritos.** Nada en MAYÚSCULAS. Quasar pone en mayúsculas los botones y las pestañas por defecto: se desactiva de forma global.
+
+## Layout
+
+**Escala de espaciado:** la de Quasar con base de 16px: `xs` 4, `sm` 8, `md` 16, `lg` 24, `xl` 48. No se usan valores fuera de la escala.
+
+**Celular (menos de 600px):** margen lateral de 16px. Estructura de Quasar `hHh lpR fFf`: encabezado fijo azul de 56px arriba, contenido en una columna y barra de navegación inferior azul de 64px (más el área segura de iOS). Cuando hay una acción principal en una pantalla de detalle ("Solicitar lugar", "Aceptar"), va en una barra fija sobre la navegación inferior y ocupa todo el ancho.
+
+**Tableta (600 a 1023px):** margen de 24px y la misma estructura que en celular. Los listados pueden ir en dos columnas de tarjetas.
+
+**Escritorio (1024px o más):** la barra inferior desaparece y su navegación pasa al encabezado como pestañas. El contenido se centra con un ancho máximo de 1120px y márgenes de 32px. La búsqueda se divide en lista (5/12) y mapa fijo (7/12). Los formularios tienen un ancho máximo de 480px y se centran.
+
+**Ritmo:** 8px entre una etiqueta y su campo, 16px entre campos, 24px entre grupos y 48px entre secciones de una pantalla. Hay más espacio arriba de un título que debajo. Las tarjetas de un listado se separan 16px.
+
+**Objetivos táctiles:** todo lo que se toca mide al menos 48×48px, incluidos los íconos sueltos (con relleno si el ícono es más chico).
+
+## Elevation & Depth
+
+El sistema es plano. La profundidad se marca con capas de color (página `fondo` → tarjeta `blanco` con `borde-sutil`) y con el marco azul. Bajo el sol las sombras casi no se ven, así que nunca cargan información. Solo lo que flota sobre el contenido lleva sombra.
+
+### Shadow Vocabulary
+- **Flotante** (`box-shadow: 0 4px 12px rgba(35, 31, 32, 0.14)`): menús desplegables, opciones de `q-select` y tooltips.
+- **Hoja** (`box-shadow: 0 8px 24px rgba(35, 31, 32, 0.18)`): diálogos y hojas inferiores (`q-dialog position="bottom"`).
+- **Barra de acción** (`box-shadow: 0 -2px 8px rgba(35, 31, 32, 0.10)`): la barra fija de acción principal en celular, para separarla del contenido que se desplaza debajo.
+
+### Named Rules
+
+**La regla plana.** `q-card` siempre va con `flat bordered`. No se usan las sombras `shadow-1` a `shadow-24` de Quasar fuera del vocabulario de arriba.
+
+## Shapes
+
+Esquinas redondeadas medias y consistentes, como un letrero con las orillas suavizadas: 12px en botones, campos y la placa de campus; 16px en tarjetas; 24px en la parte superior de las hojas inferiores; y forma de píldora en chips y contadores. Los bordes son de 1px (`borde-sutil` en tarjetas, `borde-campo` en campos) y pasan a 2px solo en el foco. No hay bordes laterales de color en tarjetas ni avisos.
+
+**Foco visible:** contorno de 2px con 2px de separación. Es azul UACJ sobre superficies claras y amarillo UACJ sobre superficies azules. Nunca se quita el foco.
+
+## Components
+
+Todos son componentes de Quasar configurados con el tema; ninguno se reemplaza.
+
+### Buttons
+- **Forma:** esquinas de 12px, alto de 48px (`size` normal con el padding del tema) y texto Button sin mayúsculas. En celular, la acción principal ocupa todo el ancho.
+- **Principal** (`color="primary"`): fondo azul UACJ con texto blanco. Hover en azul hondo y presionado en azul noche. Hay uno por pantalla: "Buscar", "Publicar viaje", "Solicitar lugar", "Aceptar".
+- **Acento** (`color="accent" text-color="dark"`): fondo amarillo con texto negro y hover en amarillo hondo. **Solo sobre superficies azules** (por ejemplo, "Publicar viaje" dentro del encabezado en escritorio). Nunca sobre blanco.
+- **Secundario** (`outline color="primary"`): fondo blanco, borde de 1px y texto azul. Para "Editar", "Ver en el mapa" y "Reenviar código".
+- **Texto** (`flat color="primary"`): para acciones menores dentro de una tarjeta o un diálogo ("Cancelar" en el sentido de cerrar).
+- **Peligro** (`color="negative"`): fondo rojo con texto blanco, para la acción destructiva principal de una pantalla ("Cancelar solicitud", "Cancelar mi lugar"). Siempre pide confirmación en un diálogo.
+- **Peligro de texto** (`flat` con clase `text-rojo-texto`): texto rojo #8C1D18 sin fondo (9.11:1 sobre blanco), para acciones destructivas que se repiten en una lista o que no son la principal ("Rechazar" en cada solicitud, "Cancelar viaje" en el detalle). Siempre pide confirmación en un diálogo cuyo botón de confirmar sí es rojo relleno.
+- **Deshabilitado:** fondo gris tenue con texto gris deshabilitado. Si hay un motivo, se explica cerca ("No quedan lugares").
+- **Cargando:** usa la propiedad `loading` de Quasar, que mantiene el ancho del botón; no se cambia el texto.
+
+### Chips
+- **Estilo:** `q-chip` sin borde, en forma de píldora y de 32px de alto, con ícono a la izquierda y texto Label. El color nunca va solo: siempre hay ícono y palabra.
+- **Estados de viaje:**
+  - Publicado: azul tenue con texto azul, ícono de calendario.
+  - En curso: amarillo con texto negro, ícono de auto.
+  - Finalizado: blanco con borde `borde-campo` y texto negro, ícono de bandera.
+  - Cancelado: gris tenue con texto gris, ícono de prohibido.
+  - Vencido (calculado): gris tenue con texto negro, ícono de reloj.
+- **Estados de solicitud:**
+  - Pendiente: amarillo tenue con texto negro, ícono de reloj de arena.
+  - Aceptada: verde tenue con texto verde, ícono de palomita.
+  - Rechazada: rojo tenue con texto rojo, ícono de tache.
+  - Cancelada: gris tenue con texto gris, ícono de prohibido.
+- **Filtros** (campus, sentido): `q-chip clickable` con fondo blanco y borde `borde-campo` cuando no está elegido, y fondo azul tenue con texto azul e ícono de palomita cuando sí.
+
+### Cards / Containers
+- **Esquinas:** 16px.
+- **Fondo:** blanco sobre la página `fondo`.
+- **Sombra:** ninguna (`flat bordered`; ver Elevation & Depth).
+- **Borde:** 1px `borde-sutil`.
+- **Relleno interno:** 16px; 24px en escritorio para el detalle.
+- Una tarjeta nunca va dentro de otra. Las secciones dentro del detalle se separan con espacio o con un `q-separator`.
+
+### Tarjeta de viaje (componente distintivo)
+Es la única pieza propia del sistema y aparece en la búsqueda, en "Mis viajes" y en el historial. Toda la tarjeta se puede tocar (`q-card` con `q-item clickable` o `v-ripple`). De arriba abajo:
+
+1. **Fila superior:** la hora en estilo Hora (azul UACJ) a la izquierda y el chip de estado a la derecha. Debajo, la fecha en Label gris ("Hoy", "Mañana", "jue 12 nov").
+2. **Ruta:** dos paradas unidas por una línea vertical de 2px en azul tenue.
+   - **Origen:** círculo azul de 12px con contorno y el nombre del punto de referencia en Title ("Oxxo Dunas"), con la calle en gris debajo.
+   - **Destino:** la **placa de campus**, una etiqueta azul UACJ con el código del campus en blanco ("CU", "ICB") y una barra amarilla de 3px en la orilla inferior, seguida del nombre completo en gris. Es la señal del sistema: se ve igual en la tarjeta, en el detalle y en el mapa. Si el viaje va desde el campus, el orden se invierte.
+3. **Fila inferior:** lugares libres ("2 de 4 lugares"), calificación del conductor (ícono de estrella y número con una decimal, en negro) y la distancia en búsqueda ("a 1.2 km"). Todo en Label, separado por espacio y sin puntos medios decorativos.
+
+Cuando la solicitud está aceptada, el detalle muestra un bloque de contacto con teléfono y placas en estilo Dato, sobre azul tenue. Este bloque no existe antes de la confirmación (RNF-02).
+
+### Inputs / Fields
+- **Estilo:** `q-input` y `q-select` con `outlined`, fondo blanco, borde de 1px `borde-campo`, esquinas de 12px, alto de 56px y texto de 16px. La etiqueta va arriba del campo, en Label negro (no flotante dentro del campo), y la ayuda va debajo en gris.
+- **Foco:** borde de 2px azul UACJ.
+- **Error:** borde rojo, mensaje en rojo texto debajo del campo con un ícono de alerta, y el mensaje dice qué está mal y cómo corregirlo ("Usa tu correo @alumnos.uacj.mx"). Se valida al salir del campo, no mientras se escribe.
+- **Deshabilitado:** fondo gris tenue y texto gris deshabilitado.
+- **Casos especiales:**
+  - Correo: `type="email"`, con el sufijo `@alumnos.uacj.mx` visible como ayuda.
+  - Teléfono: máscara `### ### ####` y `inputmode="tel"`.
+  - Código de verificación: un solo `q-input` con máscara `######`, `inputmode="numeric"` y `autocomplete="one-time-code"`, en estilo Dato a 1.75rem y centrado. Debajo, el botón secundario "Reenviar código" con la cuenta regresiva de 60 s.
+  - Punto de referencia: `q-select` con `use-input` para filtrar mientras se escribe. Cada opción muestra el nombre en Body y la calle en gris; si hay ubicación, también la distancia.
+  - Hora: `q-time` en formato de 24 horas dentro de un `q-popup-proxy`, y el valor se muestra en estilo Dato.
+  - Lugares: `q-btn-toggle` del 1 al 5, sin pasar los asientos del vehículo.
+
+### Navigation
+- **Encabezado** (`q-header`): azul UACJ, 56px, título de la pantalla en Title blanco y, a la derecha, el cambio de rol (solo para usuarios con rol AMBOS) y la campanita de avisos con un contador de no leídos (`q-badge` amarillo con texto negro). La campanita lleva a la pantalla de avisos y el contador se actualiza con una consulta periódica. En escritorio el encabezado también lleva las pestañas de navegación.
+- **Barra inferior en celular** (`q-footer` + `q-tabs` con ícono y texto): fondo azul UACJ, 64px y cuatro pestañas. Las pestañas inactivas llevan ícono y texto en azul niebla; la activa lleva fondo azul hondo, ícono y texto en blanco, e indicador amarillo de 3px arriba (`indicator-color="accent"`).
+  - Como pasajero: Buscar · Mis raites · Historial · Perfil.
+  - Como conductor: Mis viajes · Publicar · Historial · Perfil.
+  - Los avisos no van en la barra: se abren con la campanita del encabezado.
+- **Cambio de rol:** con rol AMBOS, el encabezado lleva un control compacto "Pido raite / Doy raite" sobre azul hondo; la opción elegida va en amarillo con texto negro. Se nombra por lo que haces y no por género. Al cambiar, las pestañas cambian sin recargar. El mismo control está en Perfil.
+
+### Búsqueda (variante B elegida)
+- **Celular:** el mapa ocupa la pantalla. Arriba flota el buscador ("Sales de …") y un botón de filtros que abre los filtros en una hoja inferior. Los resultados van en una hoja inferior con tres alturas (mini, media y completa) que se cambia arrastrando el asa o con el botón "Ver lista / Ver mapa" (`aria-expanded`).
+- **Accesibilidad:** en el documento, la lista de resultados va antes que el mapa, así que con teclado o lector se llega primero a las tarjetas. Todo lo que se elige en el mapa también se puede elegir en el buscador.
+- **Escritorio:** filtros y lista a la izquierda (5/12) y el mapa a la derecha (7/12).
+
+### Mapa (Leaflet + OpenStreetMap)
+- Teselas estándar de OSM con su atribución visible.
+- **Punto de referencia:** círculo azul UACJ de 14px con contorno blanco de 2px. El seleccionado crece a 20px, en amarillo con contorno negro.
+- **Campus:** la placa de campus como marcador (`divIcon`), igual que en la tarjeta.
+- **Radio de búsqueda:** círculo con contorno azul UACJ de 2px y relleno azul al 8%.
+- Los controles de zoom miden 48px y llevan el foco del sistema.
+
+### Avisos y estados vacíos
+- **Notificaciones** (`q-notify`): éxito en verde con texto blanco, error en rojo con texto blanco y advertencia en amarillo con texto negro. Siempre con ícono y en la parte inferior, por encima de la barra de navegación.
+- **Estado vacío:** un ícono de 48px en gris, una frase en Body que dice qué pasa ("No hay raites cerca de Oxxo Dunas a esa hora") y la acción para salir de ahí ("Ampliar a 5 km"). Nunca una pantalla en blanco.
+- **Carga:** `q-skeleton` con la forma de la tarjeta de viaje, no spinners de página completa.
+
+### Superficies del navegador
+- Selección de texto: fondo amarillo UACJ con texto negro.
+- Cursor de texto (`caret-color`): azul UACJ.
+- Barra de desplazamiento: delgada, en gris UACJ sobre fondo.
+- Números: `font-variant-numeric: tabular-nums` en horas, contadores y calificaciones.
+
+### Movimiento
+Se usan las transiciones de Quasar con 200ms y salida suave. El único momento propio es cuando una solicitud pasa a Aceptada: el chip cambia de amarillo tenue a verde y el bloque de contacto se despliega hacia abajo en 240ms. Con `prefers-reduced-motion` se quitan las transiciones y los desplazamientos; solo los indicadores de carga siguen girando, para que no parezca que la app se trabó.
+
+## Do's and Don'ts
+
+### Do:
+- **Do** usar el azul UACJ para el encabezado, la barra inferior y la única acción principal de cada pantalla.
+- **Do** poner el amarillo sobre azul o con texto negro encima (11.54:1).
+- **Do** revisar cada combinación nueva de texto y fondo contra la tabla de contraste; si no está, calcularla y agregarla aquí antes de usarla.
+- **Do** acompañar cada estado con ícono y palabra, además del color.
+- **Do** usar Atkinson Hyperlegible Mono para horas, placas, teléfono y código.
+- **Do** mantener texto de 16px como base y 14px como mínimo absoluto.
+- **Do** usar `q-card flat bordered` y los componentes estándar de Quasar.
+- **Do** probar cada pantalla a 375px de ancho y a 1280px, que es como se hará la demo.
+
+### Don't:
+- **Don't** poner texto amarillo, bordes amarillos ni íconos amarillos sobre blanco o sobre la página (1.41:1).
+- **Don't** usar el escudo, el logotipo ni la tipografía oficial de la UACJ.
+- **Don't** usar `#000` ni grises fuera de la paleta para el texto.
+- **Don't** escribir en MAYÚSCULAS botones, pestañas ni títulos.
+- **Don't** usar sombras para separar tarjetas, ni tarjetas dentro de tarjetas.
+- **Don't** usar bordes laterales de color en tarjetas o avisos.
+- **Don't** usar el botón de acento amarillo sobre fondo blanco.
+- **Don't** mostrar teléfono ni placas antes de que la solicitud esté aceptada.
+- **Don't** usar emojis como íconos; los íconos son de Material Icons, que ya viene con Quasar, con un solo estilo.
+- **Don't** activar el modo oscuro de Quasar: no está diseñado todavía.
+
+## Aplicación como tema de Quasar
+
+Aplicado en `Front_Raite/src/css/quasar.variables.scss` y `Front_Raite/src/css/app.scss`. Los nombres de las variables se comprobaron contra Quasar 2.30.
+
+**Colores de marca** (`src/css/quasar.variables.scss`):
+
+| Variable de Quasar | Valor | Nota |
+|---|---|---|
+| `$primary` | #003CA6 | Azul UACJ |
+| `$secondary` | #555559 | Gris UACJ, para botones neutros |
+| `$accent` | #FFD600 | Amarillo UACJ; siempre con `text-color="dark"` |
+| `$dark` | #231F20 | Negro UACJ; también lo usan `text-dark` y `bg-dark` |
+| `$dark-page` | #231F20 | Sin uso mientras no haya modo oscuro |
+| `$positive` | #1E6B34 | Verde |
+| `$negative` | #B3261E | Rojo |
+| `$info` | #002C7A | Azul hondo |
+| `$warning` | #FFD600 | Amarillo; siempre con texto negro |
+
+**Tonos derivados:** variables CSS en `src/css/app.scss` (`--raite-azul-hondo`, `--raite-azul-tenue`, `--raite-fondo`, etc.) con sus clases `.bg-*` y `.text-*` (por ejemplo `bg-azul-tenue text-primary`).
+
+**Tipografía y forma:**
+- `$typography-font-family`: Atkinson Hyperlegible Next.
+- `$body-font-size: 16px`. Mapas `$h4` (Headline en escritorio), `$h5` (Headline), `$h6` (Title), `$subtitle1`, `$subtitle2`, `$body1` (Body), `$body2` y `$caption` (Label). Ninguno baja de 14px.
+- `$generic-border-radius: 12px` y `$button-border-radius: 12px`.
+- `$button-font-weight: 700`, `$button-font-size: 16px`, `$button-padding: 0 24px` y `$button-shadow: none`. Quasar no tiene variable para quitar las mayúsculas: lo hace una regla de `app.scss` sobre `.q-btn` y `.q-tab`.
+- `$space-base: 16px` (es el valor por defecto; se deja así).
+- Los puntos de corte de Quasar (`sm` 600, `md` 1024, `lg` 1440) coinciden con los de Layout; no se cambian.
+
+**Valores por defecto de componentes:** `q-card` con `flat bordered`, `q-input` y `q-select` con `outlined` y la etiqueta fuera del campo, y `q-tabs` con `indicator-color="accent"` y `no-caps`. Donde Quasar no tenga una variable, se agrega una regla en `app.scss`; nunca se sustituye el componente.
+
+**Idioma:** `framework.lang: 'es'` en `quasar.config.ts` para que fechas, `q-date` y `q-time` salgan en español.
