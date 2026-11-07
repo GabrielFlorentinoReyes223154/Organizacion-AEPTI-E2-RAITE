@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     'apps.locations',
     'apps.rides',
     'apps.notifications',
+    'apps.ratings',
 ]
 
 MIDDLEWARE = [
