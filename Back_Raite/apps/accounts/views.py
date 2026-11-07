@@ -8,7 +8,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 
 
 from . import services
-from .permissions import CorreoVerificado, IsDriver
+from .permissions import CorreoVerificado
 from .serializers import (
     CorreoSerializer,
     LoginSerializer,
@@ -99,9 +99,10 @@ class ReenviarCodigoView(APIView):
 
 
 class VehiculoView(APIView):
-    """POST: paso 2 del registro (solo conductores). GET/PATCH: ver o editar el vehículo propio."""
+    """POST: registra el vehículo (paso 2 del registro del conductor, o un pasajero que quiere
+    ofrecer raites: su rol pasa a AMBOS). GET/PATCH: ver o editar el vehículo propio."""
 
-    permission_classes = [IsAuthenticated, CorreoVerificado, IsDriver]
+    permission_classes = [IsAuthenticated, CorreoVerificado]
 
     def _vehiculo(self, request):
         vehiculo = getattr(request.user, "vehiculo", None)
@@ -124,6 +125,12 @@ class VehiculoView(APIView):
         serializer.is_valid(raise_exception=True)
         vehiculo = services.registrar_vehiculo(request.user, serializer.validated_data)
         response_serializer = VehiculoRegistroResponseSerializer(
-            {"id": vehiculo.id, "placas": vehiculo.placas, "vehiculo_valido": vehiculo.es_valido_para_conducir()}
+            {
+                "id": vehiculo.id,
+                "placas": vehiculo.placas,
+                "vehiculo_valido": vehiculo.es_valido_para_conducir(),
+                "rol": request.user.rol,
+                "rol_display": request.user.get_rol_display(),
+            }
         )
         return Response(response_serializer.data, status=status.HTTP_201_CREATED)

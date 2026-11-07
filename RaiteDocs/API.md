@@ -29,8 +29,8 @@ Fuente de verdad: el código en `Back_Raite/apps/*/urls.py`; actualiza esta pág
 | POST | `auth/token/refresh/`, `auth/token/blacklist/` | Público (con refresh) | Renovar sesión o cerrarla. |
 | GET | `auth/me/` | Verificado | Perfil propio, con teléfono y vehículo (placas incluidas). |
 | PATCH | `auth/me/` | Verificado | Edita `telefono`, `carrera` y `preferencia_compatibilidad`. |
-| POST | `auth/vehicle/` | Verificado + conductor | Registra el vehículo (uno por usuario; 409 si ya tiene). |
-| GET / PATCH | `auth/vehicle/` | Verificado + conductor | Ver o editar marca, modelo, color y asientos (1–5; no menos que los lugares de un viaje vigente). |
+| POST | `auth/vehicle/` | Verificado (no admin) | Registra el vehículo (uno por usuario; 409 si ya tiene). Si el usuario era `PASAJERO`, su rol pasa a `AMBOS`. Responde `rol` y `rol_display`. |
+| GET / PATCH | `auth/vehicle/` | Verificado | Ver o editar marca, modelo, color y asientos (1–5; no menos que los lugares de un viaje vigente). 404 si no tiene vehículo. |
 
 ## Catálogos
 

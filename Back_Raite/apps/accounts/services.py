@@ -3,7 +3,7 @@
 from datetime import timedelta
 
 from django.conf import settings
-from django.core.exceptions import ValidationError
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.mail import send_mail
 from django.db import transaction
 from django.utils import timezone
@@ -105,11 +105,18 @@ def actualizar_perfil(usuario: Usuario, datos: dict) -> Usuario:
 
 @transaction.atomic
 def registrar_vehiculo(usuario: Usuario, datos: dict) -> Vehiculo:
+    """Registra el vehículo del usuario. Un PASAJERO que registra vehículo pasa a AMBOS,
+    porque cualquier estudiante puede alternar entre pasajero y conductor (SRS §2 y §5)."""
+    if usuario.es_admin:
+        raise PermissionDenied("Las cuentas de administrador no registran vehículo.")
     if hasattr(usuario, "vehiculo"):
         raise Conflicto("Ya tienes un vehículo registrado. Edítalo en lugar de crear otro.")
     vehiculo = Vehiculo(usuario=usuario, **datos)
     vehiculo.full_clean()
     vehiculo.save()
+    if usuario.rol == Rol.PASAJERO:
+        usuario.rol = Rol.AMBOS
+        usuario.save(update_fields=["rol", "updated_at"])
     return vehiculo
 
 

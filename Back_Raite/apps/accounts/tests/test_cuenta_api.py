@@ -221,10 +221,36 @@ class VehiculoTests(TestCase):
         respuesta = cliente_para(conductor).post("/api/auth/vehicle/", self.DATOS, format="json")
         self.assertEqual(respuesta.status_code, status.HTTP_409_CONFLICT)
 
-    def test_pasajero_no_puede_usar_vehiculo(self):
-        cliente = cliente_para(crear_usuario(rol=Rol.PASAJERO))
-        self.assertEqual(cliente.post("/api/auth/vehicle/", self.DATOS, format="json").status_code, 403)
-        self.assertEqual(cliente.get("/api/auth/vehicle/").status_code, 403)
+    def test_pasajero_que_registra_vehiculo_pasa_a_ambos(self):
+        pasajero = crear_usuario(rol=Rol.PASAJERO)
+        cliente = cliente_para(pasajero)
+        self.assertEqual(cliente.get("/api/auth/vehicle/").status_code, status.HTTP_404_NOT_FOUND)
+        respuesta = cliente.post("/api/auth/vehicle/", self.DATOS, format="json")
+        self.assertEqual(respuesta.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(respuesta.data["rol"], Rol.AMBOS)
+        pasajero.refresh_from_db()
+        self.assertEqual(pasajero.rol, Rol.AMBOS)
+        self.assertTrue(pasajero.puede_publicar_viaje())
+        self.assertEqual(cliente.get("/api/auth/vehicle/").status_code, status.HTTP_200_OK)
+
+    def test_conductor_que_registra_vehiculo_conserva_su_rol(self):
+        conductor = crear_conductor(con_vehiculo=False)
+        respuesta = cliente_para(conductor).post("/api/auth/vehicle/", self.DATOS, format="json")
+        self.assertEqual(respuesta.data["rol"], Rol.CONDUCTOR)
+
+    def test_vehiculo_invalido_no_cambia_el_rol(self):
+        pasajero = crear_usuario(rol=Rol.PASAJERO)
+        datos = {**self.DATOS, "asientos_disponibles": 9}
+        self.assertEqual(cliente_para(pasajero).post("/api/auth/vehicle/", datos, format="json").status_code, 400)
+        pasajero.refresh_from_db()
+        self.assertEqual(pasajero.rol, Rol.PASAJERO)
+
+    def test_admin_no_registra_vehiculo(self):
+        from django.contrib.auth import get_user_model
+
+        admin = get_user_model().objects.create_superuser("admin@uacj.mx", "password123")
+        respuesta = cliente_para(admin).post("/api/auth/vehicle/", self.DATOS, format="json")
+        self.assertEqual(respuesta.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_sin_verificar_no_registra_vehiculo(self):
         conductor = crear_conductor(con_vehiculo=False, correo_verificado=False)

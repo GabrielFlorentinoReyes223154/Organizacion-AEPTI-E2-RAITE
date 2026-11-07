@@ -173,3 +173,5 @@ class VehiculoRegistroResponseSerializer(serializers.Serializer):
     id = serializers.UUIDField()
     placas = serializers.CharField()
     vehiculo_valido = serializers.BooleanField()
+    rol = serializers.IntegerField()
+    rol_display = serializers.CharField()
