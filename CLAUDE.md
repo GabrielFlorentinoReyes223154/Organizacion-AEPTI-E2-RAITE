@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Fuente de verdad del proyecto para Claude Code. Última revisión: 2026-11-06.
+Fuente de verdad del proyecto para Claude Code. Última revisión: 2026-11-06 (Paso 0 y Capa 1 terminados).
 Si algo de aquí contradice al código, revisa el código y actualiza este archivo.
 
 > **Nombre del proyecto:** [NOMBRE] — pendiente de confirmar (aparece como "Raite" en el SRS y en el código, "UniGo-UACJ" en la carta y "RutaClara" en el encabezado del PDF de la carta). En el código se mantiene "Raite": no renombrar nada hasta que se pida.
@@ -21,9 +21,10 @@ Lo que **realmente** hay en el repo (los docs de diseño mencionan más cosas: P
 
 - Django 6.1.1, Django REST Framework 3.18, `djangorestframework-simplejwt` 5.5 (con `token_blacklist`), `django-cors-headers`, `dj-database-url`, `python-dotenv`, `psycopg2-binary`.
 - Base de datos: **PostgreSQL local** de cada desarrollador (sin PostGIS). Ya no se usa el Postgres remoto. Se configura con `DATABASE_URL` en `Back_Raite/.env` (gitignored); no hay respaldo SQLite. El certificado `certs/ca.pem` solo se usa si se configura por variable de entorno. Hay un virtualenv local en `Back_Raite/.venv/`.
-- Variables de entorno: `DATABASE_URL`, `SECRET_KEY`, `DEBUG` (y las de correo/certificado que se agreguen). Plantilla en `Back_Raite/.env.example`.
-- Datos iniciales (campus y puntos de referencia): se cargan con un comando de `manage.py` para que todos tengan los mismos datos.
-- **Estado:** el cambio a BD local, `.env.example`, las variables de entorno y el comando de carga están **planeados, aún no implementados** (hoy `settings.py` todavía tiene `SECRET_KEY`/`DEBUG` fijos). Al implementarlos, quitar esta línea y documentar el comando exacto aquí y en el `README.md`.
+- Variables de entorno (plantilla en `Back_Raite/.env.example`): `SECRET_KEY` y `DATABASE_URL` obligatorias; `DEBUG`, `ALLOWED_HOSTS`, `CORS_ALLOWED_ORIGINS`, `DB_SSL_ROOTCERT` (opcional) y las de correo (`EMAIL_BACKEND`, por defecto consola).
+- `LANGUAGE_CODE = es-mx`, `TIME_ZONE = America/Ciudad_Juarez`. Constantes de la app en `settings.py`: `CORREO_DOMINIO_PERMITIDO`, `CODIGO_VERIFICACION_MINUTOS`, `CODIGO_VERIFICACION_MAX_INTENTOS`.
+- Datos iniciales: `python manage.py cargar_datos_iniciales` (campus + puntos de referencia desde `apps/locations/data/*.json`; se puede repetir y no pisa lo editado en el admin).
+- Pasos completos para una máquina nueva: `README.md`.
 
 ```bash
 cd Back_Raite
@@ -32,9 +33,15 @@ python manage.py runserver            # http://localhost:8000
 python manage.py migrate
 python manage.py makemigrations
 python manage.py check
-python manage.py test                                   # todos los tests (crea BD de prueba en el Postgres de DATABASE_URL)
+python manage.py cargar_datos_iniciales                 # campus y puntos de referencia
+python manage.py generar_puntos_osm                     # SOLO para regenerar puntos_referencia.json (usa internet, ~3 min)
+python manage.py test                                   # todos los tests (el usuario de BD necesita CREATEDB)
+python manage.py test apps.rides                        # una app
 python manage.py test apps.accounts.tests.test_auth_api # un módulo
 ```
+
+- Las pruebas se escriben con las fábricas de `apps/accounts/tests/factories.py` y `apps/rides/tests/factories.py`.
+- Probar siempre en PostgreSQL: SQLite no detecta, por ejemplo, textos más largos que la columna.
 
 ### Frontend — `Front_Raite/` (TypeScript)
 
@@ -75,13 +82,14 @@ Raite/
 │   ├── requirements.txt
 │   ├── certs/ca.pem     # CA del antiguo Postgres remoto (opcional, por variable)
 │   ├── Raite_DjangoRest/  # paquete del proyecto: settings.py, urls.py, wsgi/asgi
-│   └── apps/
-│       └── accounts/    # única app: usuarios, roles, vehículo, auth JWT
-│           ├── models.py, models_choices.py
-│           ├── serializers.py, views.py, urls_auth.py, permissions.py
-│           ├── admin.py, signals.py (vacío)
-│           ├── migrations/ (0001–0012)
-│           └── tests/ (test_models.py, test_auth_api.py)
+│   ├── .env.example     # plantilla de variables de entorno
+│   └── apps/            # cada app: models.py, models_choices.py, admin.py, migrations/, tests/
+│       ├── accounts/    # Usuario, Vehiculo, CodigoVerificacion + auth JWT (views, serializers, urls_auth)
+│       ├── locations/   # Campus, PuntoReferencia; data/*.json; comandos cargar_datos_iniciales y generar_puntos_osm
+│       ├── rides/       # Viaje, Solicitud (estados y transiciones en models_choices.py)
+│       ├── notifications/ # Notificacion
+│       ├── ratings/     # Calificacion
+│       └── reports/     # Reporte
 ├── Front_Raite/         # SPA Quasar
 │   ├── quasar.config.ts
 │   └── src/
@@ -95,9 +103,11 @@ Raite/
 │   ├── docs/            # documentos formales exportados de Google Drive (SRS, propuesta fase 1/2)
 │   ├── Design/          # UI_UX.md, layouts_team.md, imágenes y PDF de diseño
 │   ├── Context/         # system_solutions_context.md
-│   ├── BD_PuntosMapa/   # Oxxo.json (export de Overpass/OSM con los OXXO de Juárez)
+│   ├── Modelo-ER.md     # diagrama ER y de estados de la Capa 1 (fuente de verdad del modelo)
+│   ├── BD_PuntosMapa/   # Oxxo.json (export crudo de Overpass; incluye puntos de Juárez, N.L. que se descartan)
 │   ├── Sketches/, TeamTasks/
 │   └── Raite-*.md, tecnologias.md, uml_*.mmd, …  # diseño técnico del equipo anterior
+├── .claude/settings.json # config. local de Claude Code (commits sin atribución); ignorado por git
 ├── graphify-out/        # grafo de conocimiento generado (ver AGENTS.md)
 └── .opencode/           # configuración de opencode + plugin graphify
 ```
@@ -106,16 +116,18 @@ Raite/
 
 - `AUTH_USER_MODEL = 'accounts.Usuario'` (PK UUID), `USERNAME_FIELD = "correo"`: el `ModelBackend` normal inicia sesión por correo, no hace falta backend propio.
 - Campos y modelos **en español** (`correo`, `nombre`, `apellidos`, `edad` 17–70, `sexo`, `carrera`, `calificacion` 0.00–5.00, `suspendido`, …). Mantener esa convención.
-- **Un solo campo `rol`** (entero): `1=ADMIN`, `2=PASAJERO`, `3=CONDUCTOR`, `4=AMBOS`. La tabla `UsuarioRol` ya no existe (migraciones 0011–0012). Helpers: `es_pasajero`, `es_conductor`, `es_admin`, `puede_crear_raite()`, `puede_aceptar_raite()`. ADMIN no se puede obtener en el registro público.
+- **Un solo campo `rol`** (entero): `1=ADMIN`, `2=PASAJERO`, `3=CONDUCTOR`, `4=AMBOS`. Helpers: `es_pasajero`, `es_conductor`, `es_admin`, `puede_publicar_viaje()`, `puede_solicitar_lugar()`. ADMIN no se puede obtener en el registro público.
+- `Usuario` además tiene `telefono` (10 dígitos), `preferencia_compatibilidad` (`MISMO_SEXO`/`MIXTO`, por defecto `MIXTO`), `correo_verificado` y `suspendido`. El dominio `@alumnos.uacj.mx` se valida en `Usuario.clean()` (el ADMIN queda exento). Las cachés antiguas `activo`/`cuenta_activa` se eliminaron.
 - `Sexo`: `M`, `F`, `X` ("Otro"). Se mantienen los tres (ver Decisiones tomadas).
-- `activo` / `cuenta_activa` son cachés de "tiene un raite en curso" (pensadas para la futura app de viajes), **no** el estado de la cuenta (eso es `is_active`).
-- `Vehiculo` (1 a 1 con el usuario): marca, modelo, color, placas (únicas, normalizadas), tipo (`COCHE`/`CAMIONETA`/`TROCA`), `asientos_disponibles` (el serializer acepta 1–8).
-- Endpoints (`/api/auth/`): `token/`, `token/refresh/`, `token/blacklist/`, `me/` (GET), `register/` (POST, paso 1; responde `requiere_vehiculo`), `vehicle/` (POST, paso 2, solo conductores). Además `admin/` de Django.
+- `Vehiculo` (1 a 1 con el usuario): marca, modelo, color, placas (únicas), tipo (`COCHE`/`CAMIONETA`/`TROCA`), `asientos_disponibles` 1–5.
+- Modelo completo, estados y qué regla vive en cada modelo: **`RaiteDocs/Modelo-ER.md`**. En la Capa 1 solo hay validaciones de un registro (`clean()`, validadores, restricciones de BD); las reglas entre varios registros van en servicios (Capa 2).
+- Endpoints actuales (`/api/auth/`): `token/`, `token/refresh/`, `token/blacklist/`, `me/` (GET), `register/` (POST, paso 1; pide `telefono`; responde `requiere_vehiculo`), `vehicle/` (POST, paso 2, solo conductores). Además `admin/` de Django. Aún no hay endpoints de viajes (Capa 2).
 - JWT: acceso 30 min, refresh 1 día, rotación + blacklist.
-- `settings.py` aún tiene `SECRET_KEY` fija y `DEBUG = True`; no apto para producción.
+- Migraciones de `accounts`: 0001–0012 vienen del equipo anterior (la 0009 se corrigió para que funcione en un PostgreSQL vacío); 0013 es de la Capa 1.
 
 ### Detalles del frontend que importan
 
+- **El registro del frontend está desfasado**: no envía `telefono` ni valida `@alumnos.uacj.mx`. Se corrige en la Capa 3.
 - Rutas por archivo (`filenameBasedRouting: true`), modo **`history`**. Páginas: `/login/LoginPage`, `/login/SignUpPage`, `/home` (elige vista según rol; con rol AMBOS abre `RoleSelectionModal` para elegir rol activo), `/home-pasajero` y `/home-conductor` (solo un título y botón de cerrar sesión), y restos de plantilla (`index.vue`, `index/(index).vue`, `index/second.vue`, `login/MainPage.vue`, `login/ErrorNotFound.vue`, `[...path].vue`).
 - Guarda global en `router/index.ts`: todo fuera de `/login*` requiere sesión; con sesión, `/login*` y `/` redirigen a `/home`.
 - Tokens en `localStorage`. Usa el alias `@/` para `src/`.
@@ -123,35 +135,35 @@ Raite/
 
 ## Requerimientos
 
-Fuente: `RaiteDocs/docs/2_SRS.md`. Estado según el código al 2026-11-06.
+Fuente: `RaiteDocs/docs/2_SRS.md`. Estado según el código al 2026-11-06 (tras la Capa 1). 🟡 = hay modelo, falta API y/o pantalla.
 ✅ hecho · 🟡 parcial · ⬜ pendiente
 
 ### Funcionales
 
 | ID | Requerimiento | Estado | Notas |
 |----|---------------|--------|-------|
-| RF-01 | Registro de usuario e identificación con correo institucional | 🟡 | Registro, login, logout y `/me` funcionan (backend + pantallas). **No se valida el dominio institucional**: se acepta cualquier correo. El paso 2 (vehículo) existe en el API pero no hay pantalla. |
-| RF-02 | Conductor publica viaje (punto de referencia de origen, campus destino, horario, lugares) | ⬜ | No existe modelo ni endpoint de viajes. |
-| RF-03 | Conductor configura cuántos lugares ofrece | ⬜ | Solo existe `Vehiculo.asientos_disponibles` (1–8), no lugares por viaje. |
-| RF-04 | Pasajero busca viajes por punto de referencia, horario y campus | ⬜ | |
-| RF-05 | Pasajero solicita un lugar en un viaje publicado | ⬜ | |
-| RF-06 | Conductor confirma o rechaza solicitudes | ⬜ | |
-| RF-07 | Preferencias de compatibilidad (mixto / mismo sexo) | ⬜ | Solo se guarda `sexo` del usuario. |
-| RF-08 | Mapa interactivo con rutas y puntos de encuentro | ⬜ | Solo hay `RaiteDocs/BD_PuntosMapa/Oxxo.json` (datos crudos de OSM). |
-| RF-09 | Notificaciones de solicitudes, confirmaciones, cambios y cancelaciones | ⬜ | |
-| RF-10 | Calificación mutua al terminar el viaje | ⬜ | Solo el campo `Usuario.calificacion` (0.00 por defecto). |
-| RF-11 | Historial de viajes por usuario | ⬜ | |
-| RF-12 | Reportar comportamiento inadecuado | ⬜ | Solo el campo `Usuario.suspendido` y el admin de Django. |
+| RF-01 | Registro de usuario e identificación con correo institucional | 🟡 | Registro, login, logout y `/me` funcionan. Modelo listo: dominio `@alumnos.uacj.mx`, `telefono`, `correo_verificado`, `CodigoVerificacion`. Falta: endpoints de verificación, bloquear login sin verificar, pantalla del vehículo. |
+| RF-02 | Conductor publica viaje (punto de referencia de origen, campus destino, horario, lugares) | 🟡 | Modelo `Viaje` + 5 campus y 128 puntos de referencia cargados. Falta API y pantalla. |
+| RF-03 | Conductor configura cuántos lugares ofrece | 🟡 | `Viaje.lugares_ofrecidos` 1–5 sin superar los asientos del vehículo. Falta API y pantalla. |
+| RF-04 | Pasajero busca viajes por punto de referencia, horario y campus | 🟡 | Índice `(estado, campus, fecha_hora)`. Falta búsqueda (con haversine y compatibilidad) y pantalla. |
+| RF-05 | Pasajero solicita un lugar en un viaje publicado | 🟡 | Modelo `Solicitud` (una activa por viaje y pasajero). Falta API y pantalla. |
+| RF-06 | Conductor confirma o rechaza solicitudes | 🟡 | Estados y transiciones definidos. Falta servicio (cupo, compatibilidad) y API. |
+| RF-07 | Preferencias de compatibilidad (mixto / mismo sexo) | 🟡 | `preferencia_compatibilidad` en usuario, viaje y solicitud. La regla de empate se aplica en la Capa 2. |
+| RF-08 | Mapa interactivo con rutas y puntos de encuentro | 🟡 | Coordenadas de campus y puntos listas. Falta Leaflet (Capa 3). |
+| RF-09 | Notificaciones de solicitudes, confirmaciones, cambios y cancelaciones | 🟡 | Modelo `Notificacion` con sus tipos. Falta crearlas desde los servicios y el endpoint de consulta. |
+| RF-10 | Calificación mutua al terminar el viaje | 🟡 | Modelo `Calificacion`. Falta API y recálculo de `Usuario.calificacion`. |
+| RF-11 | Historial de viajes por usuario | 🟡 | Se obtiene de `Viaje` + `Solicitud` (sin modelo propio). Falta endpoint y pantalla. |
+| RF-12 | Reportar comportamiento inadecuado | 🟡 | Modelo `Reporte`; el admin ya puede resolver, descartar y suspender. Falta API y pantalla. |
 
 ### No funcionales
 
 | ID | Requerimiento | Estado | Notas |
 |----|---------------|--------|-------|
-| RNF-01 | Usabilidad: interfaz simple, puntos de referencia en vez de direcciones | ⬜ | No hay pantallas de viajes todavía. |
-| RNF-02 | Seguridad: datos de contacto visibles solo entre conductor y pasajero tras confirmar | 🟡 | Hay auth JWT con refresh/blacklist. No hay datos de contacto (no existe teléfono) ni reglas de visibilidad. `SECRET_KEY` fija y `DEBUG=True`. |
+| RNF-01 | Usabilidad: interfaz simple, puntos de referencia en vez de direcciones | 🟡 | Catálogo de puntos de referencia listo. Faltan las pantallas. |
+| RNF-02 | Seguridad: datos de contacto visibles solo entre conductor y pasajero tras confirmar | 🟡 | JWT; secretos por variable de entorno; existe `telefono`. Falta la regla de visibilidad (Capa 2). |
 | RNF-03 | Disponibilidad | ⬜ | Sin despliegue. |
 | RNF-04 | Compatibilidad: diseño responsivo móvil/escritorio | 🟡 | Quasar es responsivo; solo existen login y registro. |
-| RNF-05 | Escalabilidad: poder agregar usuarios y funciones | 🟡 | Backend organizado en apps Django; solo existe `accounts`. |
+| RNF-05 | Escalabilidad: poder agregar usuarios y funciones | 🟡 | Backend en 6 apps Django con índices en las consultas principales. |
 | RNF-06 | Rendimiento en búsqueda y mapa | ⬜ | No aplica aún. |
 
 ## Reglas de negocio
@@ -184,8 +196,8 @@ Decididas el 2026-11-06. Tienen la misma prioridad que las reglas de negocio.
 2. **Sexo:** se mantienen `M`, `F` y `X`. "Mismo sexo" = mismo valor del campo `sexo`. Un usuario `X` con "mismo sexo" solo empata con otros `X`.
 3. **Correo institucional:** solo `@alumnos.uacj.mx`. La cuenta se activa con un código de verificación enviado por correo.
 4. **Contacto:** campo de teléfono/WhatsApp en el usuario, visible solo entre conductor y pasajero con raite confirmado.
-5. **Puntos de referencia:** modelo con nombre, latitud y longitud, administrado desde el admin de Django. Carga inicial desde `RaiteDocs/BD_PuntosMapa/Oxxo.json`. Sin PostGIS; cercanía con haversine en Python.
-6. **Campus:** CU, IIT, ICB, ICSA, IADA.
+5. **Puntos de referencia:** modelo con nombre, latitud y longitud, administrado desde el admin de Django. Carga inicial desde `RaiteDocs/BD_PuntosMapa/Oxxo.json`. Sin PostGIS; cercanía con haversine en Python. Los puntos a los que Nominatim no les dio calle **y** colonia se cargan con `activo=False` para revisarlos en el admin (90 de 128, porque OSM casi no tiene colonias en Juárez).
+6. **Campus:** CU, IIT, ICB, ICSA, IADA. Coordenadas tomadas de OSM; IIT e IADA comparten ubicación (por confirmar).
 7. **Mapa:** Leaflet + OpenStreetMap.
 8. **Notificaciones:** solo dentro de la app (modelo + consulta periódica). Sin push ni WebSockets.
 9. **Lugares por viaje:** 1 a 5. `Vehiculo.asientos_disponibles` también se limita a 1–5.
@@ -196,13 +208,14 @@ Decididas el 2026-11-06. Tienen la misma prioridad que las reglas de negocio.
 
 Se construye **por capas, no por funcionalidad**. El objetivo es dejar una base completa y entendible para que quien siga solo tenga que ajustar detalles. **No se empieza una capa hasta terminar y probar la anterior.**
 
-0. **Base de datos local** — `.env.example`, settings por variables de entorno, certificado opcional, comando de carga inicial, README. ⬜
-1. **Capa 1 — Modelos** ⬜
+0. **Base de datos local** — `.env.example`, settings por variables de entorno, certificado opcional, comando de carga inicial, README. ✅
+1. **Capa 1 — Modelos** ✅ (121 tests pasando en PostgreSQL; ver `RaiteDocs/Modelo-ER.md`)
    - Todos los modelos que cubren RF-01 a RF-12 y las reglas de negocio: usuarios, vehículo, campus, puntos de referencia, viajes, solicitudes, notificaciones, calificaciones, reportes, verificación de correo.
    - Validaciones a nivel modelo, migraciones, registro en el admin de Django y tests de modelo.
    - Diagrama entidad-relación en Mermaid dentro de `RaiteDocs/`.
-2. **Capa 2 — Lógica** (serializers, views del API y servicios) ⬜
+2. **Capa 2 — Lógica** (serializers, views del API y servicios) ⬜ ← siguiente
    - Endpoints y reglas de negocio: compatibilidad por sexo, cupo de lugares, visibilidad de contacto, estados del viaje y de la solicitud, verificación de correo.
+   - También: validar `@alumnos.uacj.mx` en el registro (llamar `full_clean()`), bloquear login sin `correo_verificado`, crear notificaciones en cada cambio de estado, recalcular `Usuario.calificacion`, evitar viajes/solicitudes que se crucen en horario, cercanía con haversine.
    - Tests de API.
 3. **Capa 3 — Vistas** (páginas de Quasar) ⬜
    - Pantallas que consumen el API. Sin bocetos: diseño simple y funcional con componentes de Quasar.
@@ -219,4 +232,6 @@ Al terminar cada capa, actualizar aquí su estado y la tabla de requerimientos.
 - Los archivos de `RaiteDocs/docs/` vienen de Google Docs: no editarlos a mano aquí (ver `RaiteDocs/docs/README.md`).
 - `Front_Raite/src/router/typed-router.d.ts` es generado: no editar a mano.
 - Antes de dar por terminado un cambio: `python manage.py test` (backend) y `pnpm lint:check && pnpm typecheck` (frontend).
+- **Solo commits locales: no hacer push ni abrir PR.** Del push se encarga el usuario.
+- **Los mensajes de commit no llevan `Co-Authored-By` ni ninguna mención a Claude** (también configurado en `.claude/settings.json`, que es local: `.claude/` está en `.gitignore`).
 - `AGENTS.md` pide usar `graphify` para consultas del código y correr `graphify update .` tras modificarlo, si la herramienta está instalada.
