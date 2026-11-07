@@ -36,21 +36,6 @@ declare module 'vue-router/auto-routes' {
       '/',
       Record<never, never>,
       Record<never, never>,
-      | '//(index)'
-      | '//second'
-    >,
-    '//(index)': RouteRecordInfo<
-      '//(index)',
-      '/',
-      Record<never, never>,
-      Record<never, never>,
-      | never
-    >,
-    '//second': RouteRecordInfo<
-      '//second',
-      '/second',
-      Record<never, never>,
-      Record<never, never>,
       | never
     >,
     '/[...path]': RouteRecordInfo<
@@ -60,53 +45,109 @@ declare module 'vue-router/auto-routes' {
       { path: ParamValue<false> },
       | never
     >,
-    '/home': RouteRecordInfo<
-      '/home',
-      '/home',
+    '/avisos': RouteRecordInfo<
+      '/avisos',
+      '/avisos',
       Record<never, never>,
       Record<never, never>,
       | never
     >,
-    '/home-conductor': RouteRecordInfo<
-      '/home-conductor',
-      '/home-conductor',
+    '/buscar': RouteRecordInfo<
+      '/buscar',
+      '/buscar',
       Record<never, never>,
       Record<never, never>,
       | never
     >,
-    '/home-pasajero': RouteRecordInfo<
-      '/home-pasajero',
-      '/home-pasajero',
+    '/entrar': RouteRecordInfo<
+      '/entrar',
+      '/entrar',
       Record<never, never>,
       Record<never, never>,
       | never
     >,
-    '/login/ErrorNotFound': RouteRecordInfo<
-      '/login/ErrorNotFound',
-      '/login/ErrorNotFound',
+    '/historial': RouteRecordInfo<
+      '/historial',
+      '/historial',
       Record<never, never>,
       Record<never, never>,
       | never
     >,
-    '/login/LoginPage': RouteRecordInfo<
-      '/login/LoginPage',
-      '/login/LoginPage',
+    '/mis-raites': RouteRecordInfo<
+      '/mis-raites',
+      '/mis-raites',
       Record<never, never>,
       Record<never, never>,
       | never
     >,
-    '/login/MainPage': RouteRecordInfo<
-      '/login/MainPage',
-      '/login/MainPage',
+    '/mis-viajes': RouteRecordInfo<
+      '/mis-viajes',
+      '/mis-viajes',
       Record<never, never>,
       Record<never, never>,
       | never
     >,
-    '/login/SignUpPage': RouteRecordInfo<
-      '/login/SignUpPage',
-      '/login/SignUpPage',
+    '/perfil': RouteRecordInfo<
+      '/perfil',
+      '/perfil',
       Record<never, never>,
       Record<never, never>,
+      | never
+    >,
+    '/publicar': RouteRecordInfo<
+      '/publicar',
+      '/publicar',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/registro': RouteRecordInfo<
+      '/registro',
+      '/registro',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/vehiculo': RouteRecordInfo<
+      '/vehiculo',
+      '/vehiculo',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/verificar': RouteRecordInfo<
+      '/verificar',
+      '/verificar',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/viajes/[id]/': RouteRecordInfo<
+      '/viajes/[id]/',
+      '/viajes/:id',
+      { id: ParamValue<true> },
+      { id: ParamValue<false> },
+      | never
+    >,
+    '/viajes/[id]/calificar': RouteRecordInfo<
+      '/viajes/[id]/calificar',
+      '/viajes/:id/calificar',
+      { id: ParamValue<true> },
+      { id: ParamValue<false> },
+      | never
+    >,
+    '/viajes/[id]/reportar': RouteRecordInfo<
+      '/viajes/[id]/reportar',
+      '/viajes/:id/reportar',
+      { id: ParamValue<true> },
+      { id: ParamValue<false> },
+      | never
+    >,
+    '/viajes/[id]/solicitudes': RouteRecordInfo<
+      '/viajes/[id]/solicitudes',
+      '/viajes/:id/solicitudes',
+      { id: ParamValue<true> },
+      { id: ParamValue<false> },
       | never
     >,
   }
@@ -125,24 +166,6 @@ declare module 'vue-router/auto-routes' {
     'src/pages/index.vue': {
       routes:
         | '/'
-        | '//(index)'
-        | '//second'
-      views:
-        | 'default'
-      pathParamNames:
-        | never
-    }
-    'src/pages/index/(index).vue': {
-      routes:
-        | '//(index)'
-      views:
-        | never
-      pathParamNames:
-        | never
-    }
-    'src/pages/index/second.vue': {
-      routes:
-        | '//second'
       views:
         | never
       pathParamNames:
@@ -156,57 +179,121 @@ declare module 'vue-router/auto-routes' {
       pathParamNames:
         | 'path'
     }
-    'src/pages/home.vue': {
+    'src/pages/avisos.vue': {
       routes:
-        | '/home'
+        | '/avisos'
       views:
         | never
       pathParamNames:
         | never
     }
-    'src/pages/home-conductor.vue': {
+    'src/pages/buscar.vue': {
       routes:
-        | '/home-conductor'
+        | '/buscar'
       views:
         | never
       pathParamNames:
         | never
     }
-    'src/pages/home-pasajero.vue': {
+    'src/pages/entrar.vue': {
       routes:
-        | '/home-pasajero'
+        | '/entrar'
       views:
         | never
       pathParamNames:
         | never
     }
-    'src/pages/login/ErrorNotFound.vue': {
+    'src/pages/historial.vue': {
       routes:
-        | '/login/ErrorNotFound'
+        | '/historial'
       views:
         | never
       pathParamNames:
         | never
     }
-    'src/pages/login/LoginPage.vue': {
+    'src/pages/mis-raites.vue': {
       routes:
-        | '/login/LoginPage'
+        | '/mis-raites'
       views:
         | never
       pathParamNames:
         | never
     }
-    'src/pages/login/MainPage.vue': {
+    'src/pages/mis-viajes.vue': {
       routes:
-        | '/login/MainPage'
+        | '/mis-viajes'
       views:
         | never
       pathParamNames:
         | never
     }
-    'src/pages/login/SignUpPage.vue': {
+    'src/pages/perfil.vue': {
       routes:
-        | '/login/SignUpPage'
+        | '/perfil'
+      views:
+        | never
+      pathParamNames:
+        | never
+    }
+    'src/pages/publicar.vue': {
+      routes:
+        | '/publicar'
+      views:
+        | never
+      pathParamNames:
+        | never
+    }
+    'src/pages/registro.vue': {
+      routes:
+        | '/registro'
+      views:
+        | never
+      pathParamNames:
+        | never
+    }
+    'src/pages/vehiculo.vue': {
+      routes:
+        | '/vehiculo'
+      views:
+        | never
+      pathParamNames:
+        | never
+    }
+    'src/pages/verificar.vue': {
+      routes:
+        | '/verificar'
+      views:
+        | never
+      pathParamNames:
+        | never
+    }
+    'src/pages/viajes/[id]/index.vue': {
+      routes:
+        | '/viajes/[id]/'
+      views:
+        | never
+      pathParamNames:
+        | never
+    }
+    'src/pages/viajes/[id]/calificar.vue': {
+      routes:
+        | '/viajes/[id]/calificar'
+      views:
+        | never
+      pathParamNames:
+        | never
+    }
+    'src/pages/viajes/[id]/reportar.vue': {
+      routes:
+        | '/viajes/[id]/reportar'
+      views:
+        | never
+      pathParamNames:
+        | never
+    }
+    'src/pages/viajes/[id]/solicitudes.vue': {
+      routes:
+        | '/viajes/[id]/solicitudes'
       views:
         | never
       pathParamNames:
