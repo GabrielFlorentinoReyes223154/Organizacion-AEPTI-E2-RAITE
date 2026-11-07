@@ -29,8 +29,8 @@ Fuente de verdad: el código en `Back_Raite/apps/*/urls.py`; actualiza esta pág
 | POST | `auth/token/refresh/`, `auth/token/blacklist/` | Público (con refresh) | Renovar sesión o cerrarla. |
 | GET | `auth/me/` | Verificado | Perfil propio, con teléfono y vehículo (placas incluidas). |
 | PATCH | `auth/me/` | Verificado | Edita `telefono`, `carrera` y `preferencia_compatibilidad`. |
-| POST | `auth/vehicle/` | Verificado + conductor | Registra el vehículo (uno por usuario; 409 si ya tiene). |
-| GET / PATCH | `auth/vehicle/` | Verificado + conductor | Ver o editar marca, modelo, color y asientos (1–5; no menos que los lugares de un viaje vigente). |
+| POST | `auth/vehicle/` | Verificado (no admin) | Registra el vehículo (uno por usuario; 409 si ya tiene). Si el usuario era `PASAJERO`, su rol pasa a `AMBOS`. Responde `rol` y `rol_display`. |
+| GET / PATCH | `auth/vehicle/` | Verificado | Ver o editar marca, modelo, color y asientos (1–5; no menos que los lugares de un viaje vigente). 404 si no tiene vehículo. |
 
 ## Catálogos
 
@@ -45,7 +45,7 @@ Fuente de verdad: el código en `Back_Raite/apps/*/urls.py`; actualiza esta pág
 |--------|-----|-------|----------|
 | GET | `viajes/` | Verificado | **Búsqueda.** Acepta `punto` o `lat`+`lon`, `radio_km` (3 por defecto, máximo 15), `campus`, `sentido`, `desde` y `hasta`. Devuelve viajes `PUBLICADO` a futuro, con lugar libre, que no son propios y son compatibles por sexo. Ordena por distancia y luego por hora. |
 | POST | `viajes/` | Conductor con vehículo activo, no suspendido | Publica un viaje: `punto_referencia`, `campus`, `sentido`, `fecha_hora`, `lugares_ofrecidos`, `preferencia_compatibilidad` (opcional) y `notas`. 409 si se cruza de horario con otro viaje o solicitud propios. |
-| GET | `viajes/mios/` | Conductor | Sus viajes. Por defecto `PUBLICADO` y `EN_CURSO`, vencidos incluidos (`esta_vencido`). `?estado=` filtra. |
+| GET | `viajes/mios/` | Conductor | Sus viajes. Por defecto `PUBLICADO` y `EN_CURSO`, vencidos incluidos (`esta_vencido`). `?estado=` filtra. Cada viaje trae `solicitudes_pendientes`. |
 | GET | `viajes/{id}/` | Verificado | Detalle. Si el viaje está publicado lo ve cualquiera; si no, solo el conductor y quien tuvo una solicitud. Incluye `mi_solicitud` y, para el conductor, `pasajeros_confirmados`. |
 | PATCH | `viajes/{id}/` | Conductor del viaje | Edita `fecha_hora`, `lugares_ofrecidos`, `notas` y `preferencia_compatibilidad`, solo si está publicado y no vencido. Avisa a las solicitudes activas. |
 | POST | `viajes/{id}/cancelar/` | Conductor del viaje | `PUBLICADO → CANCELADO`, también si está vencido. Cancela las solicitudes activas y avisa a sus pasajeros. |

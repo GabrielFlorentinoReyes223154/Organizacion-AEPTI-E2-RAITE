@@ -127,6 +127,16 @@ class ViajeSerializer(serializers.ModelSerializer):
         return max(viaje.lugares_ofrecidos - len(aceptadas), 0)
 
 
+class MiViajeSerializer(ViajeSerializer):
+    """Viaje en "Mis viajes" del conductor: agrega cuántas solicitudes esperan respuesta."""
+
+    solicitudes_pendientes = serializers.IntegerField(read_only=True)
+
+    class Meta(ViajeSerializer.Meta):
+        fields = [*ViajeSerializer.Meta.fields, "solicitudes_pendientes"]
+        read_only_fields = fields
+
+
 class BusquedaSerializer(serializers.Serializer):
     """Filtros de `GET /api/viajes/`. Horas en ISO 8601 (sin zona = hora de Juárez)."""
 

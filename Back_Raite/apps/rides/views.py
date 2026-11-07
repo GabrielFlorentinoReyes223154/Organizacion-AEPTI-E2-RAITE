@@ -15,6 +15,7 @@ from .serializers import (
     BusquedaSerializer,
     HistorialSerializer,
     MiSolicitudSerializer,
+    MiViajeSerializer,
     SolicitudSerializer,
     ViajeDetalleSerializer,
     ViajeEdicionSerializer,
@@ -67,7 +68,7 @@ class ViajesView(generics.GenericAPIView):
 class MisViajesView(generics.ListAPIView):
     """Viajes que publicó el conductor. Por defecto los publicados y en curso (incluye vencidos)."""
 
-    serializer_class = ViajeSerializer
+    serializer_class = MiViajeSerializer
     permission_classes = [IsAuthenticated, CorreoVerificado, IsDriver]
 
     def get_queryset(self):

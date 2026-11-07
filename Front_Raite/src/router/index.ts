@@ -6,16 +6,21 @@ import {
   createWebHashHistory,
   createWebHistory,
 } from 'vue-router';
-import { useAuthStore } from '@/stores/auth-store';
+import type { Papel } from '@/api/tipos';
+import { useSesionStore } from '@/stores/sesion';
 
-/*
- * If not building with SSR mode, you can
- * directly export the Router instantiation;
- *
- * The function below can be async too; either use
- * async/await or return a Promise which resolves
- * with the Router instance.
- */
+declare module 'vue-router' {
+  interface RouteMeta {
+    /** Se puede abrir sin sesión (entrar, registro, verificar). */
+    publico?: boolean;
+    /** Papel necesario para la pantalla. */
+    papel?: Papel;
+    /** Título del encabezado. */
+    titulo?: string;
+    /** Pantalla secundaria: lleva botón de regresar (a esta ruta si no hay historial) y no lleva barra inferior. */
+    atras?: string;
+  }
+}
 
 const createHistory = import.meta.env.QUASAR_SERVER
   ? createMemoryHistory
@@ -24,39 +29,43 @@ const createHistory = import.meta.env.QUASAR_SERVER
     : createWebHashHistory;
 
 const Router = createRouter({
-  scrollBehavior: () => ({ left: 0, top: 0 }),
+  scrollBehavior: (_to, _from, guardada) => guardada ?? { left: 0, top: 0 },
   routes,
   history: createHistory(import.meta.env.QUASAR_VUE_ROUTER_BASE),
 });
 
-// Global auth guard
-Router.beforeEach((to) => {
-  const authStore = useAuthStore();
-  const publicPaths = ['/login', '/login/SignUpPage'];
-  const requiresAuth = !publicPaths.some((p) => to.path.startsWith(p));
+Router.beforeEach(async (to) => {
+  const sesion = useSesionStore();
+  // Hay tokens pero el perfil no cargó (por ejemplo, sin señal al abrir la app): se reintenta.
+  if (sesion.acceso && !sesion.usuario) await sesion.iniciar();
 
-  if (requiresAuth && !authStore.isAuthenticated) {
-    return { path: '/login/LoginPage' };
-  }
-
-  if (to.path.startsWith('/login') && authStore.isAuthenticated) {
-    return { path: '/home' };
+  if (to.meta.publico) {
+    // Con sesión, entrar y registro no tienen caso; verificar sí (puede haber otra cuenta).
+    if (sesion.autenticado && to.path !== '/verificar') return sesion.inicio;
+    return true;
   }
 
-  if (to.path === '/') {
-    return authStore.isAuthenticated ? { path: '/home' } : { path: '/login/LoginPage' };
+  if (!sesion.autenticado) {
+    return { path: '/entrar', query: to.fullPath !== '/' ? { siguiente: to.fullPath } : {} };
   }
 
-  // Role-based access control for home pages
-  if (to.path === '/home-pasajero' && !authStore.isPasajero) {
-    return { path: '/home-conductor' };
+  if (to.path === '/') return sesion.inicio;
+
+  const papel = to.meta.papel;
+  if (papel) {
+    const puede = papel === 'conductor' ? sesion.esConductor : sesion.esPasajero;
+    if (!puede) return sesion.inicio;
+    // Con rol AMBOS, abrir una pantalla del otro papel (por ejemplo desde un aviso) cambia el papel activo.
+    if (sesion.papel !== papel) sesion.cambiarPapel(papel);
   }
-  if (to.path === '/home-conductor' && !authStore.isConductor) {
-    return { path: '/home-pasajero' };
-  }
+  return true;
 });
 
-// enable HMR for it
+// Cada pantalla nombra la pestaña del navegador (WCAG 2.4.2).
+Router.afterEach((to) => {
+  document.title = to.meta.titulo ? `${to.meta.titulo} · Raite` : 'Raite';
+});
+
 if (import.meta.hot) {
   handleHotUpdate(Router);
 }

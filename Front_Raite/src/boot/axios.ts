@@ -1,71 +1,56 @@
-import axios, { type AxiosError, type AxiosResponse, type InternalAxiosRequestConfig } from 'axios';
-import type { App } from 'vue';
-import { useAuthStore } from '@/stores/auth-store';
+import axios, { type AxiosError, type InternalAxiosRequestConfig } from 'axios';
+import { useSesionStore } from '@/stores/sesion';
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000',
+  baseURL: (import.meta.env.VITE_API_URL as string | undefined) || 'http://localhost:8000',
   headers: { 'Content-Type': 'application/json' },
+  timeout: 20000,
 });
 
-interface RetryableRequestConfig extends InternalAxiosRequestConfig {
-  _retry?: boolean;
+interface PeticionReintentable extends InternalAxiosRequestConfig {
+  _reintento?: boolean;
 }
 
-let isRefreshing = false;
-let failedQueue: Array<(token: string | null) => void> = [];
+// Peticiones que no se reintentan con un token renovado (no usan sesión o son la propia renovación).
+const SIN_RENOVAR = [
+  '/api/auth/token/',
+  '/api/auth/register/',
+  '/api/auth/verificar/',
+  '/api/auth/reenviar-codigo/',
+];
 
-const processQueue = (error: Error | null, token: string | null = null) => {
-  failedQueue.forEach((cb) => cb(token));
-  failedQueue = [];
-};
+let renovando: Promise<string | null> | null = null;
 
 api.interceptors.response.use(
-  (res: AxiosResponse) => res,
+  (respuesta) => respuesta,
   async (error: AxiosError) => {
-    const authStore = useAuthStore();
-    const originalRequest = error.config as RetryableRequestConfig;
-    const isAuthRequest = ['/api/auth/token/', '/api/auth/register/'].some((path) =>
-      originalRequest.url?.includes(path),
-    );
+    const original = error.config as PeticionReintentable | undefined;
+    const url = original?.url ?? '';
+    const esDeSesion = SIN_RENOVAR.some((ruta) => url.startsWith(ruta));
 
-    if (error.response?.status === 401 && !originalRequest._retry && !isAuthRequest) {
-      if (isRefreshing) {
-        return new Promise((resolve, reject) => {
-          failedQueue.push((token) => {
-            if (token) {
-              originalRequest.headers.Authorization = `Bearer ${token}`;
-              resolve(api(originalRequest));
-            } else {
-              reject(new Error('Token refresh failed'));
-            }
-          });
-        });
-      }
-
-      originalRequest._retry = true;
-      isRefreshing = true;
-
-      try {
-        await authStore.refreshAccessToken();
-        const token = authStore.accessToken!;
-        processQueue(null, token);
-        originalRequest.headers.Authorization = `Bearer ${token}`;
-        return api(originalRequest);
-      } catch (err) {
-        processQueue(err as Error, null);
-        await authStore.logout();
-        return Promise.reject(new Error('Authentication failed'));
-      } finally {
-        isRefreshing = false;
-      }
+    if (error.response?.status !== 401 || !original || original._reintento || esDeSesion) {
+      // Se rechaza con el error original para que la pantalla pueda leer la respuesta del API.
+      return Promise.reject(error);
     }
 
-    return Promise.reject(new Error(error.message));
+    const sesion = useSesionStore();
+    original._reintento = true;
+    renovando ??= sesion.renovarToken().finally(() => {
+      renovando = null;
+    });
+    const token = await renovando;
+    if (!token) {
+      sesion.olvidarSesion();
+      window.location.assign('/entrar');
+      return Promise.reject(error);
+    }
+    original.headers.Authorization = `Bearer ${token}`;
+    return api(original);
   },
 );
 
-export default ({ app }: { app: App }) => {
-  app.config.globalProperties.$api = api;
+export default () => {
+  /* La instancia se importa directamente donde se usa. */
 };
 
 export { api };

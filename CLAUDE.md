@@ -34,6 +34,8 @@ python manage.py migrate
 python manage.py makemigrations
 python manage.py check
 python manage.py cargar_datos_iniciales                 # campus y puntos de referencia
+python manage.py crear_datos_demo --reiniciar           # usuarios, viajes y solicitudes de demo (correos *.demo@, contraseña raite1234)
+python manage.py probar_correo tu@alumnos.uacj.mx otro@gmail.com   # muestra del correo del código (usa el EMAIL_BACKEND del .env)
 python manage.py generar_puntos_osm                     # SOLO para regenerar puntos_referencia.json (usa internet, ~3 min)
 python manage.py test                                   # todos los tests (el usuario de BD necesita CREATEDB)
 python manage.py test apps.rides                        # una app
@@ -45,7 +47,7 @@ python manage.py test apps.accounts.tests.test_auth_api # un módulo
 
 ### Frontend — `Front_Raite/` (TypeScript)
 
-- Quasar 2.30 (Vite, `@quasar/app-vite` 3.8), Vue 3.5, Vue Router 5 (rutas por archivo), Pinia 4, Axios, `validator`. Node `^22.12 || ^24 || >=26`. **pnpm** es el gestor canónico.
+- Quasar 2.30 (Vite, `@quasar/app-vite` 3.8), Vue 3.5, Vue Router 5 (rutas por archivo), Pinia 4, Axios, `validator`, Leaflet 1.9 (mapas con OpenStreetMap). Node `^22.12 || ^24 || >=26`. **pnpm** es el gestor canónico.
 - Sin runner de tests (no hay Vitest/Playwright).
 
 ```bash
@@ -62,7 +64,6 @@ pnpm typecheck    # vue-tsc --noEmit
 
 ### Decidido, aún no instalado
 
-- Mapas: Leaflet + OpenStreetMap (se instala en la Capa 3).
 - Notificaciones: la consulta periódica desde el frontend (a `GET /api/notificaciones/conteo/`) se hace en la Capa 3. Sin push ni WebSockets.
 
 ### Por definir
@@ -132,42 +133,46 @@ Raite/
 
 ### Detalles del frontend que importan
 
-- **El registro del frontend está desfasado**: no envía `telefono`, no valida `@alumnos.uacj.mx` y no tiene pantalla para el código de verificación. Como el login ahora responde 403 si el correo no está verificado, las cuentas nuevas no pueden entrar desde el frontend hasta la Capa 3. Para probar antes, marca `correo_verificado` desde el admin.
-- Rutas por archivo (`filenameBasedRouting: true`), modo **`history`**. Páginas: `/login/LoginPage`, `/login/SignUpPage`, `/home` (elige vista según rol; con rol AMBOS abre `RoleSelectionModal` para elegir rol activo), `/home-pasajero` y `/home-conductor` (solo un título y botón de cerrar sesión), y restos de plantilla (`index.vue`, `index/(index).vue`, `index/second.vue`, `login/MainPage.vue`, `login/ErrorNotFound.vue`, `[...path].vue`).
-- Guarda global en `router/index.ts`: todo fuera de `/login*` requiere sesión; con sesión, `/login*` y `/` redirigen a `/home`.
+- **Capa 3 (vistas) hecha** siguiendo `DESIGN.md` y `PRODUCT.md` (raíz del repo, excluidos de git en `.git/info/exclude`): tema de Quasar con colores UACJ, fuentes Atkinson Hyperlegible en `src/css/fonts/`.
+- Rutas por archivo (`filenameBasedRouting: true`), modo **`history`**. Cada página declara con `definePage({ meta })` si es `publico`, el `papel` que necesita (`pasajero`/`conductor`), su `titulo` y, si es secundaria, `atras` (ruta de regreso; sin barra inferior). `App.vue` elige `PublicoLayout` o `AppLayout` según `meta.publico`.
+- Páginas: `/entrar`, `/registro`, `/verificar`, `/vehiculo`, `/buscar`, `/mis-raites`, `/mis-viajes`, `/publicar` (`?editar=id`), `/viajes/[id]` (detalle para pasajero y conductor), `/viajes/[id]/solicitudes`, `/viajes/[id]/calificar`, `/viajes/[id]/reportar`, `/avisos`, `/historial`, `/perfil` y la 404.
+- Guarda global en `router/index.ts`: sin sesión todo lo no público manda a `/entrar?siguiente=…`; `/` manda al inicio del papel (`/buscar` o `/mis-viajes`). Con rol AMBOS, abrir una pantalla del otro papel cambia el papel activo.
+- Capas: `src/api/` (una función por endpoint, `tipos.ts`, `errores.ts`), `src/stores/` (`sesion`, `catalogos`, `avisos` con la consulta periódica de 30 s), `src/utils/` (`formato.ts` con horas en `America/Ciudad_Juarez`, `avisar.ts` con Notify y diálogos de confirmación), `src/components/` (tarjeta de viaje, placa de campus, mapa, selectores…).
+- `boot/axios.ts` rechaza con el error original de axios (para leer la respuesta del API con `leerError`) y renueva el token en 401.
+- Para probar sin runner: `python manage.py crear_datos_demo --reiniciar`, `runserver` y `pnpm dev`; el código de verificación sale en la consola de Django.
 - Tokens en `localStorage`. Usa el alias `@/` para `src/`.
-- `tsconfig.json` referencia archivos de tipos dentro de `node_modules/.pnpm/...` con rutas con hash: si `pnpm install` cambia versiones, el typecheck puede romperse hasta actualizar esas rutas.
+- `tsconfig.json` apunta los tipos de `#q-app` a `node_modules/@quasar/app-vite/...` (ruta estable). Antes usaba rutas de `node_modules/.pnpm/` con hash, que se rompían con cada `pnpm install`.
 
 ## Requerimientos
 
-Fuente: `RaiteDocs/docs/2_SRS.md`. Estado según el código al 2026-11-06 (tras la Capa 2). 🟡 = backend listo (modelo + API + tests), falta la pantalla (Capa 3).
+Fuente: `RaiteDocs/docs/2_SRS.md`. Estado según el código al 2026-11-07 (Capa 3 con pantallas). ✅ = API con tests y pantalla probada a mano con los datos de demo.
 ✅ hecho · 🟡 parcial · ⬜ pendiente
 
 ### Funcionales
 
 | ID | Requerimiento | Estado | Notas |
 |----|---------------|--------|-------|
-| RF-01 | Registro de usuario e identificación con correo institucional | 🟡 | API completa: registro con `@alumnos.uacj.mx` y código por correo, `verificar/`, `reenviar-codigo/`, login bloqueado sin verificar, perfil y vehículo. Falta pantalla. |
-| RF-02 | Conductor publica viaje (punto de referencia de origen, campus destino, horario, lugares) | 🟡 | `POST /api/viajes/` (sin cruces de horario), edición, cancelar/iniciar/finalizar y catálogos `campus/` y `puntos/`. Falta pantalla. |
-| RF-03 | Conductor configura cuántos lugares ofrece | 🟡 | `lugares_ofrecidos` 1–5, sin superar los asientos ni bajar de los aceptados (al publicar y al editar). Falta pantalla. |
-| RF-04 | Pasajero busca viajes por punto de referencia, horario y campus | 🟡 | `GET /api/viajes/` con radio por haversine, campus, sentido y horario, filtrando por compatibilidad. Falta pantalla. |
-| RF-05 | Pasajero solicita un lugar en un viaje publicado | 🟡 | `POST /api/viajes/{id}/solicitudes/` y `GET /api/solicitudes/mias/`; cancelar. Falta pantalla. |
-| RF-06 | Conductor confirma o rechaza solicitudes | 🟡 | Aceptar/rechazar con bloqueo del viaje para no rebasar el cupo. Falta pantalla. |
-| RF-07 | Preferencias de compatibilidad (mixto / mismo sexo) | 🟡 | `PATCH /api/auth/me/`; regla aplicada al buscar, solicitar, aceptar y editar el viaje. Falta pantalla. |
-| RF-08 | Mapa interactivo con rutas y puntos de encuentro | 🟡 | El API da coordenadas de campus y puntos (y `distancia_km`). Falta Leaflet (Capa 3). |
-| RF-09 | Notificaciones de solicitudes, confirmaciones, cambios y cancelaciones | 🟡 | Se crean en cada cambio de estado; endpoints para listar, contar y marcar leídas. Falta la consulta periódica y la pantalla. |
-| RF-10 | Calificación mutua al terminar el viaje | 🟡 | `POST /api/viajes/{id}/calificaciones/` con recálculo de `Usuario.calificacion`; pendientes por calificar. Falta pantalla. |
-| RF-11 | Historial de viajes por usuario | 🟡 | `GET /api/historial/` como conductor y como pasajero. Falta pantalla. |
-| RF-12 | Reportar comportamiento inadecuado | 🟡 | `POST /api/reportes/` y `GET /api/reportes/mios/`; el admin resuelve y suspende. Falta pantalla. |
+| RF-01 | Registro de usuario e identificación con correo institucional | ✅ | API completa: registro con `@alumnos.uacj.mx` y código por correo, `verificar/`, `reenviar-codigo/`, login bloqueado sin verificar, perfil y vehículo. Pantalla hecha. |
+| RF-02 | Conductor publica viaje (punto de referencia de origen, campus destino, horario, lugares) | ✅ | `POST /api/viajes/` (sin cruces de horario), edición, cancelar/iniciar/finalizar y catálogos `campus/` y `puntos/`. Pantalla hecha. |
+| RF-03 | Conductor configura cuántos lugares ofrece | ✅ | `lugares_ofrecidos` 1–5, sin superar los asientos ni bajar de los aceptados (al publicar y al editar). Pantalla hecha. |
+| RF-04 | Pasajero busca viajes por punto de referencia, horario y campus | ✅ | `GET /api/viajes/` con radio por haversine, campus, sentido y horario, filtrando por compatibilidad. Pantalla hecha. |
+| RF-05 | Pasajero solicita un lugar en un viaje publicado | ✅ | `POST /api/viajes/{id}/solicitudes/` y `GET /api/solicitudes/mias/`; cancelar. Pantalla hecha. |
+| RF-06 | Conductor confirma o rechaza solicitudes | ✅ | Aceptar/rechazar con bloqueo del viaje para no rebasar el cupo. Pantalla hecha. |
+| RF-07 | Preferencias de compatibilidad (mixto / mismo sexo) | ✅ | `PATCH /api/auth/me/`; regla aplicada al buscar, solicitar, aceptar y editar el viaje. Pantalla hecha. |
+| RF-08 | Mapa interactivo con rutas y puntos de encuentro | ✅ | El API da coordenadas de campus y puntos (y `distancia_km`). Pantalla hecha. |
+| RF-09 | Notificaciones de solicitudes, confirmaciones, cambios y cancelaciones | ✅ | Se crean en cada cambio de estado; endpoints para listar, contar y marcar leídas. Pantalla hecha. |
+| RF-10 | Calificación mutua al terminar el viaje | ✅ | `POST /api/viajes/{id}/calificaciones/` con recálculo de `Usuario.calificacion`; pendientes por calificar. Pantalla hecha. |
+| RF-11 | Historial de viajes por usuario | ✅ | `GET /api/historial/` como conductor y como pasajero. Pantalla hecha. |
+| RF-12 | Reportar comportamiento inadecuado | ✅ | `POST /api/reportes/` y `GET /api/reportes/mios/`; el admin resuelve y suspende. Pantalla hecha. |
 
 ### No funcionales
 
 | ID | Requerimiento | Estado | Notas |
 |----|---------------|--------|-------|
-| RNF-01 | Usabilidad: interfaz simple, puntos de referencia en vez de direcciones | 🟡 | Catálogo de puntos de referencia listo. Faltan las pantallas. |
-| RNF-02 | Seguridad: datos de contacto visibles solo entre conductor y pasajero tras confirmar | 🟡 | Teléfono y placas solo con solicitud `ACEPTADA` (probado). JWT, permisos por rol y secretos por variable de entorno. Falta revisar en pantallas. |
+| RNF-01 | Usabilidad: interfaz simple, puntos de referencia en vez de direcciones | ✅ | Origen siempre por catálogo (lista con búsqueda y mapa). Una acción principal por pantalla. |
+| RNF-02 | Seguridad: datos de contacto visibles solo entre conductor y pasajero tras confirmar | ✅ | Teléfono y placas solo con solicitud `ACEPTADA` (probado en API y en pantalla). JWT, permisos por rol y secretos por variable de entorno. |
 | RNF-03 | Disponibilidad | ⬜ | Sin despliegue. |
-| RNF-04 | Compatibilidad: diseño responsivo móvil/escritorio | 🟡 | Quasar es responsivo; solo existen login y registro. |
+| RNF-04 | Compatibilidad: diseño responsivo móvil/escritorio | ✅ | Barra inferior en celular y pestañas en el encabezado en escritorio; revisado a 390 y 1280 px. |
 | RNF-05 | Escalabilidad: poder agregar usuarios y funciones | 🟡 | 6 apps Django con servicios separados de las vistas; índices en las consultas principales; paginación. |
 | RNF-06 | Rendimiento en búsqueda y mapa | ⬜ | No aplica aún. |
 
@@ -221,9 +226,10 @@ Se construye **por capas, no por funcionalidad**. El objetivo es dejar una base 
 2. **Capa 2 — Lógica** ✅ (268 tests pasando en PostgreSQL; endpoints en `RaiteDocs/API.md`)
    - Servicios, serializers y vistas para todos los RF; reglas de compatibilidad, cupo con bloqueo, visibilidad de contacto, transiciones, vencimiento calculado, verificación de correo, notificaciones, promedio de calificación, historial y reportes.
    - Tests de API por endpoint, incluida la concurrencia al aceptar.
-3. **Capa 3 — Vistas** (páginas de Quasar) ⬜ ← siguiente
-   - Primero: registro con teléfono y pantalla del código de verificación (el login ya lo exige), y manejo de `correo_no_verificado`.
-   - Pantallas que consumen el API. Sin bocetos: diseño simple y funcional con componentes de Quasar.
+3. **Capa 3 — Vistas** (páginas de Quasar) ✅ (en `capa/vistas`; diseño en `DESIGN.md`)
+   - Variantes elegidas en el lienzo de diseño: búsqueda B (mapa con hoja de resultados), detalle A (con Llamar/WhatsApp), publicar A (con vista previa), solicitudes B (cupo como asientos).
+   - Backend agregado en esta capa: `solicitudes_pendientes` en `viajes/mios/`, pasajero que registra vehículo pasa a AMBOS, comando `crear_datos_demo`.
+   - Pendiente: decidir nombre y logo, despliegue (RNF-03) y medir rendimiento (RNF-06).
 
 Al terminar cada capa, actualizar aquí su estado y la tabla de requerimientos.
 

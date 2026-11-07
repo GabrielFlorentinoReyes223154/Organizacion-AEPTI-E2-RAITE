@@ -3,13 +3,13 @@
 from datetime import timedelta
 
 from django.conf import settings
-from django.core.exceptions import ValidationError
-from django.core.mail import send_mail
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import transaction
 from django.utils import timezone
 
 from Raite_DjangoRest.api import Conflicto
 
+from .correos import correo_codigo
 from .models import CodigoVerificacion, Usuario, Vehiculo
 from .models_choices import Rol
 
@@ -17,19 +17,10 @@ MENSAJE_CODIGO_INVALIDO = "El código es incorrecto o ya venció."
 
 
 def enviar_codigo(usuario) -> None:
-    """Genera un código nuevo y lo manda al correo del usuario (en desarrollo sale en la terminal)."""
+    """Genera un código nuevo y lo manda al correo del usuario (en desarrollo sale en la terminal).
+    Se usa al registrarse y al pedir otro código."""
     _, codigo = CodigoVerificacion.generar(usuario)
-    send_mail(
-        subject="Tu código de verificación",
-        message=(
-            f"Hola {usuario.nombre}:\n\n"
-            f"Tu código para activar tu cuenta es: {codigo}\n\n"
-            f"Vence en {settings.CODIGO_VERIFICACION_MINUTOS} minutos. "
-            "Si no te registraste, ignora este correo."
-        ),
-        from_email=None,
-        recipient_list=[usuario.correo],
-    )
+    correo_codigo(usuario, codigo).send()
 
 
 @transaction.atomic
@@ -105,11 +96,18 @@ def actualizar_perfil(usuario: Usuario, datos: dict) -> Usuario:
 
 @transaction.atomic
 def registrar_vehiculo(usuario: Usuario, datos: dict) -> Vehiculo:
+    """Registra el vehículo del usuario. Un PASAJERO que registra vehículo pasa a AMBOS,
+    porque cualquier estudiante puede alternar entre pasajero y conductor (SRS §2 y §5)."""
+    if usuario.es_admin:
+        raise PermissionDenied("Las cuentas de administrador no registran vehículo.")
     if hasattr(usuario, "vehiculo"):
         raise Conflicto("Ya tienes un vehículo registrado. Edítalo en lugar de crear otro.")
     vehiculo = Vehiculo(usuario=usuario, **datos)
     vehiculo.full_clean()
     vehiculo.save()
+    if usuario.rol == Rol.PASAJERO:
+        usuario.rol = Rol.AMBOS
+        usuario.save(update_fields=["rol", "updated_at"])
     return vehiculo
 
 

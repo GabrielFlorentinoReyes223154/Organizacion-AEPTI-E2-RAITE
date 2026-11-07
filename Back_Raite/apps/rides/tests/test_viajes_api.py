@@ -335,5 +335,15 @@ class DetalleYMisViajesTests(TestCase):
         self.assertEqual(cliente.get("/api/viajes/mios/", {"estado": "CANCELADO"}).data["count"], 1)
         self.assertEqual(cliente.get("/api/viajes/mios/", {"estado": "OTRO"}).status_code, 400)
 
+    def test_mis_viajes_cuenta_solicitudes_pendientes(self):
+        crear_solicitud(self.viaje, crear_usuario())
+        crear_solicitud(self.viaje, crear_usuario())
+        crear_solicitud(self.viaje, crear_usuario(), estado=EstadoSolicitud.ACEPTADA)
+        crear_solicitud(self.viaje, crear_usuario(), estado=EstadoSolicitud.RECHAZADA)
+        otro = crear_viaje(self.conductor, fecha_hora=timezone.now() + timedelta(days=4))
+        datos = cliente_para(self.conductor).get("/api/viajes/mios/").data["results"]
+        pendientes = {v["id"]: v["solicitudes_pendientes"] for v in datos}
+        self.assertEqual(pendientes, {str(self.viaje.pk): 2, str(otro.pk): 0})
+
     def test_mis_viajes_solo_conductores(self):
         self.assertEqual(cliente_para(crear_usuario()).get("/api/viajes/mios/").status_code, 403)

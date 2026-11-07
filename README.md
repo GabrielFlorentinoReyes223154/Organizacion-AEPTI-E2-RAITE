@@ -62,6 +62,7 @@ Después:
 ```bash
 python manage.py migrate                  # crea las tablas
 python manage.py cargar_datos_iniciales   # campus y puntos de referencia (se puede repetir)
+python manage.py crear_datos_demo         # opcional: usuarios y viajes de demo (contraseña raite1234); --reiniciar para rehacerlos
 python manage.py createsuperuser          # usuario para el admin de Django
 python manage.py runserver                # http://localhost:8000  (admin en /admin/)
 ```
