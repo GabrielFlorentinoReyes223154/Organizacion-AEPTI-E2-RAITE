@@ -1,0 +1,13 @@
+{% autoescape off %}Hola, {{ nombre }}.
+
+Escribe este código en Raite para terminar tu registro:
+
+    {{ codigo }}
+
+El código vence en {{ minutos }} minutos.
+
+Si no te registraste en Raite, ignora este correo. Sin este código nadie puede activar la cuenta.
+
+--
+Raite · Raites entre alumnos de la UACJ
+{% endautoescape %}

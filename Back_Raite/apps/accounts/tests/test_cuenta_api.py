@@ -170,6 +170,46 @@ class ReenviarCodigoTests(TestCase):
         self.assertEqual(len(mail.outbox), 1)
 
 
+class CorreoCodigoTests(TestCase):
+    """El correo del código trae HTML, texto plano y el logo incrustado (RF-01)."""
+
+    def partes(self, correo):
+        return list(correo.message().walk())
+
+    def revisar_correo(self, correo):
+        codigo = re.search(r"\b(\d{6})\b", correo.body).group(1)
+        self.assertEqual(correo.subject, f"Tu código de Raite: {codigo}")
+
+        html, tipo = correo.alternatives[0]
+        self.assertEqual(tipo, "text/html")
+        self.assertIn(codigo, html)
+        self.assertIn("cid:logo-raite@raite", html)
+        self.assertIn('alt="Raite"', html)
+
+        partes = self.partes(correo)
+        relacionado = next(p for p in partes if p.get_content_type() == "multipart/related")
+        tipos = [p.get_content_type() for p in relacionado.iter_parts()]
+        self.assertEqual(tipos, ["text/html", "image/png"])
+        logo = next(p for p in partes if p.get_content_type() == "image/png")
+        self.assertEqual(logo["Content-ID"], "<logo-raite@raite>")
+        self.assertEqual(logo.get_content_disposition(), "inline")
+        self.assertTrue(logo.get_content().startswith(b"\x89PNG"))
+
+    def test_registro_manda_html_con_logo(self):
+        cliente_para().post("/api/auth/register/", DATOS_REGISTRO, format="json")
+        self.assertEqual(len(mail.outbox), 1)
+        self.revisar_correo(mail.outbox[0])
+
+    def test_reenvio_usa_el_mismo_correo(self):
+        cliente_para().post("/api/auth/register/", DATOS_REGISTRO, format="json")
+        CodigoVerificacion.objects.update(creado_en=timezone.now() - timedelta(minutes=2))
+        cliente_para().post(
+            "/api/auth/reenviar-codigo/", {"correo": "ana.lopez@alumnos.uacj.mx"}, format="json"
+        )
+        self.assertEqual(len(mail.outbox), 2)
+        self.revisar_correo(mail.outbox[1])
+
+
 class PerfilTests(TestCase):
     def test_me_incluye_vehiculo_con_placas(self):
         conductor = crear_conductor()
