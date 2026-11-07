@@ -7,7 +7,7 @@
           <span class="publico__circulo publico__circulo--chico" aria-hidden="true" />
           <span class="publico__punto" aria-hidden="true" />
 
-          <p class="publico__nombre">Raite</p>
+          <img :src="logoSobreAzul" alt="Raite" class="publico__logo" width="228" height="103" />
 
           <div class="publico__mensaje">
             <p class="publico__titular">Comparte el camino a tu campus.</p>
@@ -42,6 +42,9 @@
 // Marco de entrar, registro y verificación.
 // Celular: franja azul con la marca y el formulario en una hoja blanca.
 // Escritorio (≥1024 px): panel azul con el mensaje a la izquierda y el formulario en una tarjeta a la derecha.
+// Logo en versión para fondo azul: blanco con el amarillo UACJ (original en RaiteDocs/Design/logo/).
+import logoSobreAzul from '@/assets/logo-raite-sobre-azul.png';
+
 const beneficios = [
   { icono: 'verified_user', texto: 'Solo alumnos con correo @alumnos.uacj.mx' },
   { icono: 'place', texto: 'Lugares conocidos, nunca tu dirección' },
@@ -90,19 +93,15 @@ const beneficios = [
   top: 56px;
   background: var(--raite-amarillo);
 }
-.publico__nombre,
+.publico__logo,
 .publico__mensaje,
 .publico__pie {
   position: relative;
 }
-.publico__nombre {
-  display: inline-block;
-  margin: 0;
-  font-size: 2.25rem;
-  font-weight: 700;
-  line-height: 1.1;
-  letter-spacing: -0.02em;
-  box-shadow: inset 0 -4px 0 var(--raite-amarillo);
+.publico__logo {
+  display: block;
+  width: auto;
+  height: 56px;
 }
 .publico__titular {
   margin: 12px 0 0;
@@ -170,10 +169,9 @@ const beneficios = [
     right: 120px;
     top: 110px;
   }
-  .publico__nombre {
+  .publico__logo {
     align-self: flex-start;
-    font-size: 2.5rem;
-    box-shadow: inset 0 -5px 0 var(--raite-amarillo);
+    height: 80px;
   }
   .publico__mensaje {
     display: flex;
