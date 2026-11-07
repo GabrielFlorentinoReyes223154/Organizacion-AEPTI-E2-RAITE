@@ -198,6 +198,136 @@ def finalizar_viaje(viaje_id, conductor) -> Viaje:
     return viaje
 
 
+
+# --- Solicitudes (RF-05, RF-06) ---
+
+
+def _solicitud_bloqueada(solicitud_id):
+    """Bloquea primero el viaje y luego la solicitud, siempre en ese orden (evita interbloqueos)."""
+    try:
+        viaje_id = Solicitud.objects.values_list("viaje_id", flat=True).get(pk=solicitud_id)
+    except Solicitud.DoesNotExist:
+        raise Http404("No existe la solicitud.")
+    viaje = bloquear_viaje(viaje_id)
+    solicitud = Solicitud.objects.select_for_update().select_related("pasajero").get(pk=solicitud_id)
+    return viaje, solicitud
+
+
+def _cambiar_solicitud(solicitud, nuevo):
+    if not solicitud.puede_cambiar_a(nuevo):
+        raise Conflicto(
+            f"La solicitud está {solicitud.get_estado_display().lower()}; no se puede cambiar a "
+            f"{EstadoSolicitud(nuevo).label.lower()}."
+        )
+    solicitud.estado = nuevo
+    solicitud.respondida_en = timezone.now()
+    solicitud.save(update_fields=["estado", "respondida_en"])
+
+
+def _exigir_viaje_abierto(viaje):
+    if viaje.estado != EstadoViaje.PUBLICADO or viaje.esta_vencido:
+        raise Conflicto("El viaje ya no admite cambios en sus solicitudes.")
+
+
+@transaction.atomic
+def solicitar_lugar(viaje_id, pasajero) -> Solicitud:
+    if not pasajero.puede_solicitar_lugar():
+        raise PermissionDenied("No puedes solicitar lugares.")
+    viaje = bloquear_viaje(viaje_id)
+    if viaje.conductor_id == pasajero.pk:
+        raise ValidationError({"viaje": "No puedes pedir lugar en tu propio viaje."})
+    if viaje.estado != EstadoViaje.PUBLICADO or viaje.fecha_hora <= timezone.now():
+        raise Conflicto("El viaje ya no recibe solicitudes.")
+    if viaje.solicitudes.filter(pasajero=pasajero, estado__in=ESTADOS_SOLICITUD_ACTIVOS).exists():
+        raise Conflicto("Ya tienes una solicitud activa en este viaje.")
+    if viaje.esta_lleno:
+        raise Conflicto("El viaje ya está lleno.")
+    if not es_compatible(viaje, pasajero):
+        raise ValidationError(
+            "Este viaje no es compatible con la preferencia de compatibilidad (mismo sexo) "
+            "tuya o de sus integrantes."
+        )
+    _exigir_sin_cruce(pasajero, viaje.fecha_hora, excluir_viaje=viaje)
+
+    solicitud = Solicitud(viaje=viaje, pasajero=pasajero)
+    solicitud.full_clean()
+    solicitud.save()
+    notificar(
+        [viaje.conductor],
+        TipoNotificacion.SOLICITUD_NUEVA,
+        f"{pasajero.nombre_completo} pidió lugar en tu viaje {describir_viaje(viaje)}.",
+        viaje,
+    )
+    return solicitud
+
+
+@transaction.atomic
+def aceptar_solicitud(solicitud_id, conductor) -> Solicitud:
+    """Con la fila del viaje bloqueada, dos aceptaciones simultáneas no rebasan el cupo."""
+    viaje, solicitud = _solicitud_bloqueada(solicitud_id)
+    exigir_conductor(viaje, conductor)
+    _exigir_viaje_abierto(viaje)
+    if solicitud.estado == EstadoSolicitud.PENDIENTE:
+        if viaje.lugares_ocupados >= viaje.lugares_ofrecidos:
+            raise Conflicto("Ya no hay lugares disponibles en el viaje.")
+        if not es_compatible(viaje, solicitud.pasajero, preferencia=solicitud.preferencia_compatibilidad):
+            raise Conflicto("El pasajero ya no es compatible con los integrantes aceptados.")
+    _cambiar_solicitud(solicitud, EstadoSolicitud.ACEPTADA)
+    notificar(
+        [solicitud.pasajero],
+        TipoNotificacion.SOLICITUD_ACEPTADA,
+        f"Te aceptaron en el viaje {describir_viaje(viaje)}. Ya puedes ver el contacto del conductor.",
+        viaje,
+    )
+    return solicitud
+
+
+@transaction.atomic
+def rechazar_solicitud(solicitud_id, conductor) -> Solicitud:
+    viaje, solicitud = _solicitud_bloqueada(solicitud_id)
+    exigir_conductor(viaje, conductor)
+    _exigir_viaje_abierto(viaje)
+    _cambiar_solicitud(solicitud, EstadoSolicitud.RECHAZADA)
+    notificar(
+        [solicitud.pasajero],
+        TipoNotificacion.SOLICITUD_RECHAZADA,
+        f"El conductor rechazó tu solicitud en el viaje {describir_viaje(viaje)}.",
+        viaje,
+    )
+    return solicitud
+
+
+@transaction.atomic
+def cancelar_solicitud(solicitud_id, pasajero) -> Solicitud:
+    viaje, solicitud = _solicitud_bloqueada(solicitud_id)
+    if solicitud.pasajero_id != pasajero.pk:
+        raise PermissionDenied("Solo quien hizo la solicitud puede cancelarla.")
+    if viaje.estado != EstadoViaje.PUBLICADO:
+        raise Conflicto("Solo puedes cancelar mientras el viaje no haya salido.")
+    _cambiar_solicitud(solicitud, EstadoSolicitud.CANCELADA)
+    notificar(
+        [viaje.conductor],
+        TipoNotificacion.SOLICITUD_CANCELADA,
+        f"{pasajero.nombre_completo} canceló su lugar en tu viaje {describir_viaje(viaje)}.",
+        viaje,
+    )
+    return solicitud
+
+
+def solicitudes_del_viaje(viaje, conductor):
+    exigir_conductor(viaje, conductor)
+    return viaje.solicitudes.select_related("pasajero").order_by("created_at")
+
+
+def solicitudes_del_pasajero(pasajero, estado=None):
+    solicitudes = (
+        Solicitud.objects.filter(pasajero=pasajero)
+        .select_related("viaje__conductor", "viaje__vehiculo", "viaje__punto_referencia", "viaje__campus")
+        .order_by("-created_at")
+    )
+    return solicitudes.filter(estado=estado) if estado else solicitudes
+
+
 # --- Lectura ---
 
 

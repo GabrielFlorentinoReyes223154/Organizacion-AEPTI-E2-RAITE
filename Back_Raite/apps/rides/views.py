@@ -6,13 +6,15 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from apps.accounts.permissions import CorreoVerificado, IsDriver, PuedePublicar
+from apps.accounts.permissions import CorreoVerificado, IsDriver, IsPassenger, PuedePublicar, PuedeSolicitar
 
 from . import services
 from .models import Viaje
-from .models_choices import EstadoViaje
+from .models_choices import EstadoSolicitud, EstadoViaje
 from .serializers import (
     BusquedaSerializer,
+    MiSolicitudSerializer,
+    SolicitudSerializer,
     ViajeDetalleSerializer,
     ViajeEdicionSerializer,
     ViajeEntradaSerializer,
@@ -20,6 +22,13 @@ from .serializers import (
 )
 
 VIAJE_RELACIONES = ("conductor", "vehiculo", "punto_referencia", "campus")
+
+
+def estado_de_la_peticion(request, opciones):
+    estado = request.query_params.get("estado")
+    if estado and estado not in opciones.values:
+        raise ValidationError({"estado": f"Usa uno de: {', '.join(opciones.values)}."})
+    return estado
 
 
 def respuesta_viaje(request, viaje, codigo=status.HTTP_200_OK):
@@ -61,9 +70,7 @@ class MisViajesView(generics.ListAPIView):
     permission_classes = [IsAuthenticated, CorreoVerificado, IsDriver]
 
     def get_queryset(self):
-        estado = self.request.query_params.get("estado")
-        if estado and estado not in EstadoViaje.values:
-            raise ValidationError({"estado": f"Usa uno de: {', '.join(EstadoViaje.values)}."})
+        estado = estado_de_la_peticion(self.request, EstadoViaje)
         return services.viajes_del_conductor(self.request.user, estado).select_related("conductor")
 
     def get_serializer_context(self):
@@ -106,3 +113,60 @@ class IniciarViajeView(AccionViajeView):
 
 class FinalizarViajeView(AccionViajeView):
     accion = services.finalizar_viaje
+
+
+class SolicitudesDeViajeView(generics.GenericAPIView):
+    """POST: pedir lugar (pasajero). GET: solicitudes del viaje (solo su conductor)."""
+
+    serializer_class = SolicitudSerializer
+
+    def get_permissions(self):
+        if self.request.method == "POST":
+            return [IsAuthenticated(), CorreoVerificado(), PuedeSolicitar()]
+        return super().get_permissions()
+
+    def post(self, request, pk):
+        solicitud = services.solicitar_lugar(pk, request.user)
+        return Response(MiSolicitudSerializer(solicitud).data, status=status.HTTP_201_CREATED)
+
+    def get(self, request, pk):
+        viaje = get_object_or_404(Viaje, pk=pk)
+        solicitudes = services.solicitudes_del_viaje(viaje, request.user)
+        pagina = self.paginate_queryset(solicitudes)
+        return self.get_paginated_response(self.get_serializer(pagina, many=True).data)
+
+
+class MisSolicitudesView(generics.ListAPIView):
+    """Solicitudes del pasajero con el resumen de cada viaje."""
+
+    serializer_class = MiSolicitudSerializer
+    permission_classes = [IsAuthenticated, CorreoVerificado, IsPassenger]
+
+    def get_queryset(self):
+        return services.solicitudes_del_pasajero(
+            self.request.user, estado_de_la_peticion(self.request, EstadoSolicitud)
+        )
+
+
+class AccionSolicitudView(APIView):
+    """POST solicitudes/{id}/aceptar|rechazar (conductor) o cancelar (pasajero)."""
+
+    accion = None
+    salida = SolicitudSerializer
+
+    def post(self, request, pk):
+        solicitud = type(self).accion(pk, request.user)
+        return Response(self.salida(solicitud).data)
+
+
+class AceptarSolicitudView(AccionSolicitudView):
+    accion = services.aceptar_solicitud
+
+
+class RechazarSolicitudView(AccionSolicitudView):
+    accion = services.rechazar_solicitud
+
+
+class CancelarSolicitudView(AccionSolicitudView):
+    accion = services.cancelar_solicitud
+    salida = MiSolicitudSerializer
