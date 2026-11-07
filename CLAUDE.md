@@ -46,7 +46,7 @@ python manage.py test apps.accounts.tests.test_auth_api # un módulo
 
 ### Frontend — `Front_Raite/` (TypeScript)
 
-- Quasar 2.30 (Vite, `@quasar/app-vite` 3.8), Vue 3.5, Vue Router 5 (rutas por archivo), Pinia 4, Axios, `validator`. Node `^22.12 || ^24 || >=26`. **pnpm** es el gestor canónico.
+- Quasar 2.30 (Vite, `@quasar/app-vite` 3.8), Vue 3.5, Vue Router 5 (rutas por archivo), Pinia 4, Axios, `validator`, Leaflet 1.9 (mapas con OpenStreetMap). Node `^22.12 || ^24 || >=26`. **pnpm** es el gestor canónico.
 - Sin runner de tests (no hay Vitest/Playwright).
 
 ```bash
@@ -63,7 +63,6 @@ pnpm typecheck    # vue-tsc --noEmit
 
 ### Decidido, aún no instalado
 
-- Mapas: Leaflet + OpenStreetMap (se instala en la Capa 3).
 - Notificaciones: la consulta periódica desde el frontend (a `GET /api/notificaciones/conteo/`) se hace en la Capa 3. Sin push ni WebSockets.
 
 ### Por definir
@@ -137,7 +136,7 @@ Raite/
 - Rutas por archivo (`filenameBasedRouting: true`), modo **`history`**. Páginas: `/login/LoginPage`, `/login/SignUpPage`, `/home` (elige vista según rol; con rol AMBOS abre `RoleSelectionModal` para elegir rol activo), `/home-pasajero` y `/home-conductor` (solo un título y botón de cerrar sesión), y restos de plantilla (`index.vue`, `index/(index).vue`, `index/second.vue`, `login/MainPage.vue`, `login/ErrorNotFound.vue`, `[...path].vue`).
 - Guarda global en `router/index.ts`: todo fuera de `/login*` requiere sesión; con sesión, `/login*` y `/` redirigen a `/home`.
 - Tokens en `localStorage`. Usa el alias `@/` para `src/`.
-- `tsconfig.json` referencia archivos de tipos dentro de `node_modules/.pnpm/...` con rutas con hash: si `pnpm install` cambia versiones, el typecheck puede romperse hasta actualizar esas rutas.
+- `tsconfig.json` apunta los tipos de `#q-app` a `node_modules/@quasar/app-vite/...` (ruta estable). Antes usaba rutas de `node_modules/.pnpm/` con hash, que se rompían con cada `pnpm install`.
 
 ## Requerimientos
 
