@@ -34,6 +34,7 @@ python manage.py migrate
 python manage.py makemigrations
 python manage.py check
 python manage.py cargar_datos_iniciales                 # campus y puntos de referencia
+python manage.py crear_datos_demo --reiniciar           # usuarios, viajes y solicitudes de demo (correos *.demo@, contraseña raite1234)
 python manage.py generar_puntos_osm                     # SOLO para regenerar puntos_referencia.json (usa internet, ~3 min)
 python manage.py test                                   # todos los tests (el usuario de BD necesita CREATEDB)
 python manage.py test apps.rides                        # una app
