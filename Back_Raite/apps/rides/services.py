@@ -10,7 +10,7 @@ from django.conf import settings
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import transaction
 from django.http import Http404
-from django.db.models import Prefetch, Q
+from django.db.models import Count, Prefetch, Q
 from django.utils import timezone
 
 from apps.locations.geo import filtro_recuadro, haversine_km
@@ -344,7 +344,12 @@ def tiene_lugar_confirmado(viaje, usuario) -> bool:
 
 
 def viajes_del_conductor(conductor, estado=None):
-    viajes = Viaje.objects.filter(conductor=conductor).select_related("punto_referencia", "campus", "vehiculo")
+    """Viajes del conductor con `solicitudes_pendientes` anotado (para "Mis viajes")."""
+    viajes = (
+        Viaje.objects.filter(conductor=conductor)
+        .select_related("punto_referencia", "campus", "vehiculo")
+        .annotate(solicitudes_pendientes=Count("solicitudes", filter=Q(solicitudes__estado=EstadoSolicitud.PENDIENTE)))
+    )
     if estado:
         return viajes.filter(estado=estado)
     return viajes.filter(Q(estado=EstadoViaje.PUBLICADO) | Q(estado=EstadoViaje.EN_CURSO))

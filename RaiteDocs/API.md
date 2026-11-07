@@ -45,7 +45,7 @@ Fuente de verdad: el código en `Back_Raite/apps/*/urls.py`; actualiza esta pág
 |--------|-----|-------|----------|
 | GET | `viajes/` | Verificado | **Búsqueda.** Acepta `punto` o `lat`+`lon`, `radio_km` (3 por defecto, máximo 15), `campus`, `sentido`, `desde` y `hasta`. Devuelve viajes `PUBLICADO` a futuro, con lugar libre, que no son propios y son compatibles por sexo. Ordena por distancia y luego por hora. |
 | POST | `viajes/` | Conductor con vehículo activo, no suspendido | Publica un viaje: `punto_referencia`, `campus`, `sentido`, `fecha_hora`, `lugares_ofrecidos`, `preferencia_compatibilidad` (opcional) y `notas`. 409 si se cruza de horario con otro viaje o solicitud propios. |
-| GET | `viajes/mios/` | Conductor | Sus viajes. Por defecto `PUBLICADO` y `EN_CURSO`, vencidos incluidos (`esta_vencido`). `?estado=` filtra. |
+| GET | `viajes/mios/` | Conductor | Sus viajes. Por defecto `PUBLICADO` y `EN_CURSO`, vencidos incluidos (`esta_vencido`). `?estado=` filtra. Cada viaje trae `solicitudes_pendientes`. |
 | GET | `viajes/{id}/` | Verificado | Detalle. Si el viaje está publicado lo ve cualquiera; si no, solo el conductor y quien tuvo una solicitud. Incluye `mi_solicitud` y, para el conductor, `pasajeros_confirmados`. |
 | PATCH | `viajes/{id}/` | Conductor del viaje | Edita `fecha_hora`, `lugares_ofrecidos`, `notas` y `preferencia_compatibilidad`, solo si está publicado y no vencido. Avisa a las solicitudes activas. |
 | POST | `viajes/{id}/cancelar/` | Conductor del viaje | `PUBLICADO → CANCELADO`, también si está vencido. Cancela las solicitudes activas y avisa a sus pasajeros. |
