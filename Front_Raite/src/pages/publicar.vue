@@ -1,5 +1,5 @@
 <template>
-  <q-page class="raite-contenedor raite-contenedor--formulario con-barra">
+  <q-page class="raite-contenedor raite-contenedor--ancho con-barra">
     <h1 class="raite-titulo gt-sm">{{ editando ? 'Editar viaje' : 'Publicar viaje' }}</h1>
 
     <EstadoVacio
@@ -21,232 +21,275 @@
       Mientras revisamos un reporte no puedes publicar viajes.
     </EstadoVacio>
 
-    <div v-else-if="cargandoEdicion" class="raite-pila">
-      <q-skeleton v-for="n in 4" :key="n" type="rect" height="72px" style="border-radius: 12px" />
+    <div v-else-if="cargandoEdicion" class="publicar__rejilla">
+      <q-skeleton type="rect" height="520px" style="border-radius: 20px" />
+      <q-skeleton type="rect" height="240px" style="border-radius: 20px" />
     </div>
 
-    <q-form
-      v-else
-      id="form-publicar"
-      class="raite-pila raite-pila--grupos"
-      novalidate
-      @submit="enviar"
-    >
-      <template v-if="!editando">
-        <div>
-          <SelectorPunto
-            v-model="datos.punto"
-            etiqueta="Sales de"
-            :con-ubicacion="true"
-            hint="Un lugar conocido. El punto exacto lo acuerdas con cada pasajero."
-            :error="errores.punto_referencia ?? null"
-          />
-          <q-btn
-            flat
-            no-caps
-            color="primary"
-            :icon="verMapa ? 'expand_less' : 'map'"
-            :label="verMapa ? 'Ocultar mapa' : 'Elegir en el mapa'"
-            class="q-mt-xs publicar__mapa-boton"
-            @click="verMapa = !verMapa"
-          />
-          <div v-if="verMapa" class="publicar__mapa">
-            <MapaRaite
-              :puntos="catalogos.puntos"
-              :seleccionado="datos.punto"
-              :campus="campusElegido ? [campusElegido] : []"
-              elegible
-              etiqueta="Mapa para elegir el punto de salida. También puedes escribirlo arriba."
-              @seleccionar="(id) => (datos.punto = id)"
+    <div v-else class="publicar__rejilla">
+      <q-form
+        id="form-publicar"
+        class="raite-tarjeta publicar__formulario"
+        novalidate
+        @submit="enviar"
+      >
+        <!-- 1. Ruta -->
+        <section class="publicar__seccion" aria-labelledby="pub-sec-ruta">
+          <h2 id="pub-sec-ruta" class="publicar__encabezado">
+            <span class="publicar__numero" aria-hidden="true">1</span>
+            Ruta
+          </h2>
+
+          <template v-if="!editando">
+            <div>
+              <SelectorPunto
+                v-model="datos.punto"
+                etiqueta="Sales de"
+                :con-ubicacion="true"
+                hint="Un lugar conocido. El punto exacto lo acuerdas con cada pasajero."
+                :error="errores.punto_referencia ?? null"
+              />
+              <q-btn
+                flat
+                no-caps
+                color="primary"
+                :icon="verMapa ? 'expand_less' : 'map'"
+                :label="verMapa ? 'Ocultar mapa' : 'Elegir en el mapa'"
+                class="q-mt-xs publicar__mapa-boton"
+                @click="verMapa = !verMapa"
+              />
+              <div v-if="verMapa" class="publicar__mapa">
+                <MapaRaite
+                  :puntos="catalogos.puntos"
+                  :seleccionado="datos.punto"
+                  :campus="campusElegido ? [campusElegido] : []"
+                  elegible
+                  etiqueta="Mapa para elegir el punto de salida. También puedes escribirlo arriba."
+                  @seleccionar="(id) => (datos.punto = id)"
+                />
+              </div>
+            </div>
+
+            <div class="publicar__fila publicar__fila--ruta">
+              <fieldset class="publicar__grupo">
+                <legend class="raite-etiqueta">Vas</legend>
+                <q-btn-toggle
+                  v-model="datos.sentido"
+                  class="raite-opciones"
+                  no-caps
+                  unelevated
+                  toggle-color="primary"
+                  :options="[
+                    { label: 'Hacia el campus', value: 'HACIA_CAMPUS' },
+                    { label: 'Desde el campus', value: 'DESDE_CAMPUS' },
+                  ]"
+                />
+              </fieldset>
+              <div>
+                <SelectorCampus v-model="datos.campus" />
+                <p v-if="errores.campus" class="publicar__error" role="alert">
+                  {{ errores.campus }}
+                </p>
+              </div>
+            </div>
+          </template>
+
+          <div v-else class="publicar__ruta-fija">
+            <RutaViaje
+              v-if="campusElegido && puntoElegido"
+              :punto="puntoElegido.nombre"
+              :campus="campusElegido"
+              :sentido="datos.sentido"
+            />
+            <p class="raite-ayuda">
+              La ruta no se cambia. Si necesitas otra, cancela este viaje y publica uno nuevo.
+            </p>
+          </div>
+        </section>
+
+        <!-- 2. Horario -->
+        <section class="publicar__seccion" aria-labelledby="pub-sec-horario">
+          <h2 id="pub-sec-horario" class="publicar__encabezado">
+            <span class="publicar__numero" aria-hidden="true">2</span>
+            Horario
+          </h2>
+          <div class="publicar__fila">
+            <div>
+              <label for="pub-dia" class="raite-etiqueta">Día</label>
+              <q-select
+                for="pub-dia"
+                v-model="datos.dia"
+                :options="dias"
+                emit-value
+                map-options
+                outlined
+                :error="!!errores.fecha_hora"
+              />
+            </div>
+            <div>
+              <label for="pub-hora" class="raite-etiqueta">Sales a las</label>
+              <q-select
+                for="pub-hora"
+                v-model="datos.hora"
+                :options="horas"
+                emit-value
+                map-options
+                outlined
+                options-dense
+                input-class="raite-dato"
+                :error="!!errores.fecha_hora"
+              />
+            </div>
+          </div>
+          <p v-if="errores.fecha_hora" class="publicar__error" role="alert">
+            {{ errores.fecha_hora }}
+          </p>
+        </section>
+
+        <!-- 3. Lugares y grupo -->
+        <section class="publicar__seccion" aria-labelledby="pub-sec-lugares">
+          <h2 id="pub-sec-lugares" class="publicar__encabezado">
+            <span class="publicar__numero" aria-hidden="true">3</span>
+            Lugares y grupo
+          </h2>
+          <div class="publicar__fila">
+            <fieldset class="publicar__grupo">
+              <legend class="raite-etiqueta">Lugares que ofreces</legend>
+              <q-btn-toggle
+                v-model="datos.lugares"
+                class="raite-opciones"
+                no-caps
+                unelevated
+                toggle-color="primary"
+                :options="
+                  [1, 2, 3, 4, 5].map((n) => ({
+                    label: String(n),
+                    value: n,
+                    disable: n > (vehiculo?.asientos_disponibles ?? 5),
+                  }))
+                "
+              />
+              <p class="raite-ayuda q-mt-sm">
+                Tu {{ vehiculo?.marca }} {{ vehiculo?.modelo }} tiene
+                {{ vehiculo?.asientos_disponibles }}
+                {{ vehiculo?.asientos_disponibles === 1 ? 'asiento' : 'asientos' }} para pasajeros.
+              </p>
+              <p v-if="errores.lugares_ofrecidos" class="publicar__error" role="alert">
+                {{ errores.lugares_ofrecidos }}
+              </p>
+            </fieldset>
+
+            <fieldset class="publicar__grupo">
+              <legend class="raite-etiqueta">¿Con quién viajas?</legend>
+              <q-btn-toggle
+                v-model="datos.preferencia"
+                class="raite-opciones"
+                no-caps
+                unelevated
+                toggle-color="primary"
+                :options="[
+                  { label: 'Grupo mixto', value: 'MIXTO' },
+                  { label: 'Mismo sexo', value: 'MISMO_SEXO' },
+                ]"
+              />
+              <p class="raite-ayuda q-mt-sm">
+                Con "mismo sexo", solo podrán pedir lugar personas con el mismo sexo que tú.
+              </p>
+              <p v-if="errores.preferencia_compatibilidad" class="publicar__error" role="alert">
+                {{ errores.preferencia_compatibilidad }}
+              </p>
+            </fieldset>
+          </div>
+        </section>
+
+        <!-- 4. Notas -->
+        <section class="publicar__seccion" aria-labelledby="pub-sec-notas">
+          <h2 id="pub-sec-notas" class="publicar__encabezado">
+            <span class="publicar__numero" aria-hidden="true">4</span>
+            Notas
+            <span class="publicar__opcional">(opcional)</span>
+          </h2>
+          <div>
+            <label for="pub-notas" class="sr-only">Notas para los pasajeros</label>
+            <q-input
+              for="pub-notas"
+              v-model="datos.notas"
+              outlined
+              type="textarea"
+              autogrow
+              maxlength="300"
+              counter
+              placeholder="Ej. Salgo puntual; espero 5 minutos."
+              v-bind="campo('notas')"
             />
           </div>
-        </div>
+        </section>
 
-        <fieldset class="publicar__grupo">
-          <legend class="raite-etiqueta">Vas</legend>
-          <q-btn-toggle
-            v-model="datos.sentido"
-            class="raite-opciones"
-            no-caps
-            unelevated
-            toggle-color="primary"
-            :options="[
-              { label: 'Hacia el campus', value: 'HACIA_CAMPUS' },
-              { label: 'Desde el campus', value: 'DESDE_CAMPUS' },
-            ]"
-          />
-        </fieldset>
+        <q-banner v-if="mensaje" class="bg-rojo-tenue text-rojo-texto rounded-borders" role="alert">
+          <template #avatar><q-icon name="error_outline" aria-hidden="true" /></template>
+          {{ mensaje }}
+        </q-banner>
+      </q-form>
 
-        <div>
-          <SelectorCampus v-model="datos.campus" />
-          <p v-if="errores.campus" class="publicar__error" role="alert">{{ errores.campus }}</p>
-        </div>
-      </template>
-
-      <section v-else class="raite-tarjeta raite-pila" aria-label="Ruta del viaje">
-        <RutaViaje
-          v-if="campusElegido && puntoElegido"
-          :punto="puntoElegido.nombre"
-          :campus="campusElegido"
-          :sentido="datos.sentido"
-        />
-        <p class="raite-ayuda">
-          La ruta no se cambia. Si necesitas otra, cancela este viaje y publica uno nuevo.
-        </p>
-      </section>
-
-      <div class="publicar__fila">
-        <div>
-          <label for="pub-dia" class="raite-etiqueta">Día</label>
-          <q-select
-            for="pub-dia"
-            v-model="datos.dia"
-            :options="dias"
-            emit-value
-            map-options
-            outlined
-            :error="!!errores.fecha_hora"
-          />
-        </div>
-        <div>
-          <label for="pub-hora" class="raite-etiqueta">Sales a las</label>
-          <q-select
-            for="pub-hora"
-            v-model="datos.hora"
-            :options="horas"
-            emit-value
-            map-options
-            outlined
-            options-dense
-            input-class="raite-dato"
-            :error="!!errores.fecha_hora"
-          />
-        </div>
-      </div>
-      <p v-if="errores.fecha_hora" class="publicar__error publicar__error--arriba" role="alert">
-        {{ errores.fecha_hora }}
-      </p>
-
-      <fieldset class="publicar__grupo">
-        <legend class="raite-etiqueta">Lugares que ofreces</legend>
-        <q-btn-toggle
-          v-model="datos.lugares"
-          class="raite-opciones"
-          no-caps
-          unelevated
-          toggle-color="primary"
-          :options="
-            [1, 2, 3, 4, 5].map((n) => ({
-              label: String(n),
-              value: n,
-              disable: n > (vehiculo?.asientos_disponibles ?? 5),
-            }))
-          "
-        />
-        <p class="raite-ayuda q-mt-sm">
-          Tu {{ vehiculo?.marca }} {{ vehiculo?.modelo }} tiene {{ vehiculo?.asientos_disponibles }}
-          {{ vehiculo?.asientos_disponibles === 1 ? 'asiento' : 'asientos' }} para pasajeros.
-        </p>
-        <p v-if="errores.lugares_ofrecidos" class="publicar__error" role="alert">
-          {{ errores.lugares_ofrecidos }}
-        </p>
-      </fieldset>
-
-      <fieldset class="publicar__grupo">
-        <legend class="raite-etiqueta">¿Con quién viajas?</legend>
-        <q-btn-toggle
-          v-model="datos.preferencia"
-          class="raite-opciones"
-          no-caps
-          unelevated
-          toggle-color="primary"
-          :options="[
-            { label: 'Grupo mixto', value: 'MIXTO' },
-            { label: 'Mismo sexo', value: 'MISMO_SEXO' },
-          ]"
-        />
-        <p class="raite-ayuda q-mt-sm">
-          Con "mismo sexo", solo podrán pedir lugar personas con el mismo sexo que tú.
-        </p>
-        <p v-if="errores.preferencia_compatibilidad" class="publicar__error" role="alert">
-          {{ errores.preferencia_compatibilidad }}
-        </p>
-      </fieldset>
-
-      <div>
-        <label for="pub-notas" class="raite-etiqueta"
-          >Notas para los pasajeros
-          <span class="text-gris text-weight-regular">(opcional)</span></label
-        >
-        <q-input
-          for="pub-notas"
-          v-model="datos.notas"
-          outlined
-          type="textarea"
-          autogrow
-          maxlength="300"
-          counter
-          placeholder="Ej. Salgo puntual; espero 5 minutos."
-          v-bind="campo('notas')"
-        />
-      </div>
-
-      <!-- Vista previa (de la variante B) -->
-      <section
-        v-if="puntoElegido && campusElegido"
-        class="raite-pila publicar__vista"
-        aria-labelledby="pub-vista"
-      >
-        <h2 id="pub-vista" class="publicar__vista-titulo">Así te verán los pasajeros</h2>
-        <div class="vista">
-          <div class="vista__arriba">
-            <div>
-              <p class="vista__hora raite-dato">{{ datos.hora }}</p>
-              <p class="vista__dia">{{ datos.dia ? diaDeClave(datos.dia) : '' }}</p>
+      <aside class="publicar__lateral">
+        <section class="raite-tarjeta publicar__vista" aria-labelledby="pub-vista">
+          <h2 id="pub-vista" class="publicar__vista-titulo">Así te verán los pasajeros</h2>
+          <div v-if="puntoElegido && campusElegido" class="vista">
+            <div class="vista__arriba">
+              <div>
+                <p class="vista__hora raite-dato">{{ datos.hora }}</p>
+                <p class="vista__dia">{{ datos.dia ? diaDeClave(datos.dia) : '' }}</p>
+              </div>
+              <span class="vista__lugares">{{ lugares(datos.lugares, datos.lugares) }}</span>
             </div>
-            <span class="vista__lugares">{{ lugares(datos.lugares, datos.lugares) }}</span>
+            <RutaViaje
+              :punto="puntoElegido.nombre"
+              :campus="campusElegido"
+              :sentido="datos.sentido"
+            />
+            <p class="vista__abajo">
+              <span>{{ nombreCorto(sesion.usuario?.nombre_completo ?? '') }}</span>
+              <span class="vista__calif"
+                ><q-icon name="star" size="16px" aria-hidden="true" />{{
+                  calificacion(sesion.usuario?.calificacion) ?? 'Nuevo'
+                }}</span
+              >
+              <span v-if="datos.preferencia === 'MISMO_SEXO'" class="text-gris">Mismo sexo</span>
+            </p>
           </div>
-          <RutaViaje
-            :punto="puntoElegido.nombre"
-            :campus="campusElegido"
-            :sentido="datos.sentido"
+          <div v-else class="vista vista--vacia">
+            <q-icon name="route" size="32px" aria-hidden="true" />
+            <p>Elige de dónde sales y el campus para ver cómo se verá tu viaje.</p>
+          </div>
+        </section>
+
+        <BarraAccion v-if="vehiculo && !sesion.usuario?.suspendido && !cargandoEdicion">
+          <q-btn
+            type="submit"
+            form="form-publicar"
+            color="primary"
+            unelevated
+            no-caps
+            :label="editando ? 'Guardar cambios' : 'Publicar viaje'"
+            :loading="enviando"
           />
-          <p class="vista__abajo">
-            <span>{{ nombreCorto(sesion.usuario?.nombre_completo ?? '') }}</span>
-            <span class="vista__calif"
-              ><q-icon name="star" size="16px" aria-hidden="true" />{{
-                calificacion(sesion.usuario?.calificacion) ?? 'Nuevo'
-              }}</span
-            >
-            <span v-if="datos.preferencia === 'MISMO_SEXO'" class="text-gris">Mismo sexo</span>
-          </p>
-        </div>
-      </section>
+        </BarraAccion>
 
-      <q-banner v-if="mensaje" class="bg-rojo-tenue text-rojo-texto rounded-borders" role="alert">
-        <template #avatar><q-icon name="error_outline" aria-hidden="true" /></template>
-        {{ mensaje }}
-      </q-banner>
-    </q-form>
-
-    <BarraAccion v-if="vehiculo && !sesion.usuario?.suspendido && !cargandoEdicion">
-      <q-btn
-        type="submit"
-        form="form-publicar"
-        color="primary"
-        unelevated
-        no-caps
-        :label="editando ? 'Guardar cambios' : 'Publicar viaje'"
-        :loading="enviando"
-      />
-    </BarraAccion>
+        <p class="publicar__privado">
+          <q-icon name="lock" size="18px" aria-hidden="true" />
+          Tu teléfono y tus placas solo los ve quien aceptes en el viaje.
+        </p>
+      </aside>
+    </div>
   </q-page>
 </template>
 
 <script setup lang="ts">
-// Publicar o editar un viaje (RF-02, RF-03, RF-07), variante A con la vista previa de la B.
+// Publicar o editar un viaje (RF-02, RF-03, RF-07). Computadora: formulario por secciones a la izquierda;
+// vista previa y botón de publicar a la derecha.
 import { computed, onMounted, reactive, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import { useQuasar } from 'quasar';
 import { viajes } from '@/api';
 import { leerError } from '@/api/errores';
 import type { Preferencia, Sentido } from '@/api/tipos';
@@ -314,7 +357,8 @@ const errores = reactive<Record<string, string>>({});
 const mensaje = ref('');
 const enviando = ref(false);
 const cargandoEdicion = ref(editando);
-const verMapa = ref(false);
+// En computadora el mapa empieza abierto: hay espacio y ayuda a ubicar el punto.
+const verMapa = ref(useQuasar().screen.gt.sm);
 
 const puntoElegido = computed(() => catalogos.puntoPorId(datos.punto));
 const campusElegido = computed(() => catalogos.campusPorId(datos.campus));
@@ -407,6 +451,57 @@ async function enviar() {
 </script>
 
 <style scoped lang="scss">
+// Computadora: formulario por secciones a la izquierda; vista previa y botón a la derecha.
+.publicar__rejilla {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+  @media (min-width: 1024px) {
+    grid-template-columns: minmax(0, 3fr) minmax(340px, 2fr);
+  }
+}
+.publicar__formulario {
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+.publicar__seccion {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.publicar__seccion + .publicar__seccion {
+  padding-top: 24px;
+  border-top: 1px solid var(--raite-gris-tenue);
+}
+.publicar__encabezado {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.125rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+.publicar__numero {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--raite-azul-tenue);
+  color: var(--raite-azul);
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+.publicar__opcional {
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: var(--raite-gris);
+}
 .publicar__grupo {
   margin: 0;
   padding: 0;
@@ -416,30 +511,57 @@ async function enviar() {
 .publicar__fila {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
+  gap: 16px 24px;
+}
+// "Vas" y "Campus" lado a lado solo cuando el formulario es ancho (pantallas de 1440 px o más).
+.publicar__fila--ruta {
+  @media (max-width: 1439px) {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 .publicar__error {
   margin: 8px 0 0;
   font-size: 0.875rem;
   color: var(--raite-rojo-texto);
 }
-.publicar__error--arriba {
-  margin-top: -16px;
-}
 .publicar__mapa-boton {
   margin-left: -8px;
 }
 .publicar__mapa {
-  height: 280px;
+  height: 300px;
   margin-top: 8px;
-  border-radius: 12px;
+  border-radius: 16px;
   overflow: hidden;
-  border: 1px solid var(--raite-borde-sutil);
+}
+.publicar__ruta-fija {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 16px;
+  background: var(--raite-fondo);
+}
+
+// --- Columna derecha ---
+.publicar__lateral {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  @media (min-width: 1024px) {
+    position: sticky;
+    top: 104px;
+  }
+}
+.publicar__vista {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 .publicar__vista-titulo {
   margin: 0;
-  font-size: 0.875rem;
-  font-weight: 600;
+  font-size: 1rem;
+  font-weight: 700;
   color: var(--raite-gris);
 }
 .vista {
@@ -450,6 +572,17 @@ async function enviar() {
   border: 1px solid var(--raite-borde-sutil);
   border-radius: 16px;
   background: var(--raite-blanco);
+}
+.vista--vacia {
+  align-items: center;
+  text-align: center;
+  padding: 28px 16px;
+  border-style: dashed;
+  color: var(--raite-gris);
+  p {
+    margin: 0;
+    max-width: 280px;
+  }
 }
 .vista__arriba {
   display: flex;
@@ -495,5 +628,14 @@ async function enviar() {
   display: inline-flex;
   align-items: center;
   gap: 4px;
+}
+.publicar__privado {
+  margin: 0;
+  padding: 0 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.875rem;
+  color: var(--raite-gris);
 }
 </style>
