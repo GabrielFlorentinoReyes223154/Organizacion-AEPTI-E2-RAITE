@@ -395,6 +395,46 @@ a {
   box-shadow: var(--raite-sombra-tarjeta);
 }
 
+// Páginas de listados en computadora: a todo el ancho, alineadas con el menú lateral.
+.raite-contenedor--ancho {
+  max-width: none;
+  margin: 0;
+}
+// Título de la página con su acción principal a la derecha.
+.raite-cabecera {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+  .raite-titulo {
+    margin: 0;
+  }
+}
+.raite-cabecera__texto {
+  margin: 4px 0 0;
+  font-size: 1rem;
+  color: var(--raite-gris);
+}
+// Cuadrícula de tarjetas de viaje: tantas columnas como quepan; misma altura por fila.
+.raite-rejilla-tarjetas {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 16px;
+  > li {
+    display: flex;
+    min-width: 0;
+    > * {
+      flex: 1;
+      min-width: 0;
+    }
+  }
+}
+
 // Botones de opción (q-btn-toggle): borde de campo, la opción elegida en azul.
 .raite-opciones.q-btn-group {
   display: grid;
