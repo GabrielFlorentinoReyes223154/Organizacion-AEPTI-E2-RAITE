@@ -1,10 +1,26 @@
 <template>
-  <q-page class="raite-contenedor raite-contenedor--angosto">
-    <h1 class="raite-titulo gt-sm">Mis viajes</h1>
+  <q-page class="raite-contenedor raite-contenedor--ancho">
+    <header class="raite-cabecera">
+      <div class="gt-sm">
+        <h1 class="raite-titulo">Mis viajes</h1>
+        <p class="raite-cabecera__texto">{{ resumen }}</p>
+      </div>
+      <q-btn
+        color="primary"
+        unelevated
+        no-caps
+        icon="add"
+        label="Publicar viaje"
+        to="/publicar"
+        class="raite-btn-xl mis-viajes__accion"
+      />
+    </header>
 
-    <div v-if="cargando && !lista.length" class="raite-pila">
-      <q-skeleton v-for="n in 3" :key="n" type="rect" height="200px" style="border-radius: 16px" />
-    </div>
+    <ul v-if="cargando && !lista.length" class="raite-rejilla-tarjetas">
+      <li v-for="n in 3" :key="n">
+        <q-skeleton type="rect" height="220px" style="border-radius: 20px" />
+      </li>
+    </ul>
 
     <EstadoVacio v-else-if="error" icono="cloud_off" :titulo="error">
       <template #acciones>
@@ -23,7 +39,7 @@
       </template>
     </EstadoVacio>
 
-    <ul v-else class="lista">
+    <ul v-else class="raite-rejilla-tarjetas">
       <li v-for="v in lista" :key="v.id">
         <TarjetaViaje :viaje="v" :to="`/viajes/${v.id}`" :mostrar-conductor="false">
           <template #estado>
@@ -77,7 +93,7 @@
 
 <script setup lang="ts">
 // Viajes publicados y en curso del conductor, con las solicitudes que esperan respuesta (RF-02, RF-06).
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { viajes } from '@/api';
 import { leerError } from '@/api/errores';
 import type { MiViaje } from '@/api/tipos';
@@ -111,16 +127,21 @@ async function cargar(numero = 1) {
   }
 }
 onMounted(() => void cargar());
+
+const resumen = computed(() => {
+  if (cargando.value && !lista.value.length) return 'Cargando tus viajes…';
+  const n = lista.value.length;
+  if (!n) return 'No tienes viajes por hacer.';
+  const pendientes = lista.value.reduce((t, v) => t + v.solicitudes_pendientes, 0);
+  const viajesTexto = `${n} ${n === 1 ? 'viaje por hacer' : 'viajes por hacer'}`;
+  if (!pendientes) return `${viajesTexto}. No tienes solicitudes por responder.`;
+  return `${viajesTexto}, ${pendientes} ${pendientes === 1 ? 'solicitud' : 'solicitudes'} por responder.`;
+});
 </script>
 
 <style scoped lang="scss">
-.lista {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+.mis-viajes__accion {
+  padding: 0 28px;
 }
 .pendientes {
   display: flex;

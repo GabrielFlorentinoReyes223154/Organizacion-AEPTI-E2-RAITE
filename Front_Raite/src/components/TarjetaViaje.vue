@@ -83,12 +83,16 @@ const etiqueta = computed(() => {
 
 <style scoped lang="scss">
 .tarjeta-viaje {
+  display: flex;
+  flex-direction: column;
   background: var(--raite-blanco);
   border-radius: 20px;
   overflow: hidden;
   box-shadow: var(--raite-sombra-tarjeta);
 }
+// En una cuadrícula las tarjetas de una fila miden lo mismo; el pie queda abajo.
 .tarjeta-viaje__enlace {
+  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 12px;

@@ -465,6 +465,10 @@ Es la pantalla a la que llevan `/` y el inicio de sesión, para los dos papeles;
 - **Solicitudes:** izquierda, el cupo como asientos en una tarjeta azul (los ocupados en amarillo con las iniciales) y los confirmados; derecha, "Quieren un lugar" con una tarjeta por solicitud: persona a la izquierda y "Rechazar" (texto rojo) y "Aceptar" (azul) en el mismo renglón.
 - **Barra de acción (`BarraAccion`):** en celular es la barra fija de abajo; en computadora se dibuja donde está en la página como una tarjeta blanca con la nota arriba y los botones apilados a todo el ancho. Así nunca tapa el menú lateral.
 
+### Listados y publicar (computadora)
+- **Mis raites y Mis viajes:** a todo el ancho (`raite-contenedor--ancho`). Arriba, `raite-cabecera`: el título, un resumen en gris ("3 viajes por hacer, 2 solicitudes por responder") y la acción principal a la derecha. Los viajes van en `raite-rejilla-tarjetas`: tantas columnas de 340px o más como quepan, y las tarjetas de una fila miden lo mismo (el pie amarillo de "solicitudes por responder" queda abajo).
+- **Publicar:** dos columnas. Izquierda, el formulario en una tarjeta con secciones numeradas y separadas por una línea (1 Ruta, con el mapa abierto de entrada; 2 Horario; 3 Lugares y grupo; 4 Notas). Derecha, fija al desplazarse: la vista previa "Así te verán los pasajeros" (con un aviso punteado mientras falte el punto o el campus), la tarjeta con "Publicar viaje" y el recordatorio de que el teléfono y las placas solo los ve quien aceptes.
+
 ### Mapa (Leaflet + OpenStreetMap)
 - Teselas estándar de OSM con su atribución visible.
 - **Punto de referencia:** círculo azul UACJ de 14px con contorno blanco de 2px. El seleccionado crece a 20px, en amarillo con contorno negro.
