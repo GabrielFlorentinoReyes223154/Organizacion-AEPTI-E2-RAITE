@@ -19,6 +19,8 @@ declare module 'vue-router' {
     titulo?: string;
     /** Pantalla secundaria: lleva botón de regresar (a esta ruta si no hay historial) y no lleva barra inferior. */
     atras?: string;
+    /** Pantalla pública con formulario largo: en escritorio la tarjeta es más ancha (registro). */
+    amplio?: boolean;
   }
 }
 

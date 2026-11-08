@@ -397,6 +397,10 @@ onBeforeUnmount(() => avisos.detener());
 .cuerpo__regresar {
   margin-left: -12px;
 }
+// La página que sigue ya no repite el margen de arriba: el título queda cerca de su contenido.
+.cuerpo__atras + :deep(.q-page.raite-contenedor) {
+  padding-top: 16px;
+}
 
 .lateral {
   position: sticky;

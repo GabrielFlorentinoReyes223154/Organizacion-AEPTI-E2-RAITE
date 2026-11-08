@@ -1,12 +1,17 @@
 <template>
   <q-form class="raite-pila raite-pila--grupos" novalidate @submit="enviar">
-    <div>
-      <h1 class="raite-titulo q-mb-sm">Revisa tu correo</h1>
-      <p v-if="correoFijo" class="raite-ayuda">
+    <div class="verificar__cabecera">
+      <span class="verificar__icono" aria-hidden="true">
+        <q-icon name="mark_email_unread" size="28px" />
+      </span>
+      <h1 class="raite-titulo raite-titulo--marca verificar__titulo">Revisa tu correo</h1>
+      <p v-if="correoFijo" class="verificar__texto">
         Te mandamos un código de 6 dígitos a <strong class="text-negro">{{ correo }}</strong
         >. Vence en 15 minutos.
       </p>
-      <p v-else class="raite-ayuda">Escribe tu correo y el código de 6 dígitos que te mandamos.</p>
+      <p v-else class="verificar__texto">
+        Escribe tu correo y el código de 6 dígitos que te mandamos.
+      </p>
     </div>
 
     <div v-if="!correoFijo">
@@ -46,7 +51,7 @@
       no-caps
       label="Verificar y entrar"
       :loading="enviando"
-      class="full-width"
+      class="full-width raite-btn-xl"
     />
 
     <div class="verificar__reenviar">
@@ -141,6 +146,31 @@ async function reenviar() {
 </script>
 
 <style scoped lang="scss">
+.verificar__cabecera {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.verificar__icono {
+  width: 56px;
+  height: 56px;
+  margin-bottom: 16px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--raite-azul-tenue);
+  color: var(--raite-azul);
+}
+.verificar__titulo {
+  margin-bottom: 4px;
+}
+.verificar__texto {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--raite-gris);
+}
 :deep(.verificar__codigo) {
   font-size: 1.75rem;
   font-weight: 600;

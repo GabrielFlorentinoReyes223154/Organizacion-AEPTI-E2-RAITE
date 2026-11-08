@@ -1,7 +1,7 @@
 <template>
   <q-layout view="hHh lpR fFf">
     <q-page-container>
-      <q-page class="publico">
+      <q-page class="publico" :class="{ 'publico--amplio': route.meta.amplio }">
         <section class="publico__panel raite-sobre-azul" aria-label="Raite">
           <span class="publico__circulo publico__circulo--grande" aria-hidden="true" />
           <span class="publico__circulo publico__circulo--chico" aria-hidden="true" />
@@ -43,7 +43,10 @@
 // Celular: franja azul con la marca y el formulario en una hoja blanca.
 // Escritorio (≥1024 px): panel azul con el mensaje a la izquierda y el formulario en una tarjeta a la derecha.
 // Logo en versión para fondo azul: blanco con el amarillo UACJ (original en RaiteDocs/Design/logo/).
+import { useRoute } from 'vue-router';
 import logoSobreAzul from '@/assets/logo-raite-sobre-azul.png';
+
+const route = useRoute();
 
 const beneficios = [
   { icono: 'verified_user', texto: 'Solo alumnos con correo @alumnos.uacj.mx' },
@@ -241,6 +244,19 @@ const beneficios = [
     border-radius: 28px;
     background: var(--raite-blanco);
     box-shadow: 0 8px 24px rgba(35, 31, 32, 0.08);
+  }
+
+  // Formulario largo (registro): el panel cede espacio y la tarjeta se ensancha a dos columnas.
+  .publico--amplio {
+    .publico__panel {
+      flex-basis: 40%;
+    }
+    .publico__contenido {
+      flex-basis: 60%;
+    }
+    .publico__tarjeta {
+      max-width: 820px;
+    }
   }
 }
 </style>
