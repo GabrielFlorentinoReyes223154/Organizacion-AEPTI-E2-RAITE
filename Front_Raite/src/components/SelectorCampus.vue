@@ -1,5 +1,19 @@
 <template>
-  <fieldset class="selector-campus">
+  <!-- Compacto: menú desplegable (barra de filtros de computadora). -->
+  <div v-if="compacto" class="selector-campus selector-campus--compacto">
+    <label :for="id" class="raite-etiqueta">{{ etiqueta }}</label>
+    <q-select
+      :for="id"
+      :model-value="modelo ?? ''"
+      :options="opcionesMenu"
+      emit-value
+      map-options
+      outlined
+      :disable="disabled"
+      @update:model-value="(v: number | '') => (modelo = v === '' ? null : v)"
+    />
+  </div>
+  <fieldset v-else class="selector-campus">
     <legend class="raite-etiqueta">{{ etiqueta }}</legend>
     <div class="selector-campus__opciones">
       <button
@@ -32,20 +46,32 @@
 
 <script setup lang="ts">
 // Los campus como botones con forma de placa (CU, IIT, ICB, ICSA, IADA).
-import { computed } from 'vue';
+import { computed, useId } from 'vue';
 import { useCatalogosStore } from '@/stores/catalogos';
 
-withDefaults(
-  defineProps<{ etiqueta?: string; permitirCualquiera?: boolean; disabled?: boolean }>(),
+const props = withDefaults(
+  defineProps<{
+    etiqueta?: string;
+    permitirCualquiera?: boolean;
+    disabled?: boolean;
+    compacto?: boolean;
+  }>(),
   {
     etiqueta: 'Campus',
     permitirCualquiera: false,
     disabled: false,
+    compacto: false,
   },
 );
 const modelo = defineModel<number | null>({ default: null });
 const catalogos = useCatalogosStore();
 const elegido = computed(() => catalogos.campusPorId(modelo.value));
+const id = useId();
+
+const opcionesMenu = computed(() => [
+  ...(props.permitirCualquiera ? [{ label: 'Todos los campus', value: '' as const }] : []),
+  ...catalogos.campus.map((c) => ({ label: `${c.codigo} · ${c.nombre}`, value: c.id })),
+]);
 </script>
 
 <style scoped lang="scss">

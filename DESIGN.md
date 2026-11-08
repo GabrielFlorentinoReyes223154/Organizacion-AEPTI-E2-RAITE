@@ -345,7 +345,7 @@ Las dos están en Google Fonts con licencia OFL. Se auto-hospedan como `woff2` v
 
 **Tableta (600 a 1023px):** margen de 24px y la misma estructura que en celular. Los listados pueden ir en dos columnas de tarjetas.
 
-**Escritorio (1024px o más):** la barra inferior desaparece y su navegación pasa a un menú lateral blanco de 240px a la izquierda. Arriba va una barra azul tenue de 72px con la marca, el cambio de papel, la campanita y el usuario. El contenido se centra con un ancho máximo de 1280px y márgenes de 32px. La búsqueda se divide en lista (izquierda) y mapa grande (derecha). Las pantallas públicas (entrar, registro, verificar) se parten a la mitad: panel azul con el mensaje a la izquierda y el formulario en una tarjeta a la derecha (máximo 480px).
+**Escritorio (1024px o más):** la barra inferior desaparece y su navegación pasa a un menú lateral blanco de 240px a la izquierda. Arriba va una barra azul tenue de 72px con la marca, el cambio de papel, la campanita y el usuario. La barra y el cuerpo ocupan todo el ancho de la ventana (márgenes de 32px, sin tope): en computadora se aprovecha la pantalla completa, y cada vista acomoda su contenido en columnas o cuadrículas en lugar de una sola columna angosta. La búsqueda lleva los filtros en una barra horizontal arriba y, debajo, la lista (izquierda) y el mapa grande (derecha) al alto de la ventana. Las pantallas públicas (entrar, registro, verificar) se parten a la mitad: panel azul con el mensaje a la izquierda y el formulario en una tarjeta a la derecha (máximo 480px).
 
 **Ritmo:** 8px entre una etiqueta y su campo, 16px entre campos, 24px entre grupos y 48px entre secciones de una pantalla. Hay más espacio arriba de un título que debajo. Las tarjetas de un listado se separan 16px.
 
@@ -450,7 +450,7 @@ Todo vive en `layouts/AppLayout.vue`.
 ### Búsqueda (variante B elegida)
 - **Celular:** el mapa ocupa la pantalla. Arriba flota el buscador ("Sales de …") y un botón de filtros que abre los filtros en una hoja inferior. Los resultados van en una hoja inferior con tres alturas (mini, media y completa) que se cambia arrastrando el asa o con el botón "Ver lista / Ver mapa" (`aria-expanded`).
 - **Accesibilidad:** en el documento, la lista de resultados va antes que el mapa, así que con teclado o lector se llega primero a las tarjetas. Todo lo que se elige en el mapa también se puede elegir en el buscador.
-- **Escritorio:** filtros y lista a la izquierda (5/12) y el mapa a la derecha (7/12).
+- **Escritorio:** barra de filtros blanca a todo el ancho (`FormBusqueda horizontal`): punto con botón de ubicación de solo ícono, sentido, campus, día, hora y distancia en menús. Cabe en un renglón desde unos 1700px y en dos a 1280px. Debajo, la lista de resultados (entre 380 y 520px, se desplaza sola) y el mapa en una tarjeta redondeada que llena el resto del alto.
 
 ### Mapa (Leaflet + OpenStreetMap)
 - Teselas estándar de OSM con su atribución visible.

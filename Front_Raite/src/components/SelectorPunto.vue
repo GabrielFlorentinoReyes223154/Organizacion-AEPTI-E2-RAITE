@@ -45,7 +45,22 @@
       </template>
     </q-select>
     <q-btn
-      v-if="conUbicacion"
+      v-if="conUbicacion && ubicacionCompacta"
+      round
+      unelevated
+      color="azul-tenue"
+      text-color="primary"
+      icon="my_location"
+      aria-label="Usar mi ubicación"
+      class="selector-punto__ubicacion"
+      :loading="buscandoUbicacion"
+      :disable="disable"
+      @click="usarUbicacion"
+    >
+      <q-tooltip>Usar mi ubicación</q-tooltip>
+    </q-btn>
+    <q-btn
+      v-else-if="conUbicacion"
       flat
       no-caps
       color="primary"
@@ -73,9 +88,17 @@ withDefaults(
     hint?: string | undefined;
     error?: string | null;
     conUbicacion?: boolean;
+    /** Botón de ubicación solo con ícono (barra de filtros de computadora). */
+    ubicacionCompacta?: boolean;
     disable?: boolean;
   }>(),
-  { etiqueta: '¿De dónde sales?', error: null, conUbicacion: true, disable: false },
+  {
+    etiqueta: '¿De dónde sales?',
+    error: null,
+    conUbicacion: true,
+    ubicacionCompacta: false,
+    disable: false,
+  },
 );
 const emit = defineEmits<{ ubicacion: [lat: number, lon: number] }>();
 const modelo = defineModel<number | null>({ default: null });
