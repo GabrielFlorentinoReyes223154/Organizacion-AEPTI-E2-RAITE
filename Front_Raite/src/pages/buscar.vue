@@ -3,6 +3,11 @@
     <h1 class="sr-only gt-sm">Buscar raite</h1>
 
     <div class="buscar__marco" :class="{ 'buscar__marco--escritorio': escritorio }">
+      <!-- Computadora: barra de filtros a todo el ancho, arriba de la lista y el mapa. -->
+      <section v-if="escritorio" class="buscar__barra" aria-label="Filtros de búsqueda">
+        <FormBusqueda v-model="busqueda" horizontal />
+      </section>
+
       <!-- Controles y resultados van primero en el documento: con teclado o lector se llega a la lista antes que al mapa. -->
       <section
         class="buscar__panel"
@@ -32,11 +37,14 @@
         </template>
 
         <template v-else>
-          <FormBusqueda v-model="busqueda" />
-          <q-separator class="q-my-lg" />
-          <h2 id="buscar-titulo-resultados" class="raite-seccion q-mb-md">
-            {{ tituloResultados }}
-          </h2>
+          <div class="buscar__cabecera-pc">
+            <h2 id="buscar-titulo-resultados" class="buscar__titulo-pc">
+              {{ tituloResultados }}
+            </h2>
+            <span v-if="tieneOrigen" class="buscar__subtitulo-pc">
+              A {{ busqueda.radio }} km de {{ nombreOrigen }}
+            </span>
+          </div>
         </template>
 
         <p v-if="resumenFiltros && !escritorio" class="buscar__resumen">
@@ -583,31 +591,65 @@ function arrastrar(evento: { isFinal?: boolean; offset?: { y: number } }) {
   box-shadow: var(--raite-sombra-barra);
 }
 
-// --- Escritorio: lista a la izquierda, mapa a la derecha ---
+// --- Computadora: filtros arriba a todo el ancho; lista a la izquierda y mapa grande a la derecha ---
+// La página mide el alto de la ventana menos la barra superior; la lista se desplaza sola y el mapa llena el resto.
 .buscar__marco--escritorio {
   display: grid;
-  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  grid-template-columns: clamp(380px, 30%, 520px) minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 24px;
+  padding: 32px;
+  box-sizing: border-box;
+  .buscar__barra {
+    grid-column: 1 / -1;
+    padding: 20px 24px;
+    border-radius: 20px;
+    background: var(--raite-blanco);
+    box-shadow: var(--raite-sombra-tarjeta);
+  }
   .buscar__panel {
     position: static;
-    height: 100%;
+    min-height: 0;
     overflow-y: auto;
     border-radius: 0;
     box-shadow: none;
-    border-right: 1px solid var(--raite-borde-sutil);
-    background: var(--raite-fondo);
-    padding: 32px;
+    background: transparent;
+    padding: 0 8px 0 0;
     transition: none;
   }
   .buscar__lista {
     overflow: visible;
-    padding: 0;
+    padding: 0 0 4px;
+  }
+  .buscar__tarjetas {
+    gap: 16px;
   }
   .buscar__mapa {
     position: relative;
     inset: auto;
+    min-height: 0;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: var(--raite-sombra-tarjeta);
   }
   .buscar__mapa :deep(.leaflet-top) {
     top: 0;
   }
+}
+.buscar__cabecera-pc {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 16px;
+}
+.buscar__titulo-pc {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+.buscar__subtitulo-pc {
+  font-size: 0.875rem;
+  color: var(--raite-gris);
 }
 </style>
