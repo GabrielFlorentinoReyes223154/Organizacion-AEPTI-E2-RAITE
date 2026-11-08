@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Fuente de verdad del proyecto para Claude Code. Última revisión: 2026-11-06 (Capa 2 terminada).
+Fuente de verdad del proyecto para Claude Code. Última revisión: 2026-11-07 (Capa 3 rediseñada para computadora).
 Si algo de aquí contradice al código, revisa el código y actualiza este archivo.
 
 > **Nombre del proyecto:** [NOMBRE] — pendiente de confirmar (aparece como "Raite" en el SRS y en el código, "UniGo-UACJ" en la carta y "RutaClara" en el encabezado del PDF de la carta). En el código se mantiene "Raite": no renombrar nada hasta que se pida.
@@ -96,12 +96,13 @@ Raite/
 │       ├── boot/        # axios.ts (instancia `api` + refresh de token en 401), auth-init.ts
 │       ├── stores/      # auth-store.ts (sesión, rol, rol activo); example-store.ts es de plantilla
 │       ├── router/      # index.ts (guardas); typed-router.d.ts es GENERADO, no editar
-│       ├── layouts/     # MainLayout.vue
-│       ├── components/  # RoleSelectionModal.vue, EssentialLink.vue (plantilla)
+│       ├── layouts/     # AppLayout.vue (con sesión) y PublicoLayout.vue (entrar, registro, verificar)
+│       ├── components/  # TarjetaViaje, TarjetaDestacada, BarraAccion, MapaRaite, selectores, chips…
+│       ├── assets/      # logo-raite.png (fondo claro) y logo-raite-sobre-azul.png
 │       └── pages/       # rutas por archivo (ver abajo)
 ├── RaiteDocs/           # documentación (mayormente en español)
 │   ├── docs/            # documentos formales exportados de Google Drive (SRS, propuesta fase 1/2)
-│   ├── Design/          # UI_UX.md, layouts_team.md, imágenes y PDF de diseño
+│   ├── Design/          # UI_UX.md, layouts_team.md, imágenes, PDF de diseño y logo/ (logo original)
 │   ├── Context/         # system_solutions_context.md
 │   ├── Modelo-ER.md     # diagrama ER y de estados de la Capa 1 (fuente de verdad del modelo)
 │   ├── API.md           # lista de endpoints de la Capa 2 (método, URL, quién, qué hace)
@@ -133,10 +134,16 @@ Raite/
 
 ### Detalles del frontend que importan
 
-- **Capa 3 (vistas) hecha** siguiendo `DESIGN.md` y `PRODUCT.md` (raíz del repo, excluidos de git en `.git/info/exclude`): tema de Quasar con colores UACJ, fuentes Atkinson Hyperlegible en `src/css/fonts/`.
-- Rutas por archivo (`filenameBasedRouting: true`), modo **`history`**. Cada página declara con `definePage({ meta })` si es `publico`, el `papel` que necesita (`pasajero`/`conductor`), su `titulo` y, si es secundaria, `atras` (ruta de regreso; sin barra inferior). `App.vue` elige `PublicoLayout` o `AppLayout` según `meta.publico`.
-- Páginas: `/entrar`, `/registro`, `/verificar`, `/vehiculo`, `/buscar`, `/mis-raites`, `/mis-viajes`, `/publicar` (`?editar=id`), `/viajes/[id]` (detalle para pasajero y conductor), `/viajes/[id]/solicitudes`, `/viajes/[id]/calificar`, `/viajes/[id]/reportar`, `/avisos`, `/historial`, `/perfil` y la 404.
-- Guarda global en `router/index.ts`: sin sesión todo lo no público manda a `/entrar?siguiente=…`; `/` manda al inicio del papel (`/buscar` o `/mis-viajes`). Con rol AMBOS, abrir una pantalla del otro papel cambia el papel activo.
+- **Capa 3 (vistas) rediseñada** el 2026-11-07 siguiendo `DESIGN.md` y `PRODUCT.md` (raíz del repo, versionados): tema de Quasar con colores UACJ, fuentes Atkinson Hyperlegible en `src/css/fonts/`, botones en píldora, campos rellenos y tarjetas con sombra suave. La estructura viene de una maqueta inspirada en el Figma de NeoFracc.
+- **Prioridad: computadora.** El prototipo se presenta en una PC, así que cada vista se diseñó para ≥1024 px aprovechando todo el ancho (columnas, cuadrículas, barras horizontales). El celular funciona pero no se ha pulido: no invertir en él sin que se pida, y no romperlo.
+- **Layout con sesión (`AppLayout.vue`):** en computadora, barra superior azul tenue a todo el ancho (logo, cambio de papel, campanita, usuario) y menú lateral blanco fijo (Inicio, las dos secciones del papel, Historial, Avisos, Perfil, Cerrar sesión); las pantallas con `meta.atras` muestran "Regresar" y su título arriba del contenido. En celular, encabezado blanco y barra inferior blanca de cuatro pestañas.
+- **Layout público (`PublicoLayout.vue`):** panel azul con el logo y los puntos de confianza a la izquierda y el formulario en una tarjeta a la derecha; `meta.amplio` (registro) ensancha la tarjeta.
+- **Piezas del tema (`app.scss`):** `raite-contenedor--ancho` (página a todo el ancho), `raite-cabecera` (título + resumen + acción), `raite-rejilla-tarjetas` (cuadrícula de tarjetas de la misma altura), `raite-btn-xl` (acción principal de 56 px), `raite-titulo--marca`. Los h1–h6 tienen interlineado 1.3 (Quasar los trae enormes).
+- **`BarraAccion`:** en celular es la barra fija de abajo (la página lleva `con-barra`); en computadora se dibuja donde esté como una tarjeta, para no tapar el menú lateral.
+- Rutas por archivo (`filenameBasedRouting: true`), modo **`history`**. Cada página declara con `definePage({ meta })` si es `publico`, el `papel` que necesita (`pasajero`/`conductor`), su `titulo`, si es secundaria `atras` (ruta de regreso; sin barra inferior) y, en públicas, `amplio`. `App.vue` elige `PublicoLayout` o `AppLayout` según `meta.publico`.
+- **Ojo con el servidor de desarrollo:** al reescribir un `.vue` completo, el plugin de rutas a veces deja de leer su `definePage` (la pantalla sale con título "Raite" y sin "Regresar"). Se arregla reiniciando `pnpm dev`; no es un error del código.
+- Páginas: `/entrar`, `/registro`, `/verificar`, `/inicio`, `/vehiculo`, `/buscar`, `/mis-raites`, `/mis-viajes`, `/publicar` (`?editar=id`), `/viajes/[id]` (detalle para pasajero y conductor), `/viajes/[id]/solicitudes`, `/viajes/[id]/calificar`, `/viajes/[id]/reportar`, `/avisos`, `/historial`, `/perfil` y la 404.
+- Guarda global en `router/index.ts`: sin sesión todo lo no público manda a `/entrar?siguiente=…`; `/` y el inicio de sesión mandan a `/inicio` (la misma para los dos papeles; su contenido cambia con el papel). Con rol AMBOS, abrir una pantalla del otro papel cambia el papel activo.
 - Capas: `src/api/` (una función por endpoint, `tipos.ts`, `errores.ts`), `src/stores/` (`sesion`, `catalogos`, `avisos` con la consulta periódica de 30 s), `src/utils/` (`formato.ts` con horas en `America/Ciudad_Juarez`, `avisar.ts` con Notify y diálogos de confirmación), `src/components/` (tarjeta de viaje, placa de campus, mapa, selectores…).
 - `boot/axios.ts` rechaza con el error original de axios (para leer la respuesta del API con `leerError`) y renueva el token en 401.
 - Para probar sin runner: `python manage.py crear_datos_demo --reiniciar`, `runserver` y `pnpm dev`; el código de verificación sale en la consola de Django.
@@ -172,7 +179,7 @@ Fuente: `RaiteDocs/docs/2_SRS.md`. Estado según el código al 2026-11-07 (Capa 
 | RNF-01 | Usabilidad: interfaz simple, puntos de referencia en vez de direcciones | ✅ | Origen siempre por catálogo (lista con búsqueda y mapa). Una acción principal por pantalla. |
 | RNF-02 | Seguridad: datos de contacto visibles solo entre conductor y pasajero tras confirmar | ✅ | Teléfono y placas solo con solicitud `ACEPTADA` (probado en API y en pantalla). JWT, permisos por rol y secretos por variable de entorno. |
 | RNF-03 | Disponibilidad | ⬜ | Sin despliegue. |
-| RNF-04 | Compatibilidad: diseño responsivo móvil/escritorio | ✅ | Barra inferior en celular y pestañas en el encabezado en escritorio; revisado a 390 y 1280 px. |
+| RNF-04 | Compatibilidad: diseño responsivo móvil/escritorio | ✅ | Escritorio: barra superior y menú lateral, vistas a todo el ancho (revisado a 1900 y 1280 px). Celular: encabezado y barra inferior; funciona, pero el rediseño se pulió para computadora. |
 | RNF-05 | Escalabilidad: poder agregar usuarios y funciones | 🟡 | 6 apps Django con servicios separados de las vistas; índices en las consultas principales; paginación. |
 | RNF-06 | Rendimiento en búsqueda y mapa | ⬜ | No aplica aún. |
 
@@ -229,7 +236,8 @@ Se construye **por capas, no por funcionalidad**. El objetivo es dejar una base 
 3. **Capa 3 — Vistas** (páginas de Quasar) ✅ (en `capa/vistas`; diseño en `DESIGN.md`)
    - Variantes elegidas en el lienzo de diseño: búsqueda B (mapa con hoja de resultados), detalle A (con Llamar/WhatsApp), publicar A (con vista previa), solicitudes B (cupo como asientos).
    - Backend agregado en esta capa: `solicitudes_pendientes` en `viajes/mios/`, pasajero que registra vehículo pasa a AMBOS, comando `crear_datos_demo`.
-   - Pendiente: decidir nombre y logo, despliegue (RNF-03) y medir rendimiento (RNF-06).
+   - **Rediseño (2026-11-07), solo frontend**, una rama por parte encadenada a la anterior: `capa/vistas-entrar` (tema, layout público, Entrar, logo) → `-navegacion` → `-busqueda` → `-acceso` (registro, verificar, vehículo) → `-inicio` (pantalla nueva) → `-detalle` (detalle y solicitudes) → `-mis-viajes` (mis raites, mis viajes, publicar) → `-cuenta` (avisos, historial, perfil) → `-calificar` (calificar, reportar, 404) → `-cierre`. Revisado con capturas a 1900 y 1280 px; `pnpm lint:check`, `pnpm typecheck` y `pnpm build` pasan.
+   - Logo decidido (ver `PRODUCT.md`). Pendiente: confirmar el nombre, pulir el celular, despliegue (RNF-03) y medir rendimiento (RNF-06).
 
 Al terminar cada capa, actualizar aquí su estado y la tabla de requerimientos.
 
@@ -243,7 +251,8 @@ Al terminar cada capa, actualizar aquí su estado y la tabla de requerimientos.
 - Los archivos de `RaiteDocs/docs/` vienen de Google Docs: no editarlos a mano aquí (ver `RaiteDocs/docs/README.md`).
 - `Front_Raite/src/router/typed-router.d.ts` es generado: no editar a mano.
 - Antes de dar por terminado un cambio: `python manage.py test` (backend) y `pnpm lint:check && pnpm typecheck` (frontend).
-- **Una rama por capa:** `capa/modelos` (Capa 1, ya integrada en `main`), `capa/logica` (Capa 2), `capa/vistas` (Capa 3). Cada rama sale de `main` después de integrar la capa anterior; se trabaja en la rama de la capa en curso.
+- **Una rama por capa:** `capa/modelos` (Capa 1, ya integrada en `main`), `capa/logica` (Capa 2), `capa/vistas` (Capa 3). Cada rama sale de `main` después de integrar la capa anterior; se trabaja en la rama de la capa en curso. Las partes de una capa van en ramas con guion (`capa/vistas-inicio`), nunca con diagonal (`capa/vistas/inicio` choca con la rama `capa/vistas`).
+- **En el rediseño los commits los hace el usuario:** al terminar cada parte, Claude le da la rama, los `git add` y los mensajes exactos (pequeños, uno por cambio, `feat(front): …` en español) y no corre `git commit` ni `git push`.
 - **Solo commits locales: no hacer push ni abrir PR.** Del push se encarga el usuario.
 - **Los mensajes de commit no llevan `Co-Authored-By` ni ninguna mención a Claude** (también configurado en `.claude/settings.json`, que es local: `.claude/` está en `.gitignore`).
 - `AGENTS.md` pide usar `graphify` para consultas del código y correr `graphify update .` tras modificarlo, si la herramienta está instalada.
