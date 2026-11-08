@@ -435,12 +435,17 @@ Cuando la solicitud está aceptada, el detalle muestra un bloque de contacto con
   - Lugares: `q-btn-toggle` del 1 al 5, sin pasar los asientos del vehículo.
 
 ### Navigation
-- **Encabezado** (`q-header`): azul UACJ, 56px, título de la pantalla en Title blanco y, a la derecha, el cambio de rol (solo para usuarios con rol AMBOS) y la campanita de avisos con un contador de no leídos (`q-badge` amarillo con texto negro). La campanita lleva a la pantalla de avisos y el contador se actualiza con una consulta periódica. En escritorio el encabezado también lleva las pestañas de navegación.
-- **Barra inferior en celular** (`q-footer` + `q-tabs` con ícono y texto): fondo azul UACJ, 64px y cuatro pestañas. Las pestañas inactivas llevan ícono y texto en azul niebla; la activa lleva fondo azul hondo, ícono y texto en blanco, e indicador amarillo de 3px arriba (`indicator-color="accent"`).
-  - Como pasajero: Buscar · Mis raites · Historial · Perfil.
+Todo vive en `layouts/AppLayout.vue`.
+
+- **Encabezado en celular** (`q-header`): blanco, 64px, con una línea `borde-sutil` abajo. A la izquierda, el título de la pantalla en Headline negro; a la derecha, la campanita (botón redondo azul tenue con ícono azul de 24px y contador `amarillo` con texto negro y un aro blanco). En pantallas secundarias (`meta.atras`) lleva la flecha de regresar a la izquierda y el título centrado en Title azul, sin campanita.
+- **Barra superior en computadora:** azul tenue, 72px, contenido centrado a 1280px. Logo (versión para fondo claro, `assets/logo-raite.png`, 48px de alto) que lleva a `/`; a la derecha el cambio de papel, la campanita (botón redondo blanco) y una píldora blanca con las iniciales en un círculo azul y el nombre corto ("Valeria R.") que lleva a Perfil.
+- **Menú lateral en computadora:** tarjeta blanca de 240px, fija al desplazarse, con el papel arriba ("Como pasajero" / "Como conductor"), las mismas entradas que la barra inferior más Avisos (con contador amarillo tenue) y, separado, "Cerrar sesión" en rojo texto. La entrada activa lleva fondo azul tenue y texto azul. En pantallas secundarias, arriba del contenido van "Regresar" y el título de la pantalla.
+- **Barra inferior en celular** (`q-footer` + `q-tabs` con ícono y texto): blanca, 72px, con una línea `borde-sutil` arriba y cuatro pestañas. Las inactivas van en gris UACJ; la activa en azul con el texto en negritas y un punto azul de 5px debajo.
+  - Como pasajero: Buscar raite · Mis raites · Historial · Perfil.
   - Como conductor: Mis viajes · Publicar · Historial · Perfil.
-  - Los avisos no van en la barra: se abren con la campanita del encabezado.
-- **Cambio de rol:** con rol AMBOS, el encabezado lleva un control compacto "Pido raite / Doy raite" sobre azul hondo; la opción elegida va en amarillo con texto negro. Se nombra por lo que haces y no por género. Al cambiar, las pestañas cambian sin recargar. El mismo control está en Perfil.
+  - Los avisos no van en la barra: se abren con la campanita.
+- **Cambio de papel:** con rol AMBOS, un par de píldoras "Pido raite / Doy raite". La elegida va en azul con texto blanco y la otra en azul sobre azul tenue (en la barra de computadora el fondo del control es blanco). En celular ocupa una segunda fila del encabezado a todo el ancho; en computadora va en la barra superior. Se nombra por lo que haces y no por género. El mismo control está en Perfil.
+- **Foco:** el encabezado y la barra inferior son claros, así que el foco ahí es azul. El amarillo queda solo para lo marcado con `.raite-sobre-azul`.
 
 ### Búsqueda (variante B elegida)
 - **Celular:** el mapa ocupa la pantalla. Arriba flota el buscador ("Sales de …") y un botón de filtros que abre los filtros en una hoja inferior. Los resultados van en una hoja inferior con tres alturas (mini, media y completa) que se cambia arrastrando el asa o con el botón "Ver lista / Ver mapa" (`aria-expanded`).
