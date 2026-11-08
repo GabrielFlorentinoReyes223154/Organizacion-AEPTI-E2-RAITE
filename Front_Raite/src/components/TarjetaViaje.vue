@@ -84,9 +84,9 @@ const etiqueta = computed(() => {
 <style scoped lang="scss">
 .tarjeta-viaje {
   background: var(--raite-blanco);
-  border: 1px solid var(--raite-borde-sutil);
-  border-radius: 16px;
+  border-radius: 20px;
   overflow: hidden;
+  box-shadow: var(--raite-sombra-tarjeta);
 }
 .tarjeta-viaje__enlace {
   display: flex;
@@ -95,7 +95,7 @@ const etiqueta = computed(() => {
   padding: 16px;
   color: inherit;
   text-decoration: none;
-  border-radius: 16px;
+  border-radius: 20px;
   &:hover {
     background: var(--raite-blanco-hover);
   }
