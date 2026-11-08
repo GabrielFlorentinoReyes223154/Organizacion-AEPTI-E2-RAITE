@@ -460,6 +460,11 @@ Es la pantalla a la que llevan `/` y el inicio de sesión, para los dos papeles;
 - **Accesibilidad:** en el documento, la lista de resultados va antes que el mapa, así que con teclado o lector se llega primero a las tarjetas. Todo lo que se elige en el mapa también se puede elegir en el buscador.
 - **Escritorio:** barra de filtros blanca a todo el ancho (`FormBusqueda horizontal`): punto con botón de ubicación de solo ícono, sentido, campus, día, hora y distancia en menús. Cabe en un renglón desde unos 1700px y en dos a 1280px. Debajo, la lista de resultados (entre 380 y 520px, se desplaza sola) y el mapa en una tarjeta redondeada que llena el resto del alto.
 
+### Detalle del viaje y solicitudes (computadora)
+- **Detalle:** dos columnas a todo el ancho. Izquierda (3/5): la fecha, hora, estado y ruta en la `TarjetaDestacada`, con el sentido y los lugares libres abajo; el mapa (360px de alto) y los datos del viaje (vehículo, grupo, lugares, punto, notas). Derecha (2/5): quién maneja (o tus pasajeros, para el conductor), el estado de la solicitud o el bloque de contacto, la tarjeta de acciones y, debajo, las acciones secundarias (editar, cancelar, reportar) como botones de texto.
+- **Solicitudes:** izquierda, el cupo como asientos en una tarjeta azul (los ocupados en amarillo con las iniciales) y los confirmados; derecha, "Quieren un lugar" con una tarjeta por solicitud: persona a la izquierda y "Rechazar" (texto rojo) y "Aceptar" (azul) en el mismo renglón.
+- **Barra de acción (`BarraAccion`):** en celular es la barra fija de abajo; en computadora se dibuja donde está en la página como una tarjeta blanca con la nota arriba y los botones apilados a todo el ancho. Así nunca tapa el menú lateral.
+
 ### Mapa (Leaflet + OpenStreetMap)
 - Teselas estándar de OSM con su atribución visible.
 - **Punto de referencia:** círculo azul UACJ de 14px con contorno blanco de 2px. El seleccionado crece a 20px, en amarillo con contorno negro.
