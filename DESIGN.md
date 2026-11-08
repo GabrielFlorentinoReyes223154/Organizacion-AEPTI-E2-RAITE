@@ -475,6 +475,11 @@ Es la pantalla a la que llevan `/` y el inicio de sesión, para los dos papeles;
 - **Perfil:** izquierda (fija), el resumen centrado (avatar de 112px con aro, nombre, carrera, correo, "Correo verificado" en verde, calificación y para qué usas Raite), el cambio de papel o la invitación azul a registrar el vehículo, y "Cerrar sesión" (contorno rojo). Derecha: "Tus datos" (teléfono y carrera a dos columnas y "Con quién viajo" como dos tarjetas seleccionables con explicación neutra), el vehículo en una fila con "Editar" y "Mis reportes" desplegable.
 - **Encabezados:** `app.scss` fija el interlineado de h1–h6 en 1.3 porque Quasar trae interlineados enormes (h2: 3.75rem).
 
+### Calificar, reportar y 404 (computadora)
+- **Calificar:** izquierda (fija), el viaje que se califica (cuándo, desde dónde, campus) con la explicación de para qué sirve calificar; derecha, una tarjeta por persona en cuadrícula (avatar, nombre, carrera, estrellas azules de 44px con el texto "Muy mal… Excelente" debajo, comentario opcional y "Enviar calificación" a todo el ancho). Las estrellas no van en amarillo: sobre blanco no se verían (1.41:1).
+- **Reportar:** izquierda, el formulario: la persona se elige en tarjetas con avatar y una marca circular, "¿Qué pasó?" en un campo alto y "Enviar reporte" a la derecha. Derecha (fija): el aviso rojo tenue "¿Estás en peligro ahora? Llama al 911…" y "Qué pasa después" en tres pasos numerados.
+- **404:** tarjeta centrada de 560px con el ícono en círculo azul tenue, "404" en letra de datos, el mensaje y dos salidas ("Ir al inicio" y "Ver historial").
+
 ### Mapa (Leaflet + OpenStreetMap)
 - Teselas estándar de OSM con su atribución visible.
 - **Punto de referencia:** círculo azul UACJ de 14px con contorno blanco de 2px. El seleccionado crece a 20px, en amarillo con contorno negro.
