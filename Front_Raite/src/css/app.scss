@@ -121,6 +121,17 @@ body {
   text-rendering: optimizeLegibility;
 }
 
+// Quasar da a h1–h6 interlineados enormes (h2: 3.75rem). Todos los encabezados de Raite llevan su
+// propio tamaño, así que el interlineado base es el de los títulos de DESIGN.md.
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  line-height: 1.3;
+}
+
 ::selection {
   background: var(--raite-amarillo);
   color: var(--raite-negro);

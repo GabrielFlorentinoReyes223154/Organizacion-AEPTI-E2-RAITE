@@ -1,21 +1,42 @@
 <template>
-  <q-page class="raite-contenedor raite-contenedor--angosto">
-    <h1 class="raite-titulo gt-sm">Historial</h1>
+  <q-page class="raite-contenedor raite-contenedor--ancho">
+    <header class="raite-cabecera">
+      <div class="gt-sm">
+        <h1 class="raite-titulo">Historial</h1>
+        <p class="raite-cabecera__texto">{{ resumen }}</p>
+      </div>
+      <div
+        v-if="sesion.esAmbos"
+        class="historial__filtros"
+        role="group"
+        aria-label="Qué viajes ver"
+      >
+        <button
+          v-for="f in filtros"
+          :key="f.valor"
+          type="button"
+          class="historial__filtro"
+          :aria-pressed="filtro === f.valor"
+          @click="filtro = f.valor"
+        >
+          {{ f.texto }}
+        </button>
+      </div>
+    </header>
 
-    <section
-      v-if="pendientes.length"
-      class="por-calificar raite-pila"
-      aria-labelledby="hist-calificar"
-    >
-      <h2 id="hist-calificar" class="raite-seccion">Te falta calificar</h2>
+    <section v-if="pendientes.length" class="por-calificar" aria-labelledby="hist-calificar">
+      <h2 id="hist-calificar" class="por-calificar__titulo">
+        <q-icon name="star_outline" size="22px" aria-hidden="true" />
+        Te falta calificar
+      </h2>
       <ul class="por-calificar__lista">
         <li v-for="p in pendientesPorViaje" :key="p.viajeId" class="por-calificar__fila">
           <div class="por-calificar__texto">
             <p class="text-weight-bold">{{ p.nombres }}</p>
-            <p class="raite-ayuda">{{ p.cuando }} · {{ p.punto }} · {{ p.campus }}</p>
+            <p class="por-calificar__detalle">{{ p.cuando }} · {{ p.punto }} · {{ p.campus }}</p>
           </div>
           <q-btn
-            color="primary"
+            color="dark"
             unelevated
             no-caps
             label="Calificar"
@@ -25,23 +46,11 @@
       </ul>
     </section>
 
-    <q-btn-toggle
-      v-if="sesion.esAmbos"
-      v-model="filtro"
-      class="raite-opciones q-mb-lg"
-      no-caps
-      unelevated
-      toggle-color="primary"
-      :options="[
-        { label: 'Todos', value: 'todos' },
-        { label: 'Como pasajero', value: 'pasajero' },
-        { label: 'Como conductor', value: 'conductor' },
-      ]"
-    />
-
-    <div v-if="cargando && !lista.length" class="raite-pila">
-      <q-skeleton v-for="n in 3" :key="n" type="rect" height="180px" style="border-radius: 16px" />
-    </div>
+    <ul v-if="cargando && !lista.length" class="raite-rejilla-tarjetas">
+      <li v-for="n in 3" :key="n">
+        <q-skeleton type="rect" height="190px" style="border-radius: 20px" />
+      </li>
+    </ul>
 
     <EstadoVacio v-else-if="error" icono="cloud_off" :titulo="error">
       <template #acciones>
@@ -57,7 +66,7 @@
       Cuando termines o se cancele un raite, lo verás en esta lista.
     </EstadoVacio>
 
-    <ul v-else class="lista">
+    <ul v-else class="raite-rejilla-tarjetas">
       <li v-for="v in lista" :key="v.id">
         <TarjetaViaje
           :viaje="v"
@@ -108,6 +117,19 @@ const cargando = ref(true);
 const error = ref('');
 const pagina = ref(1);
 const hayMas = ref(false);
+const total = ref(0);
+
+const resumen = computed(() => {
+  if (cargando.value && !lista.value.length) return 'Cargando tu historial…';
+  if (!total.value) return 'Todavía no tienes viajes terminados.';
+  return `${total.value} ${total.value === 1 ? 'viaje terminado o cancelado' : 'viajes terminados o cancelados'}.`;
+});
+
+const filtros: { valor: Papel | 'todos'; texto: string }[] = [
+  { valor: 'todos', texto: 'Todos' },
+  { valor: 'pasajero', texto: 'Como pasajero' },
+  { valor: 'conductor', texto: 'Como conductor' },
+];
 
 const pendientesPorViaje = computed(() => {
   const grupos = new Map<string, CalificacionPendiente[]>();
@@ -133,6 +155,7 @@ async function cargar(numero = 1) {
     const respuesta = await viajes.historial(params);
     lista.value = numero === 1 ? respuesta.results : [...lista.value, ...respuesta.results];
     hayMas.value = !!respuesta.next;
+    total.value = respuesta.count;
     pagina.value = numero;
   } catch (e) {
     error.value = leerError(e).mensaje;
@@ -149,32 +172,58 @@ onMounted(async () => {
 </script>
 
 <style scoped lang="scss">
-.lista {
-  margin: 0;
-  padding: 0;
-  list-style: none;
+.historial__filtros {
   display: flex;
-  flex-direction: column;
-  gap: 16px;
+  gap: 8px;
 }
+.historial__filtro {
+  height: 44px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--raite-blanco);
+  color: var(--raite-azul);
+  font: inherit;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  box-shadow: var(--raite-sombra-tarjeta);
+  cursor: pointer;
+  &[aria-pressed='true'] {
+    background: var(--raite-azul);
+    color: var(--raite-blanco);
+  }
+}
+
+// Lo que falta calificar: amarillo tenue, arriba de la lista.
 .por-calificar {
   margin-bottom: 24px;
-  padding: 16px;
-  border-radius: 16px;
-  background: var(--raite-azul-tenue);
+  padding: 20px 24px;
+  border-radius: 20px;
+  background: var(--raite-amarillo-tenue);
+}
+.por-calificar__titulo {
+  margin: 0 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.125rem;
+  font-weight: 700;
 }
 .por-calificar__lista {
   margin: 0;
   padding: 0;
   list-style: none;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
   gap: 12px;
 }
 .por-calificar__fila {
   display: flex;
   align-items: center;
   gap: 12px;
+  padding: 12px 16px;
+  border-radius: 16px;
+  background: var(--raite-blanco);
 }
 .por-calificar__texto {
   flex-grow: 1;
@@ -182,5 +231,9 @@ onMounted(async () => {
   p {
     margin: 0;
   }
+}
+.por-calificar__detalle {
+  font-size: 0.875rem;
+  color: var(--raite-gris);
 }
 </style>
