@@ -220,7 +220,7 @@ components:
 
 # Design System: Raite
 
-> Rediseño del 2026-11-07. La estructura viene de una maqueta inspirada en el Figma de NeoFracc (encabezado blanco, barra inferior blanca, tarjeta destacada, accesos rápidos, botones en píldora y campos rellenos), traducida a la paleta UACJ de abajo. Se aplica vista por vista; la primera fue Entrar (con el layout público y el tema base). Si algo no funciona en Quasar o con contenido real, se corrige aquí primero.
+> Rediseño del 2026-11-07. La estructura viene de una maqueta inspirada en el Figma de NeoFracc (encabezado blanco, barra inferior blanca, tarjeta destacada, accesos rápidos, botones en píldora y campos rellenos), traducida a la paleta UACJ de abajo. Ya está aplicada en todas las vistas, pensadas primero para computadora (el celular funciona, pero falta pulirlo). Si algo no funciona en Quasar o con contenido real, se corrige aquí primero.
 
 ## Overview
 
