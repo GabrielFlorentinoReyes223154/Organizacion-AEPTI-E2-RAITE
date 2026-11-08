@@ -299,10 +299,9 @@ onBeforeUnmount(() => avisos.detener());
 .encabezado__escritorio {
   background: var(--raite-azul-tenue);
 }
+// A todo el ancho de la ventana: en computadora se aprovecha toda la pantalla.
 .encabezado__fila {
-  max-width: 1280px;
   min-height: 72px;
-  margin: 0 auto;
   padding: 0 32px;
   box-sizing: border-box;
   display: flex;
@@ -378,8 +377,6 @@ onBeforeUnmount(() => avisos.detener());
 // --- Cuerpo (computadora: menú lateral + contenido) ---
 @media (min-width: 1024px) {
   .cuerpo {
-    max-width: 1280px;
-    margin: 0 auto;
     padding-left: 32px;
     box-sizing: border-box;
     display: flex;
