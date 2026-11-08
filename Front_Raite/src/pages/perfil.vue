@@ -1,164 +1,202 @@
 <template>
-  <q-page v-if="usuario" class="raite-contenedor raite-contenedor--angosto">
+  <q-page v-if="usuario" class="raite-contenedor raite-contenedor--ancho">
     <h1 class="raite-titulo gt-sm">Perfil</h1>
 
-    <div class="raite-pila raite-pila--grupos">
-      <section class="raite-tarjeta cabecera" aria-label="Tu cuenta">
-        <AvatarIniciales :nombre="usuario.nombre_completo" :tam="56" tono="solido" />
-        <div class="cabecera__datos">
-          <p class="cabecera__nombre">{{ usuario.nombre_completo }}</p>
-          <p class="raite-ayuda">{{ usuario.correo }}</p>
-        </div>
-        <span class="cabecera__calif">
-          <q-icon name="star" size="20px" aria-hidden="true" />
-          {{ calificacion(usuario.calificacion) ?? 'Nuevo' }}
-        </span>
-      </section>
+    <div class="perfil">
+      <!-- Izquierda: quién eres en Raite -->
+      <aside class="perfil__lateral">
+        <section class="raite-tarjeta perfil__resumen" aria-label="Tu cuenta">
+          <AvatarIniciales :nombre="usuario.nombre_completo" :tam="112" class="perfil__avatar" />
+          <h2 class="perfil__nombre">{{ usuario.nombre_completo }}</h2>
+          <p class="perfil__carrera">{{ usuario.carrera }}</p>
+          <p class="perfil__correo">{{ usuario.correo }}</p>
+          <span class="perfil__verificado">
+            <q-icon name="verified" size="18px" aria-hidden="true" />
+            Correo verificado
+          </span>
+          <dl class="perfil__cifras">
+            <div>
+              <dt>Calificación</dt>
+              <dd class="raite-dato">
+                <q-icon name="star" size="20px" aria-hidden="true" />
+                {{ calificacion(usuario.calificacion) ?? 'Nuevo' }}
+              </dd>
+            </div>
+            <div>
+              <dt>Usas Raite para</dt>
+              <dd>{{ usoTexto }}</dd>
+            </div>
+          </dl>
+        </section>
 
-      <!-- Cómo usa Raite -->
-      <section v-if="sesion.esAmbos" class="raite-pila" aria-labelledby="perfil-uso">
-        <h2 id="perfil-uso" class="raite-seccion">Ahora estás usando Raite para</h2>
-        <q-btn-toggle
-          :model-value="sesion.papel"
-          class="raite-opciones"
-          no-caps
-          unelevated
-          toggle-color="primary"
-          :options="[
-            { label: 'Pedir raite', value: 'pasajero' },
-            { label: 'Dar raite', value: 'conductor' },
-          ]"
-          @update:model-value="cambiarPapel"
-        />
-      </section>
-
-      <router-link v-else-if="!usuario.es_conductor" to="/vehiculo" class="ofrecer">
-        <q-icon name="directions_car" size="28px" aria-hidden="true" />
-        <span class="ofrecer__texto">
-          <span class="ofrecer__titulo">Quiero ofrecer raites</span>
-          <span class="ofrecer__detalle"
-            >Registra tu vehículo y comparte los lugares que te sobran.</span
-          >
-        </span>
-        <q-icon name="chevron_right" size="24px" aria-hidden="true" />
-      </router-link>
-
-      <!-- Datos que se pueden editar -->
-      <q-form class="raite-tarjeta raite-pila" novalidate @submit="guardar">
-        <h2 class="raite-seccion">Tus datos</h2>
-        <div>
-          <label for="perfil-tel" class="raite-etiqueta">Teléfono o WhatsApp</label>
-          <q-input
-            hide-bottom-space
-            for="perfil-tel"
-            v-model="datos.telefono"
-            outlined
-            type="tel"
-            inputmode="tel"
-            mask="### ### ####"
-            unmasked-value
-            input-class="raite-dato"
-            hint="Solo lo ve quien confirme un raite contigo"
-            :error="!!errores.telefono"
-            :error-message="errores.telefono"
-          />
-        </div>
-        <div>
-          <label for="perfil-carrera" class="raite-etiqueta">Carrera</label>
-          <q-input
-            hide-bottom-space
-            for="perfil-carrera"
-            v-model="datos.carrera"
-            outlined
-            maxlength="120"
-            :error="!!errores.carrera"
-            :error-message="errores.carrera"
-          />
-        </div>
-        <fieldset class="perfil__grupo">
-          <legend class="raite-etiqueta">¿Con quién prefieres viajar?</legend>
+        <section
+          v-if="sesion.esAmbos"
+          class="raite-tarjeta raite-pila"
+          aria-labelledby="perfil-uso"
+        >
+          <h2 id="perfil-uso" class="perfil__seccion">Ahora estás usando Raite para</h2>
           <q-btn-toggle
-            v-model="datos.preferencia_compatibilidad"
+            :model-value="sesion.papel"
             class="raite-opciones"
             no-caps
             unelevated
             toggle-color="primary"
             :options="[
-              { label: 'Grupo mixto', value: 'MIXTO' },
-              { label: 'Mismo sexo', value: 'MISMO_SEXO' },
+              { label: 'Pedir raite', value: 'pasajero' },
+              { label: 'Dar raite', value: 'conductor' },
             ]"
+            @update:model-value="cambiarPapel"
           />
-          <p class="raite-ayuda q-mt-sm">
-            Con "mismo sexo" solo verás y compartirás raites donde todos tengan el mismo sexo que
-            tú.
-          </p>
-        </fieldset>
+        </section>
+
+        <router-link v-else-if="!usuario.es_conductor" to="/vehiculo" class="ofrecer">
+          <q-icon name="directions_car" size="28px" aria-hidden="true" />
+          <span class="ofrecer__texto">
+            <span class="ofrecer__titulo">Quiero ofrecer raites</span>
+            <span class="ofrecer__detalle"
+              >Registra tu vehículo y comparte los lugares que te sobran.</span
+            >
+          </span>
+          <q-icon name="chevron_right" size="24px" aria-hidden="true" />
+        </router-link>
+
         <q-btn
-          type="submit"
-          color="primary"
-          unelevated
+          outline
+          color="negative"
           no-caps
-          label="Guardar cambios"
-          :disable="!hayCambios"
-          :loading="guardando"
+          icon="logout"
+          label="Cerrar sesión"
+          class="full-width perfil__salir"
+          :loading="saliendo"
+          @click="salir"
         />
-      </q-form>
+      </aside>
 
-      <section
-        v-if="usuario.vehiculo"
-        class="raite-tarjeta raite-pila"
-        aria-labelledby="perfil-vehiculo"
-      >
-        <div class="row items-center justify-between no-wrap">
-          <h2 id="perfil-vehiculo" class="raite-seccion">Tu vehículo</h2>
-          <q-btn flat no-caps color="primary" icon="edit" label="Editar" to="/vehiculo" />
-        </div>
-        <p class="vehiculo">
-          {{ usuario.vehiculo.marca }} {{ usuario.vehiculo.modelo }}
-          {{ usuario.vehiculo.color.toLowerCase() }} · {{ usuario.vehiculo.asientos_disponibles }}
-          {{ usuario.vehiculo.asientos_disponibles === 1 ? 'asiento' : 'asientos' }}
-          <span class="raite-dato vehiculo__placas">{{ usuario.vehiculo.placas }}</span>
-        </p>
-      </section>
-
-      <q-expansion-item
-        class="raite-tarjeta reportes"
-        icon="flag"
-        label="Mis reportes"
-        :caption="
-          reportes === null
-            ? undefined
-            : reportes.length
-              ? `${reportes.length} enviados`
-              : 'Ninguno'
-        "
-        @before-show="cargarReportes"
-      >
-        <p v-if="reportes === null" class="raite-ayuda q-pa-md">Cargando…</p>
-        <p v-else-if="!reportes.length" class="raite-ayuda q-pa-md">No has enviado reportes.</p>
-        <ul v-else class="reportes__lista">
-          <li v-for="r in reportes" :key="r.id" class="reportes__fila">
+      <!-- Derecha: lo que se puede cambiar -->
+      <div class="perfil__principal">
+        <q-form class="raite-tarjeta perfil__formulario" novalidate @submit="guardar">
+          <h2 class="perfil__seccion">Tus datos</h2>
+          <div class="perfil__campos">
             <div>
-              <p class="text-weight-bold">{{ r.reportado.nombre_completo }}</p>
-              <p class="raite-ayuda">
-                {{ diaCorto(r.created_at) }} · {{ r.motivo.slice(0, 80)
-                }}{{ r.motivo.length > 80 ? '…' : '' }}
-              </p>
+              <label for="perfil-tel" class="raite-etiqueta">Teléfono o WhatsApp</label>
+              <q-input
+                hide-bottom-space
+                for="perfil-tel"
+                v-model="datos.telefono"
+                outlined
+                type="tel"
+                inputmode="tel"
+                mask="### ### ####"
+                unmasked-value
+                input-class="raite-dato"
+                hint="Solo lo ve quien confirme un raite contigo"
+                :error="!!errores.telefono"
+                :error-message="errores.telefono"
+              />
             </div>
-            <span class="reportes__estado">{{ r.estado_display }}</span>
-          </li>
-        </ul>
-      </q-expansion-item>
+            <div>
+              <label for="perfil-carrera" class="raite-etiqueta">Carrera</label>
+              <q-input
+                hide-bottom-space
+                for="perfil-carrera"
+                v-model="datos.carrera"
+                outlined
+                maxlength="120"
+                :error="!!errores.carrera"
+                :error-message="errores.carrera"
+              />
+            </div>
+          </div>
 
-      <q-btn
-        outline
-        color="primary"
-        no-caps
-        icon="logout"
-        label="Cerrar sesión"
-        :loading="saliendo"
-        @click="salir"
-      />
+          <fieldset class="perfil__grupo">
+            <legend class="raite-etiqueta">Con quién viajo</legend>
+            <div class="perfil__preferencias">
+              <button
+                v-for="p in preferencias"
+                :key="p.valor"
+                type="button"
+                class="perfil__preferencia"
+                :aria-pressed="datos.preferencia_compatibilidad === p.valor"
+                @click="datos.preferencia_compatibilidad = p.valor"
+              >
+                <span class="perfil__preferencia-marca" aria-hidden="true">
+                  <q-icon name="check" size="16px" />
+                </span>
+                <span class="perfil__preferencia-texto">
+                  <span class="perfil__preferencia-nombre">{{ p.nombre }}</span>
+                  <span class="perfil__preferencia-detalle">{{ p.detalle }}</span>
+                </span>
+              </button>
+            </div>
+          </fieldset>
+
+          <div class="perfil__acciones">
+            <span v-if="hayCambios" class="raite-ayuda">Tienes cambios sin guardar.</span>
+            <q-btn
+              type="submit"
+              color="primary"
+              unelevated
+              no-caps
+              label="Guardar cambios"
+              class="perfil__guardar"
+              :disable="!hayCambios"
+              :loading="guardando"
+            />
+          </div>
+        </q-form>
+
+        <section
+          v-if="usuario.vehiculo"
+          class="raite-tarjeta perfil__vehiculo"
+          aria-labelledby="perfil-vehiculo"
+        >
+          <span class="perfil__vehiculo-icono" aria-hidden="true">
+            <q-icon name="directions_car" size="28px" />
+          </span>
+          <div class="perfil__vehiculo-datos">
+            <h2 id="perfil-vehiculo" class="perfil__vehiculo-nombre">
+              {{ usuario.vehiculo.marca }} {{ usuario.vehiculo.modelo }}
+              {{ usuario.vehiculo.color.toLowerCase() }}
+            </h2>
+            <p class="raite-ayuda">
+              {{ usuario.vehiculo.asientos_disponibles }}
+              {{ usuario.vehiculo.asientos_disponibles === 1 ? 'asiento' : 'asientos' }} para
+              pasajeros · placas
+              <span class="raite-dato perfil__placas">{{ usuario.vehiculo.placas }}</span>
+            </p>
+          </div>
+          <q-btn outline color="primary" no-caps icon="edit" label="Editar" to="/vehiculo" />
+        </section>
+
+        <q-expansion-item
+          class="raite-tarjeta reportes"
+          icon="flag"
+          label="Mis reportes"
+          :caption="
+            reportes === null
+              ? 'Los que has enviado y su estado'
+              : reportes.length
+                ? `${reportes.length} enviados`
+                : 'Ninguno'
+          "
+          @before-show="cargarReportes"
+        >
+          <p v-if="reportes === null" class="raite-ayuda q-pa-md">Cargando…</p>
+          <p v-else-if="!reportes.length" class="raite-ayuda q-pa-md">No has enviado reportes.</p>
+          <ul v-else class="reportes__lista">
+            <li v-for="r in reportes" :key="r.id" class="reportes__fila">
+              <div>
+                <p class="text-weight-bold">{{ r.reportado.nombre_completo }}</p>
+                <p class="raite-ayuda">
+                  {{ diaCorto(r.created_at) }} · {{ r.motivo.slice(0, 80)
+                  }}{{ r.motivo.length > 80 ? '…' : '' }}
+                </p>
+              </div>
+              <span class="reportes__estado">{{ r.estado_display }}</span>
+            </li>
+          </ul>
+        </q-expansion-item>
+      </div>
     </div>
   </q-page>
 </template>
@@ -169,7 +207,7 @@ import { computed, reactive, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { comoLista, cuenta, reportes as apiReportes } from '@/api';
 import { leerError } from '@/api/errores';
-import type { Papel, Preferencia, Reporte } from '@/api/tipos';
+import { Rol, type Papel, type Preferencia, type Reporte } from '@/api/tipos';
 import AvatarIniciales from '@/components/AvatarIniciales.vue';
 import { useSesionStore } from '@/stores/sesion';
 import { avisarError, avisarExito } from '@/utils/avisar';
@@ -194,6 +232,27 @@ const errores = reactive<Record<string, string>>({});
 const guardando = ref(false);
 const saliendo = ref(false);
 const reportes = ref<Reporte[] | null>(null);
+
+const usoTexto = computed(() => {
+  const rol = usuario.value?.rol;
+  if (rol === Rol.AMBOS) return 'Pedir y dar raite';
+  if (rol === Rol.CONDUCTOR) return 'Dar raite';
+  return 'Pedir raite';
+});
+
+// "Con quién viajo": dos tarjetas en lugar de botones (textos neutros, sin suponer el sexo de nadie).
+const preferencias: { valor: Preferencia; nombre: string; detalle: string }[] = [
+  {
+    valor: 'MIXTO',
+    nombre: 'Grupo mixto',
+    detalle: 'Puedes viajar con cualquier alumno verificado.',
+  },
+  {
+    valor: 'MISMO_SEXO',
+    nombre: 'Mismo sexo',
+    detalle: 'Solo con personas que registraron el mismo sexo que tú. Aplica a todo el viaje.',
+  },
+];
 
 const hayCambios = computed(
   () =>
@@ -243,36 +302,108 @@ async function salir() {
 </script>
 
 <style scoped lang="scss">
-.cabecera {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-.cabecera__datos {
-  flex-grow: 1;
-  min-width: 0;
-  p {
-    margin: 0;
-    overflow-wrap: anywhere;
+// Computadora: resumen a la izquierda (fijo) y datos editables a la derecha.
+.perfil {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+  @media (min-width: 1024px) {
+    grid-template-columns: minmax(300px, 1fr) minmax(0, 2.2fr);
   }
 }
-.cabecera__nombre {
+.perfil__lateral,
+.perfil__principal {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+}
+@media (min-width: 1024px) {
+  .perfil__lateral {
+    position: sticky;
+    top: 104px;
+  }
+}
+.perfil__seccion {
+  margin: 0;
   font-size: 1.125rem;
   font-weight: 700;
+  line-height: 1.3;
 }
-.cabecera__calif {
+
+// --- Resumen ---
+.perfil__resumen {
+  padding: 28px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 4px;
+}
+.perfil__avatar {
+  margin-bottom: 12px;
+  font-size: 2.25rem !important;
+  box-shadow:
+    0 0 0 4px var(--raite-blanco),
+    0 0 0 6px var(--raite-azul-niebla);
+}
+.perfil__nombre {
+  margin: 0;
+  font-size: 1.375rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+.perfil__carrera,
+.perfil__correo {
+  margin: 0;
+  font-size: 0.9375rem;
+  color: var(--raite-gris);
+  overflow-wrap: anywhere;
+}
+.perfil__verificado {
+  margin-top: 8px;
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  font-size: 1.125rem;
-  font-weight: 700;
+  gap: 6px;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: var(--raite-verde-tenue);
+  color: var(--raite-verde-texto);
+  font-size: 0.875rem;
+  font-weight: 600;
 }
+.perfil__cifras {
+  width: 100%;
+  margin: 16px 0 0;
+  padding: 16px 0 0;
+  border-top: 1px solid var(--raite-gris-tenue);
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  dt {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--raite-gris);
+  }
+  dd {
+    margin: 4px 0 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    font-size: 1.0625rem;
+    font-weight: 700;
+  }
+}
+
 .ofrecer {
   display: flex;
   align-items: center;
   gap: 16px;
   padding: 16px;
-  border-radius: 16px;
+  border-radius: 20px;
   background: var(--raite-azul);
   color: var(--raite-blanco);
   text-decoration: none;
@@ -299,22 +430,135 @@ async function salir() {
   font-size: 0.875rem;
   color: var(--raite-azul-niebla);
 }
+.perfil__salir {
+  background: var(--raite-blanco);
+}
+
+// --- Datos ---
+.perfil__formulario {
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.perfil__campos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px 24px;
+}
 .perfil__grupo {
   margin: 0;
   padding: 0;
   border: 0;
+  min-width: 0;
 }
-.vehiculo {
-  margin: 0;
+.perfil__preferencias {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px;
+}
+.perfil__preferencia {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid var(--raite-borde-campo);
+  border-radius: 16px;
+  background: var(--raite-blanco);
+  color: var(--raite-negro);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  &:hover:not([aria-pressed='true']) {
+    background: var(--raite-blanco-hover);
+  }
+  &[aria-pressed='true'] {
+    border-color: var(--raite-azul);
+    background: var(--raite-azul-tenue);
+    box-shadow: inset 0 0 0 1px var(--raite-azul);
+    .perfil__preferencia-nombre {
+      color: var(--raite-azul);
+    }
+    .perfil__preferencia-marca {
+      border-color: var(--raite-azul);
+      background: var(--raite-azul);
+      color: var(--raite-blanco);
+    }
+  }
+}
+.perfil__preferencia-marca {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  margin-top: 1px;
+  border: 2px solid var(--raite-borde-campo);
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: transparent;
+}
+.perfil__preferencia-texto {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.perfil__preferencia-nombre {
+  font-weight: 700;
+}
+.perfil__preferencia-detalle {
+  font-size: 0.875rem;
+  line-height: 1.4;
+  color: var(--raite-gris);
+}
+.perfil__acciones {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 16px;
+}
+.perfil__guardar {
+  min-width: 200px;
+}
+
+// --- Vehículo ---
+.perfil__vehiculo {
+  padding: 20px 24px;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 4px 12px;
+  gap: 16px;
 }
-.vehiculo__placas {
+.perfil__vehiculo-icono {
+  flex: none;
+  width: 56px;
+  height: 56px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--raite-azul-tenue);
+  color: var(--raite-azul);
+}
+.perfil__vehiculo-datos {
+  flex: 1;
+  min-width: 220px;
+  p {
+    margin: 2px 0 0;
+  }
+}
+.perfil__vehiculo-nombre {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+.perfil__placas {
   font-weight: 600;
   letter-spacing: 0.08em;
+  color: var(--raite-negro);
 }
+
+// --- Reportes ---
 .reportes {
   padding: 0;
   overflow: hidden;
