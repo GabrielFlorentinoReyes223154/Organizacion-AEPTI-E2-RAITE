@@ -1,15 +1,16 @@
 <template>
   <q-page>
-    <div v-if="cargando && !viaje" class="raite-contenedor raite-contenedor--angosto">
-      <q-skeleton type="rect" height="140px" class="q-mb-md" style="border-radius: 16px" />
-      <q-skeleton
-        v-for="n in 2"
-        :key="n"
-        type="rect"
-        height="120px"
-        class="q-mb-md"
-        style="border-radius: 16px"
-      />
+    <div v-if="cargando && !viaje" class="raite-contenedor solicitudes">
+      <q-skeleton type="rect" height="220px" class="solicitudes__esqueleto zona-cupo" />
+      <div class="zona-pendientes raite-pila">
+        <q-skeleton
+          v-for="n in 2"
+          :key="n"
+          type="rect"
+          height="96px"
+          class="solicitudes__esqueleto"
+        />
+      </div>
     </div>
 
     <div v-else-if="error" class="raite-contenedor raite-contenedor--angosto">
@@ -20,49 +21,48 @@
       </EstadoVacio>
     </div>
 
-    <template v-else-if="viaje">
-      <!-- Cupo a la vista -->
-      <section class="cupo" aria-labelledby="sol-cupo">
-        <div class="cupo__contenido">
-          <p class="cupo__viaje">
-            <span
-              >{{ diaCorto(viaje.fecha_hora) }} ·
-              <span class="raite-dato">{{ hora(viaje.fecha_hora) }}</span></span
-            >
-            <PlacaCampus :codigo="viaje.campus.codigo" :nombre="viaje.campus.nombre" clara />
-          </p>
-          <p class="cupo__punto">{{ viaje.punto_referencia.nombre }}</p>
-          <h2 id="sol-cupo" class="cupo__titulo">
-            {{ ocupados }} de {{ viaje.lugares_ofrecidos }} lugares ocupados
-          </h2>
-          <ul class="cupo__asientos">
-            <li
-              v-for="(asiento, i) in asientos"
-              :key="i"
-              :class="asiento ? 'cupo__asiento cupo__asiento--ocupado' : 'cupo__asiento'"
-            >
-              <template v-if="asiento">
-                <span class="cupo__iniciales" aria-hidden="true">{{
-                  iniciales(asiento.nombre_completo)
-                }}</span>
-                <span class="cupo__nombre">{{ asiento.nombre }}</span>
-              </template>
-              <span v-else>Libre</span>
-            </li>
-          </ul>
-        </div>
+    <div v-else-if="viaje" class="raite-contenedor solicitudes">
+      <!-- Cupo a la vista: un asiento por lugar ofrecido -->
+      <section class="cupo zona-cupo raite-sobre-azul" aria-labelledby="sol-cupo">
+        <p class="cupo__viaje">
+          <span
+            >{{ diaCorto(viaje.fecha_hora) }} ·
+            <span class="raite-dato">{{ hora(viaje.fecha_hora) }}</span></span
+          >
+          <PlacaCampus :codigo="viaje.campus.codigo" :nombre="viaje.campus.nombre" clara />
+        </p>
+        <p class="cupo__punto">{{ viaje.punto_referencia.nombre }}</p>
+        <h2 id="sol-cupo" class="cupo__titulo">
+          {{ ocupados }} de {{ viaje.lugares_ofrecidos }} lugares ocupados
+        </h2>
+        <ul class="cupo__asientos">
+          <li
+            v-for="(asiento, i) in asientos"
+            :key="i"
+            :class="asiento ? 'cupo__asiento cupo__asiento--ocupado' : 'cupo__asiento'"
+          >
+            <template v-if="asiento">
+              <span class="cupo__iniciales" aria-hidden="true">{{
+                iniciales(asiento.nombre_completo)
+              }}</span>
+              <span class="cupo__nombre">{{ asiento.nombre }}</span>
+            </template>
+            <span v-else>Libre</span>
+          </li>
+        </ul>
       </section>
 
-      <div class="raite-contenedor raite-contenedor--angosto raite-pila">
-        <h2 class="raite-seccion">Quieren un lugar · {{ pendientes.length }}</h2>
+      <!-- Por responder -->
+      <section class="zona-pendientes raite-pila" aria-labelledby="sol-pendientes">
+        <h2 id="sol-pendientes" class="solicitudes__seccion">
+          Quieren un lugar · {{ pendientes.length }}
+        </h2>
 
-        <EstadoVacio
-          v-if="!pendientes.length"
-          icono="inbox"
-          titulo="No hay solicitudes por responder"
-        >
-          Te avisamos con la campanita cuando alguien pida lugar.
-        </EstadoVacio>
+        <div v-if="!pendientes.length" class="raite-tarjeta">
+          <EstadoVacio icono="inbox" titulo="No hay solicitudes por responder">
+            Te avisamos con la campanita cuando alguien pida lugar.
+          </EstadoVacio>
+        </div>
 
         <ul v-else class="lista">
           <li v-for="s in pendientes" :key="s.id">
@@ -71,7 +71,7 @@
               :aria-label="`Solicitud de ${s.pasajero.nombre_completo}`"
             >
               <div class="solicitud__persona">
-                <AvatarIniciales :nombre="s.pasajero.nombre_completo" />
+                <AvatarIniciales :nombre="s.pasajero.nombre_completo" :tam="52" />
                 <div class="solicitud__datos">
                   <p class="solicitud__nombre">{{ s.pasajero.nombre_completo }}</p>
                   <p class="raite-ayuda solicitud__resumen">
@@ -108,12 +108,21 @@
         <p v-if="pendientes.length && !libres" class="raite-ayuda">
           Ya no tienes lugares libres. Rechaza las demás o edita el viaje para ofrecer más.
         </p>
+      </section>
 
-        <template v-if="confirmados.length">
-          <h2 class="raite-seccion q-mt-md">Confirmados · {{ confirmados.length }}</h2>
+      <!-- Confirmados, respondidas y cuándo se puede iniciar -->
+      <div class="zona-extras raite-pila">
+        <section
+          v-if="confirmados.length"
+          class="raite-tarjeta raite-pila"
+          aria-labelledby="sol-confirmados"
+        >
+          <h2 id="sol-confirmados" class="solicitudes__seccion">
+            Confirmados · {{ confirmados.length }}
+          </h2>
           <ul class="lista">
-            <li v-for="s in confirmados" :key="s.id" class="raite-tarjeta confirmado">
-              <AvatarIniciales :nombre="s.pasajero.nombre_completo" :tam="40" tono="verde" />
+            <li v-for="s in confirmados" :key="s.id" class="confirmado">
+              <AvatarIniciales :nombre="s.pasajero.nombre_completo" :tam="44" tono="verde" />
               <div class="solicitud__datos">
                 <p class="solicitud__nombre">{{ s.pasajero.nombre_completo }}</p>
                 <p class="raite-dato confirmado__telefono">{{ telefono(s.pasajero.telefono) }}</p>
@@ -129,17 +138,21 @@
               />
             </li>
           </ul>
-        </template>
+        </section>
 
-        <template v-if="respondidas.length">
-          <h2 class="raite-seccion q-mt-md">Respondidas</h2>
-          <ul class="lista">
+        <section
+          v-if="respondidas.length"
+          class="raite-tarjeta raite-pila"
+          aria-labelledby="sol-respondidas"
+        >
+          <h2 id="sol-respondidas" class="solicitudes__seccion">Respondidas</h2>
+          <ul class="lista lista--compacta">
             <li v-for="s in respondidas" :key="s.id" class="respondida">
               <span>{{ s.pasajero.nombre_completo }}</span>
               <ChipEstado :estado="s.estado" />
             </li>
           </ul>
-        </template>
+        </section>
 
         <p v-if="viaje.estado === 'PUBLICADO'" class="raite-ayuda nota-inicio">
           <q-icon name="schedule" size="18px" aria-hidden="true" />
@@ -147,12 +160,13 @@
           solicitudes que sigan pendientes se rechazan al iniciar.
         </p>
       </div>
-    </template>
+    </div>
   </q-page>
 </template>
 
 <script setup lang="ts">
-// Solicitudes del conductor (RF-06), variante B: el cupo como asientos y la lista para responder.
+// Solicitudes del conductor (RF-06): el cupo como asientos y la lista para responder.
+// Computadora: cupo y confirmados a la izquierda, por responder a la derecha.
 // Aceptar responde 409 si otro aceptó antes el último lugar (el backend bloquea el viaje).
 import { computed, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
@@ -244,20 +258,52 @@ async function rechazar(s: Solicitud) {
 </script>
 
 <style scoped lang="scss">
-.cupo {
-  background: var(--raite-azul);
-  color: var(--raite-blanco);
+// Computadora: cupo y confirmados a la izquierda, solicitudes por responder a la derecha.
+// Celular: una columna en el orden cupo, por responder y lo demás.
+.solicitudes {
+  max-width: none;
+  margin: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+  @media (min-width: 1024px) {
+    grid-template-columns: minmax(360px, 2fr) minmax(0, 3fr);
+    grid-template-areas:
+      'cupo pendientes'
+      'extras pendientes';
+    grid-template-rows: auto 1fr;
+    .zona-cupo {
+      grid-area: cupo;
+    }
+    .zona-pendientes {
+      grid-area: pendientes;
+    }
+    .zona-extras {
+      grid-area: extras;
+    }
+  }
 }
-.cupo__contenido {
-  max-width: 720px;
-  margin: 0 auto;
-  padding: 8px 16px 20px;
+.solicitudes__esqueleto {
+  border-radius: 20px;
+}
+.solicitudes__seccion {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+// --- Cupo (tarjeta azul) ---
+.cupo {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  @media (min-width: 600px) {
-    padding: 16px 24px 28px;
-  }
+  padding: 24px;
+  border-radius: 24px;
+  background: var(--raite-azul);
+  color: var(--raite-blanco);
+  box-shadow: var(--raite-sombra-destacada);
 }
 .cupo__viaje {
   margin: 0;
@@ -265,17 +311,17 @@ async function rechazar(s: Solicitud) {
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  font-size: 1.125rem;
+  font-size: 1.25rem;
   font-weight: 700;
 }
 .cupo__punto {
   margin: 0;
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
   color: var(--raite-azul-niebla);
 }
 .cupo__titulo {
-  margin: 8px 0 4px;
-  font-size: 1rem;
+  margin: 12px 0 4px;
+  font-size: 1.0625rem;
   font-weight: 700;
 }
 .cupo__asientos {
@@ -283,11 +329,11 @@ async function rechazar(s: Solicitud) {
   padding: 0;
   list-style: none;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(64px, 1fr));
-  gap: 8px;
+  grid-template-columns: repeat(auto-fit, minmax(72px, 1fr));
+  gap: 10px;
 }
 .cupo__asiento {
-  height: 72px;
+  height: 84px;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -295,7 +341,7 @@ async function rechazar(s: Solicitud) {
   justify-content: center;
   gap: 2px;
   border: 2px dashed var(--raite-azul-niebla);
-  border-radius: 12px;
+  border-radius: 16px;
   font-size: 0.875rem;
   font-weight: 600;
   color: var(--raite-azul-niebla);
@@ -306,7 +352,7 @@ async function rechazar(s: Solicitud) {
   color: var(--raite-negro);
 }
 .cupo__iniciales {
-  font-size: 1.125rem;
+  font-size: 1.25rem;
   font-weight: 700;
 }
 .cupo__nombre {
@@ -317,6 +363,7 @@ async function rechazar(s: Solicitud) {
   text-overflow: ellipsis;
 }
 
+// --- Listas ---
 .lista {
   margin: 0;
   padding: 0;
@@ -325,16 +372,23 @@ async function rechazar(s: Solicitud) {
   flex-direction: column;
   gap: 12px;
 }
+.lista--compacta {
+  gap: 0;
+}
 .solicitud {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding-bottom: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 16px;
+  padding: 16px 20px;
 }
 .solicitud__persona {
+  flex: 1 1 260px;
+  min-width: 0;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
 }
 .solicitud__datos {
   flex-grow: 1;
@@ -344,6 +398,7 @@ async function rechazar(s: Solicitud) {
   }
 }
 .solicitud__nombre {
+  font-size: 1.0625rem;
   font-weight: 700;
 }
 .solicitud__resumen {
@@ -353,15 +408,15 @@ async function rechazar(s: Solicitud) {
 }
 .solicitud__acciones {
   display: flex;
-  justify-content: space-between;
   gap: 8px;
-  margin-left: -8px;
+  > .q-btn {
+    min-width: 120px;
+  }
 }
 .confirmado {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px 16px;
 }
 .confirmado__telefono {
   color: var(--raite-azul);
@@ -372,14 +427,16 @@ async function rechazar(s: Solicitud) {
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  padding: 4px 0;
-  border-bottom: 1px solid var(--raite-borde-sutil);
+  padding: 10px 0;
+  border-bottom: 1px solid var(--raite-gris-tenue);
   font-weight: 600;
+  &:last-child {
+    border-bottom: 0;
+  }
 }
 .nota-inicio {
   display: flex;
   gap: 8px;
   align-items: flex-start;
-  margin-top: 8px;
 }
 </style>
