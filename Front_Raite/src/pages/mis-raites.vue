@@ -1,10 +1,26 @@
 <template>
-  <q-page class="raite-contenedor raite-contenedor--angosto">
-    <h1 class="raite-titulo gt-sm">Mis raites</h1>
+  <q-page class="raite-contenedor raite-contenedor--ancho">
+    <header class="raite-cabecera">
+      <div class="gt-sm">
+        <h1 class="raite-titulo">Mis raites</h1>
+        <p class="raite-cabecera__texto">{{ resumen }}</p>
+      </div>
+      <q-btn
+        color="primary"
+        unelevated
+        no-caps
+        icon="search"
+        label="Buscar raite"
+        to="/buscar"
+        class="raite-btn-xl mis-raites__accion"
+      />
+    </header>
 
-    <div v-if="cargando && !lista.length" class="raite-pila">
-      <q-skeleton v-for="n in 3" :key="n" type="rect" height="180px" style="border-radius: 16px" />
-    </div>
+    <ul v-if="cargando && !lista.length" class="raite-rejilla-tarjetas">
+      <li v-for="n in 3" :key="n">
+        <q-skeleton type="rect" height="200px" style="border-radius: 20px" />
+      </li>
+    </ul>
 
     <EstadoVacio v-else-if="error" icono="cloud_off" :titulo="error">
       <template #acciones>
@@ -26,7 +42,7 @@
     <template v-else>
       <section v-if="activas.length" class="raite-pila" aria-labelledby="mr-activas">
         <h2 id="mr-activas" class="raite-seccion">Próximos</h2>
-        <ul class="lista">
+        <ul class="raite-rejilla-tarjetas">
           <li v-for="s in activas" :key="s.id">
             <TarjetaViaje :viaje="s.viaje" :to="`/viajes/${s.viaje.id}`">
               <template #estado><ChipEstado :estado="s.estado" /></template>
@@ -42,7 +58,7 @@
 
       <section v-if="anteriores.length" class="raite-pila q-mt-xl" aria-labelledby="mr-anteriores">
         <h2 id="mr-anteriores" class="raite-seccion">Respondidas y canceladas</h2>
-        <ul class="lista">
+        <ul class="raite-rejilla-tarjetas">
           <li v-for="s in anteriores" :key="s.id">
             <TarjetaViaje :viaje="s.viaje" :to="`/viajes/${s.viaje.id}`" compacta>
               <template #estado><ChipEstado :estado="s.estado" /></template>
@@ -78,6 +94,13 @@ const activas = computed(() =>
     .filter((s) => (s.estado === 'PENDIENTE' || s.estado === 'ACEPTADA') && vigente(s))
     .sort((a, b) => a.viaje.fecha_hora.localeCompare(b.viaje.fecha_hora)),
 );
+const resumen = computed(() => {
+  if (cargando.value && !lista.value.length) return 'Cargando tus solicitudes…';
+  const n = activas.value.length;
+  if (!n) return 'No tienes raites próximos.';
+  const aceptados = activas.value.filter((s) => s.estado === 'ACEPTADA').length;
+  return `${n} ${n === 1 ? 'raite próximo' : 'raites próximos'}, ${aceptados} ${aceptados === 1 ? 'aceptado' : 'aceptados'}.`;
+});
 const anteriores = computed(() =>
   lista.value
     .filter((s) => (s.estado === 'RECHAZADA' || s.estado === 'CANCELADA') && vigente(s))
@@ -99,12 +122,7 @@ onMounted(() => void cargar());
 </script>
 
 <style scoped lang="scss">
-.lista {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+.mis-raites__accion {
+  padding: 0 28px;
 }
 </style>
