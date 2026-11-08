@@ -161,32 +161,27 @@ const atras = computed(() => route.meta.atras);
 const titulo = computed(() => route.meta.titulo ?? 'Raite');
 const esConductor = computed(() => sesion.papel === 'conductor');
 
-const pestanas = computed(() =>
+const INICIO = { ruta: '/inicio', texto: 'Inicio', icono: 'home' };
+const HISTORIAL = { ruta: '/historial', texto: 'Historial', icono: 'history' };
+const AVISOS = { ruta: '/avisos', texto: 'Avisos', icono: 'notifications_none' };
+const PERFIL = { ruta: '/perfil', texto: 'Perfil', icono: 'person_outline' };
+
+const propias = computed(() =>
   esConductor.value
     ? [
         { ruta: '/mis-viajes', texto: 'Mis viajes', icono: 'directions_car' },
         { ruta: '/publicar', texto: 'Publicar', icono: 'add_circle_outline' },
-        { ruta: '/historial', texto: 'Historial', icono: 'history' },
-        { ruta: '/perfil', texto: 'Perfil', icono: 'person_outline' },
       ]
     : [
         { ruta: '/buscar', texto: 'Buscar raite', icono: 'search' },
         { ruta: '/mis-raites', texto: 'Mis raites', icono: 'receipt_long' },
-        { ruta: '/historial', texto: 'Historial', icono: 'history' },
-        { ruta: '/perfil', texto: 'Perfil', icono: 'person_outline' },
       ],
 );
 
-// En el menú lateral también van los avisos (en celular se abren con la campanita).
-const menu = computed(() => {
-  const lista = [...pestanas.value];
-  lista.splice(lista.length - 1, 0, {
-    ruta: '/avisos',
-    texto: 'Avisos',
-    icono: 'notifications_none',
-  });
-  return lista;
-});
+// Barra inferior (celular): cuatro pestañas; Historial y Avisos se abren desde Inicio y la campanita.
+const pestanas = computed(() => [INICIO, ...propias.value, PERFIL]);
+// Menú lateral (computadora): todo.
+const menu = computed(() => [INICIO, ...propias.value, HISTORIAL, AVISOS, PERFIL]);
 
 const contador = computed(() => (avisos.noLeidas > 9 ? '9+' : String(avisos.noLeidas)));
 const etiquetaAvisos = computed(() =>
