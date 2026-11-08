@@ -36,32 +36,37 @@ function elegir(papel: Papel) {
 </script>
 
 <style scoped lang="scss">
+// Píldoras sobre fondo claro: la opción elegida en azul con texto blanco (9.56:1),
+// la otra en azul sobre azul tenue (8.12:1). Sobre la barra azul tenue de escritorio el fondo pasa a blanco.
 .cambio-rol {
   display: inline-flex;
   flex-shrink: 0;
-  padding: 2px;
-  border-radius: 12px;
-  background: var(--raite-azul-hondo);
+  gap: 2px;
+  padding: 3px;
+  border-radius: 999px;
+  background: var(--raite-azul-tenue);
 }
 .cambio-rol__opcion {
-  height: 44px;
-  padding: 0 12px;
+  height: 40px;
+  padding: 0 14px;
   border: 0;
-  border-radius: 9px;
+  border-radius: 999px;
   background: transparent;
-  color: var(--raite-azul-niebla);
+  color: var(--raite-azul);
   font: inherit;
   font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: 700;
   white-space: nowrap;
   cursor: pointer;
+  &:hover:not([aria-pressed='true']) {
+    background: var(--raite-azul-tenue-hover);
+  }
   &[aria-pressed='true'] {
-    background: var(--raite-amarillo);
-    color: var(--raite-negro);
-    font-weight: 700;
+    background: var(--raite-azul);
+    color: var(--raite-blanco);
   }
   &:focus-visible {
-    outline: 2px solid var(--raite-amarillo);
+    outline: 2px solid var(--raite-azul);
     outline-offset: 2px;
   }
 }
