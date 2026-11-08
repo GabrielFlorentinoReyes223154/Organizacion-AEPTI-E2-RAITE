@@ -1,68 +1,110 @@
 <template>
-  <q-page class="raite-contenedor raite-contenedor--formulario">
-    <div v-if="cargando" class="raite-pila">
-      <q-skeleton type="rect" height="80px" style="border-radius: 16px" />
-      <q-skeleton type="rect" height="160px" style="border-radius: 16px" />
+  <q-page class="raite-contenedor raite-contenedor--ancho">
+    <div v-if="cargando" class="reportar">
+      <q-skeleton type="rect" height="420px" style="border-radius: 20px" />
+      <q-skeleton type="rect" height="240px" style="border-radius: 20px" />
     </div>
 
-    <EstadoVacio
-      v-else-if="!personas.length"
-      icono="flag"
-      titulo="No hay a quién reportar en este viaje"
-    >
-      Solo puedes reportar a alguien con quien compartiste un raite confirmado.
-    </EstadoVacio>
+    <div v-else-if="!personas.length" class="raite-tarjeta reportar__vacio">
+      <EstadoVacio icono="flag" titulo="No hay a quién reportar en este viaje">
+        Solo puedes reportar a alguien con quien compartiste un raite confirmado.
+      </EstadoVacio>
+    </div>
 
-    <q-form v-else class="raite-pila raite-pila--grupos" novalidate @submit="enviar">
-      <div class="riesgo" role="note">
-        <q-icon name="emergency" size="24px" aria-hidden="true" />
-        <p>
-          <strong>¿Estás en peligro ahora?</strong> Llama al 911 o pide ayuda a la seguridad de tu
-          campus. Este reporte no llega de inmediato.
-        </p>
-      </div>
+    <div v-else class="reportar">
+      <q-form class="raite-tarjeta reportar__formulario" novalidate @submit="enviar">
+        <fieldset class="reportar__grupo">
+          <legend class="raite-etiqueta">¿A quién quieres reportar?</legend>
+          <div class="reportar__personas">
+            <button
+              v-for="p in personas"
+              :key="p.id"
+              type="button"
+              class="reportar__persona"
+              :aria-pressed="reportado === p.id"
+              @click="reportado = p.id"
+            >
+              <AvatarIniciales :nombre="p.nombre_completo" :tam="44" />
+              <span class="reportar__persona-texto">
+                <span class="reportar__persona-nombre">{{ p.nombre_completo }}</span>
+                <span class="reportar__persona-detalle">{{ p.carrera }}</span>
+              </span>
+              <span class="reportar__marca" aria-hidden="true">
+                <q-icon name="check" size="16px" />
+              </span>
+            </button>
+          </div>
+          <p v-if="errores.reportado" class="reportar__error" role="alert">
+            {{ errores.reportado }}
+          </p>
+        </fieldset>
 
-      <fieldset class="reportar__grupo">
-        <legend class="raite-etiqueta">¿A quién quieres reportar?</legend>
-        <q-option-group v-model="reportado" :options="opciones" type="radio" color="primary" />
-        <p v-if="errores.reportado" class="reportar__error" role="alert">{{ errores.reportado }}</p>
-      </fieldset>
+        <div>
+          <label for="rep-motivo" class="raite-etiqueta">¿Qué pasó?</label>
+          <q-input
+            hide-bottom-space
+            for="rep-motivo"
+            v-model="motivo"
+            outlined
+            type="textarea"
+            autogrow
+            input-style="min-height: 140px"
+            maxlength="1000"
+            counter
+            hint="Cuéntalo con tus palabras: qué pasó y cuándo."
+            :error="!!errores.motivo"
+            :error-message="errores.motivo"
+          />
+        </div>
 
-      <div>
-        <label for="rep-motivo" class="raite-etiqueta">¿Qué pasó?</label>
-        <q-input
-          hide-bottom-space
-          for="rep-motivo"
-          v-model="motivo"
-          outlined
-          type="textarea"
-          autogrow
-          maxlength="1000"
-          counter
-          hint="Cuéntalo con tus palabras: qué pasó y cuándo."
-          :error="!!errores.motivo"
-          :error-message="errores.motivo"
-        />
-      </div>
+        <q-banner
+          v-if="mensaje"
+          class="bg-rojo-tenue text-rojo-texto rounded-borders"
+          role="alert"
+          >{{ mensaje }}</q-banner
+        >
 
-      <p class="raite-ayuda">
-        La persona reportada no sabrá quién la reportó. El equipo de Raite revisa cada caso.
-      </p>
+        <div class="reportar__acciones">
+          <q-btn
+            type="submit"
+            color="primary"
+            unelevated
+            no-caps
+            label="Enviar reporte"
+            class="raite-btn-xl reportar__enviar"
+            :loading="enviando"
+          />
+        </div>
+      </q-form>
 
-      <q-banner v-if="mensaje" class="bg-rojo-tenue text-rojo-texto rounded-borders" role="alert">{{
-        mensaje
-      }}</q-banner>
+      <aside class="reportar__lateral">
+        <div class="riesgo" role="note">
+          <q-icon name="emergency" size="28px" aria-hidden="true" />
+          <p>
+            <strong>¿Estás en peligro ahora?</strong> Llama al 911 o pide ayuda a la seguridad de tu
+            campus. Este reporte no llega de inmediato.
+          </p>
+        </div>
 
-      <q-btn
-        type="submit"
-        color="primary"
-        unelevated
-        no-caps
-        label="Enviar reporte"
-        :loading="enviando"
-        class="full-width"
-      />
-    </q-form>
+        <section class="raite-tarjeta reportar__pasos" aria-labelledby="rep-despues">
+          <h2 id="rep-despues" class="reportar__pasos-titulo">Qué pasa después</h2>
+          <ol class="reportar__lista">
+            <li>
+              <span class="reportar__numero" aria-hidden="true">1</span>
+              <span>El equipo de Raite revisa cada caso.</span>
+            </li>
+            <li>
+              <span class="reportar__numero" aria-hidden="true">2</span>
+              <span>La persona reportada no sabrá quién la reportó.</span>
+            </li>
+            <li>
+              <span class="reportar__numero" aria-hidden="true">3</span>
+              <span>Puedes ver el estado de tu reporte en Perfil, en "Mis reportes".</span>
+            </li>
+          </ol>
+        </section>
+      </aside>
+    </div>
   </q-page>
 </template>
 
@@ -73,6 +115,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { reportes, viajes } from '@/api';
 import { leerError } from '@/api/errores';
 import type { UsuarioPublico, ViajeDetalle } from '@/api/tipos';
+import AvatarIniciales from '@/components/AvatarIniciales.vue';
 import EstadoVacio from '@/components/EstadoVacio.vue';
 import { useSesionStore } from '@/stores/sesion';
 import { avisarExito } from '@/utils/avisar';
@@ -100,9 +143,6 @@ const personas = computed<UsuarioPublico[]>(() => {
     ? [viaje.value.conductor]
     : [];
 });
-const opciones = computed(() =>
-  personas.value.map((p) => ({ label: p.nombre_completo, value: p.id })),
-);
 
 onMounted(async () => {
   try {
@@ -142,30 +182,155 @@ async function enviar() {
 </script>
 
 <style scoped lang="scss">
-.riesgo {
-  display: flex;
-  gap: 12px;
-  align-items: flex-start;
-  padding: 16px;
-  border-radius: 16px;
-  background: var(--raite-rojo-tenue);
-  color: var(--raite-rojo-texto);
-  p {
-    margin: 0;
-    line-height: 1.4;
+// Computadora: el reporte a la izquierda; el aviso de emergencia y qué sigue a la derecha.
+.reportar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+  @media (min-width: 1024px) {
+    grid-template-columns: minmax(0, 2fr) minmax(320px, 1fr);
   }
+}
+.reportar__vacio {
+  max-width: 640px;
+}
+.reportar__formulario {
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
 }
 .reportar__grupo {
   margin: 0;
   padding: 0;
   border: 0;
-  :deep(.q-radio) {
-    min-height: 48px;
+  min-width: 0;
+}
+.reportar__personas {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+}
+.reportar__persona {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--raite-borde-campo);
+  border-radius: 16px;
+  background: var(--raite-blanco);
+  color: var(--raite-negro);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  &:hover:not([aria-pressed='true']) {
+    background: var(--raite-blanco-hover);
   }
+  &[aria-pressed='true'] {
+    border-color: var(--raite-azul);
+    background: var(--raite-azul-tenue);
+    box-shadow: inset 0 0 0 1px var(--raite-azul);
+    .reportar__marca {
+      border-color: var(--raite-azul);
+      background: var(--raite-azul);
+      color: var(--raite-blanco);
+    }
+  }
+}
+.reportar__persona-texto {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.reportar__persona-nombre {
+  font-weight: 700;
+}
+.reportar__persona-detalle {
+  font-size: 0.875rem;
+  color: var(--raite-gris);
+}
+.reportar__marca {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--raite-borde-campo);
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: transparent;
 }
 .reportar__error {
   margin: 8px 0 0;
   font-size: 0.875rem;
   color: var(--raite-rojo-texto);
+}
+.reportar__acciones {
+  display: flex;
+  justify-content: flex-end;
+}
+.reportar__enviar {
+  min-width: 240px;
+}
+
+// --- Columna derecha ---
+.reportar__lateral {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  @media (min-width: 1024px) {
+    position: sticky;
+    top: 104px;
+  }
+}
+.riesgo {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 20px;
+  border-radius: 20px;
+  background: var(--raite-rojo-tenue);
+  color: var(--raite-rojo-texto);
+  p {
+    margin: 0;
+    line-height: 1.45;
+  }
+}
+.reportar__pasos {
+  padding: 24px;
+}
+.reportar__pasos-titulo {
+  margin: 0 0 16px;
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+.reportar__lista {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  li {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    line-height: 1.45;
+  }
+}
+.reportar__numero {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--raite-azul-tenue);
+  color: var(--raite-azul);
+  font-size: 0.875rem;
+  font-weight: 700;
 }
 </style>
