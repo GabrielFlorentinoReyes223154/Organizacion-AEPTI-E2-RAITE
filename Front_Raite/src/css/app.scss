@@ -151,12 +151,11 @@ a {
 }
 
 // --- Foco visible: azul sobre claro, amarillo sobre azul ---
+// El encabezado y la barra inferior son claros desde el rediseño; solo lo marcado con .raite-sobre-azul usa amarillo.
 :focus-visible {
   outline: 2px solid var(--raite-azul);
   outline-offset: 2px;
 }
-.q-header,
-.q-footer,
 .raite-sobre-azul {
   :focus-visible {
     outline-color: var(--raite-amarillo);
@@ -169,14 +168,15 @@ a {
   outline: 2px solid var(--raite-azul) !important;
   outline-offset: 2px;
 }
-.q-header,
-.q-footer,
 .raite-sobre-azul {
   .q-btn:focus-visible,
   .q-tab:focus-visible {
     outline-color: var(--raite-amarillo) !important;
     outline-offset: -2px;
   }
+}
+.q-footer .q-tab:focus-visible {
+  outline-offset: -2px;
 }
 
 // --- Sin MAYÚSCULAS (la regla sin gritos) ---
