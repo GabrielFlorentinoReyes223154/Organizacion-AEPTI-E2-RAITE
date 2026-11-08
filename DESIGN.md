@@ -441,9 +441,17 @@ Todo vive en `layouts/AppLayout.vue`.
 - **Barra superior en computadora:** azul tenue, 72px, contenido centrado a 1280px. Logo (versión para fondo claro, `assets/logo-raite.png`, 48px de alto) que lleva a `/`; a la derecha el cambio de papel, la campanita (botón redondo blanco) y una píldora blanca con las iniciales en un círculo azul y el nombre corto ("Valeria R.") que lleva a Perfil.
 - **Menú lateral en computadora:** tarjeta blanca de 240px, fija al desplazarse, con el papel arriba ("Como pasajero" / "Como conductor"), las mismas entradas que la barra inferior más Avisos (con contador amarillo tenue) y, separado, "Cerrar sesión" en rojo texto. La entrada activa lleva fondo azul tenue y texto azul. En pantallas secundarias, arriba del contenido van "Regresar" y el título de la pantalla.
 - **Barra inferior en celular** (`q-footer` + `q-tabs` con ícono y texto): blanca, 72px, con una línea `borde-sutil` arriba y cuatro pestañas. Las inactivas van en gris UACJ; la activa en azul con el texto en negritas y un punto azul de 5px debajo.
-  - Como pasajero: Buscar raite · Mis raites · Historial · Perfil.
-  - Como conductor: Mis viajes · Publicar · Historial · Perfil.
-  - Los avisos no van en la barra: se abren con la campanita.
+  - Como pasajero: Inicio · Buscar raite · Mis raites · Perfil.
+  - Como conductor: Inicio · Mis viajes · Publicar · Perfil.
+  - Historial y Avisos no van en la barra: se abren desde Inicio y con la campanita. En el menú lateral de computadora sí aparecen (Inicio, las dos del papel, Historial, Avisos, Perfil).
+
+### Inicio (`/inicio`)
+Es la pantalla a la que llevan `/` y el inicio de sesión, para los dos papeles; su contenido cambia con el papel activo.
+- **Cabecera:** la fecha ("Hoy, sábado 7 de noviembre"), "Hola, Nombre" y la acción principal a la derecha ("Buscar raite" o "Publicar viaje", `raite-btn-xl`).
+- **Cifras (solo conductor):** cuatro tarjetas con ícono en círculo de color tenue: solicitudes por responder (amarillo), viajes próximos (azul), lugares ocupados (verde) y su calificación (azul).
+- **Tarjeta destacada** (`TarjetaDestacada`, 3/5 del ancho): el próximo raite del pasajero (su solicitud aceptada o pendiente más cercana, con conductor, calificación y auto) o el próximo viaje del conductor (lugares ocupados y solicitudes por responder; el botón lleva a las solicitudes si hay). Sin nada próximo, invita a buscar o publicar.
+- **Pendientes** (2/5): calificaciones por hacer (fondo amarillo tenue, botón negro "Calificar"), solicitudes en espera (pasajero) o viajes con solicitudes por responder (conductor). Sin nada, "Todo al día" en verde. Abajo, el enlace a los avisos.
+- **Accesos rápidos:** seis cuadros blancos de 128px con ícono en círculo azul tenue.
 - **Cambio de papel:** con rol AMBOS, un par de píldoras "Pido raite / Doy raite". La elegida va en azul con texto blanco y la otra en azul sobre azul tenue (en la barra de computadora el fondo del control es blanco). En celular ocupa una segunda fila del encabezado a todo el ancho; en computadora va en la barra superior. Se nombra por lo que haces y no por género. El mismo control está en Perfil.
 - **Foco:** el encabezado y la barra inferior son claros, así que el foco ahí es azul. El amarillo queda solo para lo marcado con `.raite-sobre-azul`.
 

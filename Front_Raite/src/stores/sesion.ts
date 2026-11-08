@@ -46,9 +46,9 @@ export const useSesionStore = defineStore('sesion', {
       if (s.usuario.rol === Rol.AMBOS) return s.papelElegido;
       return s.usuario.es_conductor ? 'conductor' : 'pasajero';
     },
-    /** Pantalla de inicio según el papel. */
+    /** Pantalla de inicio: la misma para los dos papeles; su contenido cambia según el papel. */
     inicio(): string {
-      return this.papel === 'conductor' ? '/mis-viajes' : '/buscar';
+      return '/inicio';
     },
   },
 
