@@ -132,7 +132,7 @@
               class="cuerpo__regresar"
               @click="regresar"
             />
-            <h1 class="raite-titulo q-mb-none">{{ titulo }}</h1>
+            <h1 class="raite-titulo cuerpo__titulo">{{ titulo }}</h1>
           </div>
           <slot />
         </div>
@@ -392,8 +392,12 @@ onBeforeUnmount(() => avisos.detener());
 .cuerpo__regresar {
   margin-left: -12px;
 }
+.cuerpo__titulo {
+  margin-bottom: 0;
+}
 // La página que sigue ya no repite el margen de arriba: el título queda cerca de su contenido.
-.cuerpo__atras + :deep(.q-page.raite-contenedor) {
+.cuerpo__atras + :deep(.q-page.raite-contenedor),
+.cuerpo__atras + :deep(.q-page > .raite-contenedor) {
   padding-top: 16px;
 }
 

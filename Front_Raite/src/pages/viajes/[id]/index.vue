@@ -1,9 +1,14 @@
 <template>
-  <q-page :class="{ 'con-barra': hayBarra }">
-    <div v-if="cargando && !viaje" class="raite-contenedor raite-contenedor--angosto">
-      <q-skeleton type="rect" height="180px" class="q-mb-md" style="border-radius: 16px" />
-      <q-skeleton type="rect" height="96px" class="q-mb-md" style="border-radius: 16px" />
-      <q-skeleton type="rect" height="140px" style="border-radius: 16px" />
+  <q-page class="detalle" :class="{ 'con-barra': hayBarra }">
+    <div v-if="cargando && !viaje" class="raite-contenedor detalle__rejilla">
+      <div class="raite-pila">
+        <q-skeleton type="rect" height="240px" class="detalle__esqueleto" />
+        <q-skeleton type="rect" height="320px" class="detalle__esqueleto" />
+      </div>
+      <div class="raite-pila">
+        <q-skeleton type="rect" height="140px" class="detalle__esqueleto" />
+        <q-skeleton type="rect" height="120px" class="detalle__esqueleto" />
+      </div>
     </div>
 
     <div v-else-if="error" class="raite-contenedor raite-contenedor--angosto">
@@ -14,39 +19,91 @@
       </EstadoVacio>
     </div>
 
-    <template v-else-if="viaje">
-      <!-- Letrero: hora y ruta sobre azul -->
-      <section class="letrero" aria-label="Horario y ruta">
-        <div class="letrero__contenido">
-          <div class="letrero__arriba">
-            <div>
-              <p class="letrero__hora raite-dato">{{ hora(viaje.fecha_hora) }}</p>
-              <p class="letrero__dia">{{ diaLargo(viaje.fecha_hora) }}</p>
-            </div>
+    <div v-else-if="viaje" class="raite-contenedor detalle__rejilla">
+      <!-- Izquierda: horario y ruta, mapa y datos del viaje -->
+      <div class="detalle__principal">
+        <TarjetaDestacada :etiqueta="diaLargo(viaje.fecha_hora)" :viaje="viaje">
+          <template #estado>
             <ChipEstado :estado="viaje.estado" :vencido="viaje.esta_vencido" />
-          </div>
-          <RutaViaje
-            :punto="viaje.punto_referencia.nombre"
-            :campus="viaje.campus"
-            :sentido="viaje.sentido"
-            sobre-azul
-            grande
-          >
-            {{ textoSentido(viaje.sentido) }} ·
-            {{ lugares(viaje.lugares_disponibles, viaje.lugares_ofrecidos) }} libres
-          </RutaViaje>
-        </div>
-      </section>
+          </template>
+          <template #pie>
+            <span class="detalle__dato-azul">
+              <q-icon
+                :name="viaje.sentido === 'HACIA_CAMPUS' ? 'school' : 'home'"
+                size="20px"
+                aria-hidden="true"
+              />
+              {{ textoSentido(viaje.sentido) }}
+            </span>
+            <span class="detalle__dato-azul">
+              <q-icon name="event_seat" size="20px" aria-hidden="true" />
+              {{ lugares(viaje.lugares_disponibles, viaje.lugares_ofrecidos) }} libres
+            </span>
+          </template>
+        </TarjetaDestacada>
 
-      <div class="raite-contenedor raite-contenedor--angosto raite-pila">
-        <!-- Pasajero: quién maneja -->
-        <section v-if="!esConductor" class="raite-tarjeta persona" aria-label="Quién maneja">
-          <AvatarIniciales :nombre="viaje.conductor.nombre_completo" />
-          <div class="persona__datos">
-            <p class="persona__nombre">{{ viaje.conductor.nombre_completo }}</p>
-            <p class="raite-ayuda">{{ viaje.conductor.carrera }}</p>
+        <section class="raite-tarjeta detalle__mapa-tarjeta" aria-labelledby="det-mapa">
+          <h2 id="det-mapa" class="detalle__seccion">Ruta</h2>
+          <div class="detalle__mapa">
+            <MapaRaite
+              :puntos="[viaje.punto_referencia]"
+              :seleccionado="viaje.punto_referencia.id"
+              :campus="[viaje.campus]"
+              :ruta="ruta"
+              :etiqueta="`Mapa de ${viaje.punto_referencia.nombre} a ${viaje.campus.nombre}`"
+            />
           </div>
-          <span class="persona__calif">
+        </section>
+
+        <section class="raite-tarjeta" aria-labelledby="det-datos">
+          <h2 id="det-datos" class="detalle__seccion">Datos del viaje</h2>
+          <dl class="detalle__datos">
+            <div>
+              <dt>Vehículo</dt>
+              <dd>
+                {{ viaje.vehiculo.marca }} {{ viaje.vehiculo.modelo }}
+                {{ viaje.vehiculo.color.toLowerCase() }}
+              </dd>
+            </div>
+            <div>
+              <dt>Grupo</dt>
+              <dd>{{ textoPreferencia(viaje.preferencia_compatibilidad) }}</dd>
+            </div>
+            <div>
+              <dt>Lugares</dt>
+              <dd>
+                {{ viaje.lugares_ofrecidos }} ofrecidos, {{ viaje.lugares_disponibles }} libres
+              </dd>
+            </div>
+            <div>
+              <dt>Punto de salida</dt>
+              <dd>{{ viaje.punto_referencia.nombre }}</dd>
+            </div>
+            <div v-if="viaje.notas" class="detalle__ancho">
+              <dt>Notas</dt>
+              <dd class="detalle__notas">{{ viaje.notas }}</dd>
+            </div>
+          </dl>
+        </section>
+      </div>
+
+      <!-- Derecha: personas, estado o contacto, y acciones -->
+      <aside class="detalle__lateral">
+        <!-- Pasajero: quién maneja -->
+        <section
+          v-if="!esConductor"
+          class="raite-tarjeta detalle__persona"
+          aria-labelledby="det-maneja"
+        >
+          <h2 id="det-maneja" class="detalle__etiqueta">Quién maneja</h2>
+          <div class="detalle__persona-fila">
+            <AvatarIniciales :nombre="viaje.conductor.nombre_completo" :tam="64" />
+            <div class="detalle__persona-datos">
+              <p class="detalle__persona-nombre">{{ viaje.conductor.nombre_completo }}</p>
+              <p class="raite-ayuda">{{ viaje.conductor.carrera }}</p>
+            </div>
+          </div>
+          <span class="detalle__calif">
             <q-icon name="star" size="18px" aria-hidden="true" />
             <span class="sr-only">Calificación</span>
             {{ calificacion(viaje.conductor.calificacion) ?? 'Nuevo' }}
@@ -56,7 +113,7 @@
         <!-- Conductor: pasajeros confirmados -->
         <section v-else class="raite-tarjeta raite-pila" aria-labelledby="det-pasajeros">
           <div class="row items-center justify-between no-wrap">
-            <h2 id="det-pasajeros" class="raite-seccion">Tus pasajeros</h2>
+            <h2 id="det-pasajeros" class="detalle__seccion q-mb-none">Tus pasajeros</h2>
             <q-btn
               v-if="viaje.estado === 'PUBLICADO' && !viaje.esta_vencido"
               flat
@@ -70,12 +127,12 @@
           <p v-if="!viaje.pasajeros_confirmados?.length" class="raite-ayuda">
             Todavía no confirmas a nadie.
           </p>
-          <ul v-else class="lista-personas">
-            <li v-for="p in viaje.pasajeros_confirmados" :key="p.id" class="persona persona--fila">
-              <AvatarIniciales :nombre="p.nombre_completo" :tam="40" tono="verde" />
-              <div class="persona__datos">
-                <p class="persona__nombre">{{ p.nombre_completo }}</p>
-                <p class="raite-dato persona__telefono">{{ telefono(p.telefono) }}</p>
+          <ul v-else class="detalle__lista">
+            <li v-for="p in viaje.pasajeros_confirmados" :key="p.id" class="detalle__pasajero">
+              <AvatarIniciales :nombre="p.nombre_completo" :tam="44" tono="verde" />
+              <div class="detalle__persona-datos">
+                <p class="detalle__pasajero-nombre">{{ p.nombre_completo }}</p>
+                <p class="raite-dato detalle__telefono">{{ telefono(p.telefono) }}</p>
               </div>
               <q-btn
                 v-if="p.telefono"
@@ -99,24 +156,6 @@
             </li>
           </ul>
         </section>
-
-        <dl class="raite-tarjeta datos">
-          <div>
-            <dt>Vehículo</dt>
-            <dd>
-              {{ viaje.vehiculo.marca }} {{ viaje.vehiculo.modelo }}
-              {{ viaje.vehiculo.color.toLowerCase() }}
-            </dd>
-          </div>
-          <div>
-            <dt>Grupo</dt>
-            <dd>{{ textoPreferencia(viaje.preferencia_compatibilidad) }}</dd>
-          </div>
-          <div v-if="viaje.notas" class="datos__ancho">
-            <dt>Notas</dt>
-            <dd class="datos__notas">{{ viaje.notas }}</dd>
-          </div>
-        </dl>
 
         <!-- Estado de la solicitud del pasajero -->
         <template v-if="!esConductor">
@@ -151,14 +190,21 @@
             </p>
           </div>
 
-          <section v-if="estadoSolicitud === 'ACEPTADA'" class="contacto" aria-label="Contacto">
-            <ChipEstado estado="ACEPTADA" class="self-start" />
+          <section
+            v-if="estadoSolicitud === 'ACEPTADA'"
+            class="contacto"
+            aria-labelledby="det-contacto"
+          >
+            <div class="contacto__cabecera">
+              <q-icon name="verified_user" size="22px" color="primary" aria-hidden="true" />
+              <h2 id="det-contacto" class="contacto__titulo">Contacto confirmado</h2>
+            </div>
             <div class="contacto__datos">
               <div>
                 <p class="contacto__etiqueta">Teléfono / WhatsApp</p>
                 <p class="contacto__valor raite-dato">{{ telefono(viaje.conductor.telefono) }}</p>
               </div>
-              <div v-if="viaje.vehiculo.placas" class="text-right">
+              <div v-if="viaje.vehiculo.placas">
                 <p class="contacto__etiqueta">Placas</p>
                 <p class="contacto__valor contacto__valor--placas raite-dato">
                   {{ viaje.vehiculo.placas }}
@@ -189,21 +235,80 @@
           </section>
         </template>
 
-        <section class="raite-tarjeta mapa-tarjeta" aria-labelledby="det-mapa">
-          <h2 id="det-mapa" class="raite-seccion q-mb-sm">Ruta</h2>
-          <div class="mapa-tarjeta__mapa">
-            <MapaRaite
-              :puntos="[viaje.punto_referencia]"
-              :seleccionado="viaje.punto_referencia.id"
-              :campus="[viaje.campus]"
-              :ruta="ruta"
-              :etiqueta="`Mapa de ${viaje.punto_referencia.nombre} a ${viaje.campus.nombre}`"
+        <BarraAccion v-if="hayBarra" :nota="notaBarra">
+          <!-- Pasajero -->
+          <template v-if="!esConductor">
+            <q-btn
+              v-if="accionPasajero === 'solicitar'"
+              color="primary"
+              unelevated
+              no-caps
+              :label="viaje.lugares_disponibles ? 'Solicitar lugar' : 'Sin lugares libres'"
+              :disable="!viaje.lugares_disponibles"
+              :loading="ocupado === 'solicitar'"
+              @click="solicitar"
             />
-          </div>
-        </section>
+            <q-btn
+              v-else-if="accionPasajero === 'cancelar'"
+              color="negative"
+              unelevated
+              no-caps
+              :label="estadoSolicitud === 'ACEPTADA' ? 'Cancelar mi lugar' : 'Cancelar solicitud'"
+              :loading="ocupado === 'cancelarSolicitud'"
+              @click="cancelarSolicitud"
+            />
+            <q-btn
+              v-else-if="accionPasajero === 'calificar'"
+              color="primary"
+              unelevated
+              no-caps
+              label="Calificar a quien manejó"
+              :to="`/viajes/${viaje.id}/calificar`"
+            />
+          </template>
+
+          <!-- Conductor -->
+          <template v-else>
+            <template v-if="viaje.estado === 'PUBLICADO' && !viaje.esta_vencido">
+              <q-btn
+                color="primary"
+                unelevated
+                no-caps
+                label="Iniciar viaje"
+                :disable="!puedeIniciar"
+                :loading="ocupado === 'iniciar'"
+                @click="iniciar"
+              />
+              <q-btn
+                outline
+                color="primary"
+                no-caps
+                label="Ver solicitudes"
+                :to="`/viajes/${viaje.id}/solicitudes`"
+              />
+            </template>
+            <q-btn
+              v-else-if="viaje.estado === 'EN_CURSO'"
+              color="primary"
+              unelevated
+              no-caps
+              label="Terminar viaje"
+              :loading="ocupado === 'finalizar'"
+              @click="finalizar"
+            />
+            <q-btn
+              v-else-if="pendientesCalificar"
+              color="primary"
+              unelevated
+              no-caps
+              label="Calificar a tus pasajeros"
+              :to="`/viajes/${viaje.id}/calificar`"
+            />
+          </template>
+        </BarraAccion>
 
         <!-- Acciones secundarias -->
-        <div class="secundarias">
+        <div class="detalle__secundarias">
           <template v-if="esConductor && viaje.estado === 'PUBLICADO'">
             <q-btn
               v-if="!viaje.esta_vencido"
@@ -234,85 +339,14 @@
             :to="`/viajes/${viaje.id}/reportar`"
           />
         </div>
-      </div>
-
-      <BarraAccion v-if="hayBarra" :nota="notaBarra">
-        <!-- Pasajero -->
-        <template v-if="!esConductor">
-          <q-btn
-            v-if="accionPasajero === 'solicitar'"
-            color="primary"
-            unelevated
-            no-caps
-            :label="viaje.lugares_disponibles ? 'Solicitar lugar' : 'Sin lugares libres'"
-            :disable="!viaje.lugares_disponibles"
-            :loading="ocupado === 'solicitar'"
-            @click="solicitar"
-          />
-          <q-btn
-            v-else-if="accionPasajero === 'cancelar'"
-            color="negative"
-            unelevated
-            no-caps
-            :label="estadoSolicitud === 'ACEPTADA' ? 'Cancelar mi lugar' : 'Cancelar solicitud'"
-            :loading="ocupado === 'cancelarSolicitud'"
-            @click="cancelarSolicitud"
-          />
-          <q-btn
-            v-else-if="accionPasajero === 'calificar'"
-            color="primary"
-            unelevated
-            no-caps
-            label="Calificar a quien manejó"
-            :to="`/viajes/${viaje.id}/calificar`"
-          />
-        </template>
-
-        <!-- Conductor -->
-        <template v-else>
-          <template v-if="viaje.estado === 'PUBLICADO' && !viaje.esta_vencido">
-            <q-btn
-              outline
-              color="primary"
-              no-caps
-              label="Solicitudes"
-              :to="`/viajes/${viaje.id}/solicitudes`"
-            />
-            <q-btn
-              color="primary"
-              unelevated
-              no-caps
-              label="Iniciar viaje"
-              :disable="!puedeIniciar"
-              :loading="ocupado === 'iniciar'"
-              @click="iniciar"
-            />
-          </template>
-          <q-btn
-            v-else-if="viaje.estado === 'EN_CURSO'"
-            color="primary"
-            unelevated
-            no-caps
-            label="Terminar viaje"
-            :loading="ocupado === 'finalizar'"
-            @click="finalizar"
-          />
-          <q-btn
-            v-else-if="pendientesCalificar"
-            color="primary"
-            unelevated
-            no-caps
-            label="Calificar a tus pasajeros"
-            :to="`/viajes/${viaje.id}/calificar`"
-          />
-        </template>
-      </BarraAccion>
-    </template>
+      </aside>
+    </div>
   </q-page>
 </template>
 
 <script setup lang="ts">
-// Detalle del viaje (RF-05, RF-06, RF-08), variante A: letrero azul arriba y la acción en la barra fija.
+// Detalle del viaje (RF-05, RF-06, RF-08). Computadora: horario, mapa y datos a la izquierda; personas,
+// estado y acciones a la derecha. Celular: una columna con la acción en la barra fija.
 // El contacto (teléfono y placas) solo aparece con la solicitud aceptada (regla 4, RNF-02).
 import { computed, onBeforeUnmount, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
@@ -324,7 +358,7 @@ import BarraAccion from '@/components/BarraAccion.vue';
 import ChipEstado from '@/components/ChipEstado.vue';
 import EstadoVacio from '@/components/EstadoVacio.vue';
 import MapaRaite from '@/components/MapaRaite.vue';
-import RutaViaje from '@/components/RutaViaje.vue';
+import TarjetaDestacada from '@/components/TarjetaDestacada.vue';
 import { useSesionStore } from '@/stores/sesion';
 import { avisarError, avisarExito, confirmar } from '@/utils/avisar';
 import {
@@ -496,80 +530,64 @@ function finalizar() {
 </script>
 
 <style scoped lang="scss">
-.letrero {
-  background: var(--raite-azul);
-  color: var(--raite-blanco);
-}
-.letrero__contenido {
-  max-width: 720px;
-  margin: 0 auto;
-  padding: 8px 16px 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  @media (min-width: 600px) {
-    padding: 16px 24px 32px;
-  }
-}
-.letrero__arriba {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 8px;
-}
-.letrero__hora {
-  margin: 0;
-  font-size: 2.75rem;
-  font-weight: 700;
-  line-height: 1;
-  letter-spacing: -0.02em;
-}
-.letrero__dia {
-  margin: 6px 0 0;
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--raite-azul-niebla);
-}
-
-.persona {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.persona__datos {
-  flex-grow: 1;
-  min-width: 0;
-  p {
-    margin: 0;
-  }
-}
-.persona__nombre {
-  font-weight: 700;
-}
-.persona__telefono {
-  color: var(--raite-azul);
-  letter-spacing: 0.04em;
-}
-.persona__calif {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-weight: 700;
-}
-.lista-personas {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.datos {
+// Computadora: dos columnas a todo el ancho (ruta, mapa y datos | personas, estado y acciones).
+.detalle__rejilla {
+  max-width: none;
   margin: 0;
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+  @media (min-width: 1024px) {
+    grid-template-columns: minmax(0, 3fr) minmax(340px, 2fr);
+  }
+}
+.detalle__principal,
+.detalle__lateral {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+}
+.detalle__esqueleto {
+  border-radius: 20px;
+}
+.detalle__seccion {
+  margin: 0 0 12px;
+  font-size: 1.125rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+.detalle__etiqueta {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--raite-gris);
+}
+.detalle__dato-azul {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+}
+
+.detalle__mapa-tarjeta {
+  padding: 20px;
+}
+.detalle__mapa {
+  height: 240px;
+  border-radius: 16px;
+  overflow: hidden;
+  @media (min-width: 1024px) {
+    height: 360px;
+  }
+}
+
+.detalle__datos {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px 24px;
   dt {
     font-size: 0.875rem;
     font-weight: 600;
@@ -580,14 +598,71 @@ function finalizar() {
     font-weight: 600;
   }
 }
-.datos__ancho {
+.detalle__ancho {
   grid-column: 1 / -1;
 }
-.datos__notas {
+.detalle__notas {
   font-weight: 400 !important;
   white-space: pre-line;
 }
 
+// --- Personas ---
+.detalle__persona {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px;
+}
+.detalle__persona-fila {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.detalle__persona-datos {
+  flex-grow: 1;
+  min-width: 0;
+  p {
+    margin: 0;
+  }
+}
+.detalle__persona-nombre {
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+.detalle__calif {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: var(--raite-fondo);
+  font-weight: 700;
+}
+.detalle__lista {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.detalle__pasajero {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.detalle__pasajero-nombre {
+  font-weight: 700;
+}
+.detalle__telefono {
+  color: var(--raite-azul);
+  letter-spacing: 0.04em;
+}
+
+// --- Avisos de estado ---
 .aviso-bloque {
   margin: 0;
   display: flex;
@@ -617,18 +692,29 @@ function finalizar() {
   }
 }
 
+// --- Contacto (solo con la solicitud aceptada) ---
 .contacto {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 16px;
-  border-radius: 16px;
+  gap: 14px;
+  padding: 20px;
+  border-radius: 20px;
   background: var(--raite-azul-tenue);
 }
-.contacto__datos {
+.contacto__cabecera {
   display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+.contacto__titulo {
+  margin: 0;
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: var(--raite-azul);
+}
+.contacto__datos {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
   p {
     margin: 0;
@@ -660,19 +746,11 @@ function finalizar() {
   font-size: 0.875rem;
 }
 
-.mapa-tarjeta__mapa {
-  height: 220px;
-  border-radius: 12px;
-  overflow: hidden;
-  @media (min-width: 1024px) {
-    height: 280px;
-  }
-}
-
-.secundarias {
+.detalle__secundarias {
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
   margin-left: -8px;
 }
 </style>

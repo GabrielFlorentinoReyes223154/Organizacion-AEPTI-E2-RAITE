@@ -381,9 +381,12 @@ a {
   line-height: 1.4;
   color: var(--raite-gris);
 }
-// Las páginas con BarraAccion dejan espacio abajo para que nada quede tapado.
-.con-barra {
-  padding-bottom: 120px !important;
+// Las páginas con BarraAccion dejan espacio abajo para que nada quede tapado (solo en celular:
+// en computadora la barra va dentro del contenido).
+@media (max-width: 1023px) {
+  .con-barra {
+    padding-bottom: 120px !important;
+  }
 }
 .raite-tarjeta {
   background: var(--raite-blanco);
