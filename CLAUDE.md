@@ -68,7 +68,7 @@ pnpm typecheck    # vue-tsc --noEmit
 
 ### Por definir
 
-- Hospedaje / despliegue: **POR DEFINIR** (se decide al final).
+- Hospedaje / despliegue: en línea en `www.raite.online`, con el backend en Render gratuito. Render gratuito bloquea SMTP: en producción los correos salen por la API HTTP de Brevo (`apps/accounts/correo_brevo.py`; variables en `Back_Raite/.env.example`).
 
 ## Estructura del repo
 
