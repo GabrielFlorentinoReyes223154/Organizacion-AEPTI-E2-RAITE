@@ -161,6 +161,10 @@ EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
 EMAIL_USE_TLS = env_bool('EMAIL_USE_TLS', False)
 DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'Raite <no-reply@localhost>')
+EMAIL_TIMEOUT = int(os.getenv('EMAIL_TIMEOUT', '10'))  # segundos; sin esto, un SMTP bloqueado cuelga la petición
+BREVO_API_KEY = os.getenv('BREVO_API_KEY', '')
+# URL pública del logo para los correos. Vacía: va incrustado (Brevo por API necesita la URL).
+CORREO_LOGO_URL = os.getenv('CORREO_LOGO_URL', '')
 
 AUTH_USER_MODEL = 'accounts.Usuario'
 
