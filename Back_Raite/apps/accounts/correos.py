@@ -1,7 +1,7 @@
 """Correos de cuentas con versión HTML y de texto plano (RF-01).
 
-El logo va adjunto como imagen relacionada (CID) y no como enlace: el sitio aún no está en línea,
-y Gmail no muestra SVG ni imágenes en data URI.
+El logo va como enlace público si hay `CORREO_LOGO_URL` (necesario con la API de Brevo). Si no, va
+adjunto como imagen relacionada (CID), porque Gmail no muestra SVG ni imágenes en data URI.
 """
 
 from functools import cache
@@ -53,13 +53,13 @@ def correo_codigo(usuario, codigo: str) -> CorreoConImagenes:
         "nombre": usuario.nombre,
         "codigo": codigo,
         "minutos": settings.CODIGO_VERIFICACION_MINUTOS,
-        "cid_logo": CID_LOGO,
+        "logo_src": settings.CORREO_LOGO_URL or f"cid:{CID_LOGO}",
     }
     correo = CorreoConImagenes(
         subject=f"Tu código de Raite: {codigo}",
         body=render_to_string("accounts/correo/codigo_verificacion.txt", contexto),
         to=[usuario.correo],
-        imagenes=[(CID_LOGO, _logo(), "raite.png")],
+        imagenes=[] if settings.CORREO_LOGO_URL else [(CID_LOGO, _logo(), "raite.png")],
     )
     correo.attach_alternative(
         render_to_string("accounts/correo/codigo_verificacion.html", contexto), "text/html"
