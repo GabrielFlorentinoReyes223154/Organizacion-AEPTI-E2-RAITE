@@ -22,10 +22,10 @@ Fuente de verdad: el código en `Back_Raite/apps/*/urls.py`; actualiza esta pág
 
 | Método | URL | Quién | Qué hace |
 |--------|-----|-------|----------|
-| POST | `auth/register/` | Público | Crea el usuario sin verificar (`@alumnos.uacj.mx`, teléfono de 10 dígitos) y envía un código de 6 dígitos. Responde `requiere_vehiculo` y `requiere_verificacion`. |
-| POST | `auth/verificar/` | Público | `{correo, codigo}`. Activa la cuenta y devuelve `access`, `refresh` y `usuario`. Máximo 5 intentos; el código vence a los 15 min. |
-| POST | `auth/reenviar-codigo/` | Público | `{correo}`. Anula los códigos anteriores y manda uno nuevo. Responde 409 si no han pasado 60 s y el mismo mensaje en cualquier otro caso. |
-| POST | `auth/token/` | Público | Login con `{correo, password}`. Responde 403 `correo_no_verificado` si falta verificar. |
+| POST | `auth/register/` | Público | Valida los datos (`@alumnos.uacj.mx`, teléfono de 10 dígitos) y envía un código de 6 dígitos **sin guardar nada ni apartar el correo**. Responde `token` (firmado, vence a los 15 min), `requiere_vehiculo` y `requiere_verificacion`. 409 si se pidió un código para ese correo hace menos de 60 s. |
+| POST | `auth/verificar/` | Público | `{token, codigo}`. Crea la cuenta ya verificada y devuelve `access`, `refresh` y `usuario`. Máximo 5 intentos. Reemplaza una cuenta antigua que se haya quedado sin verificar. 409 si el correo ya está verificado. |
+| POST | `auth/reenviar-codigo/` | Público | `{token}`. Manda un código nuevo y devuelve el `token` que reemplaza al anterior. 409 si no han pasado 60 s o el correo ya está verificado. |
+| POST | `auth/token/` | Público | Login con `{correo, password}`. Responde 403 `correo_no_verificado` en cuentas antiguas que no completaron la verificación. |
 | POST | `auth/token/refresh/`, `auth/token/blacklist/` | Público (con refresh) | Renovar sesión o cerrarla. |
 | GET | `auth/me/` | Verificado | Perfil propio, con teléfono y vehículo (placas incluidas). |
 | PATCH | `auth/me/` | Verificado | Edita `telefono`, `carrera` y `preferencia_compatibilidad`. |

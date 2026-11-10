@@ -131,6 +131,7 @@ Raite/
 - **Errores:** los servicios lanzan `ValidationError` de Django (el manejador de `Raite_DjangoRest/api.py` la convierte en 400), `PermissionDenied` (403), `Http404` o `Conflicto` (409, para conflictos de estado).
 - **Permisos:** por defecto todo el API pide sesión y `correo_verificado` (`CorreoVerificado`); los endpoints públicos declaran `AllowAny`. Otras clases en `accounts/permissions.py`: `PuedePublicar`, `PuedeSolicitar`, `IsDriver`, `IsPassenger`. Quién es dueño del viaje o de la solicitud se revisa en el servicio.
 - **Cupo:** aceptar una solicitud bloquea la fila del viaje (`select_for_update`). Hay una prueba con dos hilos que solo funciona en PostgreSQL.
+- **Registro sin datos guardados:** `auth/register/` no toca la BD ni aparta el correo. Devuelve un token firmado (15 min) que el navegador conserva en `sessionStorage`; la cuenta se crea en `auth/verificar/`. Los intentos y la espera de reenvío usan la caché de Django, sin datos personales. `CodigoVerificacion` ya no se usa en este flujo.
 - **Viaje vencido:** un `PUBLICADO` con más de 2 h de retraso. Se calcula (`Viaje.esta_vencido`, `Viaje.objects.vencidos()` / `vigentes()`), no se guarda: solo se puede cancelar y no cuenta para cruces ni búsquedas.
 - Paginación de 20 en los listados; los catálogos y las calificaciones pendientes no se paginan.
 - JWT: acceso 30 min, refresh 1 día, rotación + blacklist.
