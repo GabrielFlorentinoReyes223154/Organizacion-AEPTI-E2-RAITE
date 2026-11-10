@@ -76,7 +76,6 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { cuenta } from '@/api';
 import { leerError } from '@/api/errores';
 import { useSesionStore } from '@/stores/sesion';
 
@@ -110,15 +109,6 @@ async function enviar() {
     await router.replace(siguiente);
   } catch (error) {
     const legible = leerError(error);
-    if (legible.codigo === 'correo_no_verificado') {
-      // Se manda un código nuevo; si se pidió uno hace menos de 60 s, el que ya llegó sigue sirviendo.
-      await cuenta.reenviarCodigo(correo.value).catch(() => undefined);
-      await router.push({
-        path: '/verificar',
-        query: { correo: correo.value.trim().toLowerCase() },
-      });
-      return;
-    }
     mensaje.value =
       legible.status === 401
         ? 'El correo o la contraseña no coinciden. Revísalos e inténtalo de nuevo.'

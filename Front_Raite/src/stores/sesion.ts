@@ -5,6 +5,7 @@ import { defineStore } from 'pinia';
 import { api } from '@/boot/axios';
 import { cuenta } from '@/api';
 import { Rol, type DatosRegistro, type Papel, type Tokens, type Usuario } from '@/api/tipos';
+import { guardarRegistroPendiente, olvidarRegistroPendiente } from '@/utils/registro-pendiente';
 
 const CLAVE_ACCESO = 'access_token';
 const CLAVE_RENOVAR = 'refresh_token';
@@ -107,12 +108,18 @@ export const useSesionStore = defineStore('sesion', {
       await this.cargarUsuario();
     },
 
-    registrar(datos: DatosRegistro) {
-      return cuenta.registrar({ ...datos, correo: datos.correo.trim().toLowerCase() });
+    async registrar(datos: DatosRegistro) {
+      const respuesta = await cuenta.registrar({
+        ...datos,
+        correo: datos.correo.trim().toLowerCase(),
+      });
+      guardarRegistroPendiente(respuesta.token);
+      return respuesta;
     },
 
-    async verificar(correo: string, codigo: string) {
-      const respuesta = await cuenta.verificar(correo.trim().toLowerCase(), codigo);
+    async verificar(token: string, codigo: string) {
+      const respuesta = await cuenta.verificar(token, codigo);
+      olvidarRegistroPendiente();
       this.guardarTokens(respuesta);
       this.usuario = respuesta.usuario;
       if (respuesta.usuario.rol === Rol.CONDUCTOR) this.cambiarPapel('conductor');

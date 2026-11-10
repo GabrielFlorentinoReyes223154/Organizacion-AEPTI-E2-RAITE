@@ -52,16 +52,16 @@ export const cuenta = {
   salir: (refresh: string) => post<unknown>('/api/auth/token/blacklist/', { refresh }),
   registrar: (datos: DatosRegistro) =>
     post<{
-      id: Uuid;
       correo: string;
       rol: RolId;
       requiere_vehiculo: boolean;
       requiere_verificacion: boolean;
+      token: string;
     }>('/api/auth/register/', datos),
-  verificar: (correo: string, codigo: string) =>
-    post<Tokens & { usuario: Usuario }>('/api/auth/verificar/', { correo, codigo }),
-  reenviarCodigo: (correo: string) =>
-    post<{ detail: string }>('/api/auth/reenviar-codigo/', { correo }),
+  verificar: (token: string, codigo: string) =>
+    post<Tokens & { usuario: Usuario }>('/api/auth/verificar/', { token, codigo }),
+  reenviarCodigo: (token: string) =>
+    post<{ detail: string; token: string }>('/api/auth/reenviar-codigo/', { token }),
   yo: () => get<Usuario>('/api/auth/me/'),
   editarPerfil: (datos: {
     telefono?: string;
