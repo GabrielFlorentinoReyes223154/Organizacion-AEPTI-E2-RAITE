@@ -12,4 +12,7 @@
  *   readonly MY_OTHER_VAR: string;
  * }
  */
-interface ImportMetaEnv {}
+interface ImportMetaEnv {
+  /** URL del API; sin definir, se usa http://localhost:8000. */
+  readonly VITE_API_URL?: string;
+}

@@ -47,6 +47,13 @@ export default defineConfig((/* ctx */) => {
       filenameBasedRouting: true,
 
       vueRouterMode: 'history', // available values: 'hash', 'history'
+
+      // Quasar solo pasa al cliente las variables con prefijo QCLI_; se agrega VITE_ para
+      // que VITE_API_URL (la URL del API en producción) llegue al build.
+      env: {
+        clientPrefix: ['QCLI_', 'VITE_'],
+        ignoreType: ['import.meta.env.VITE_API_URL'], // su tipo va en env.d.ts
+      },
       // vueRouterBase,
 
       // publicPath: '/',
