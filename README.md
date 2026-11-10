@@ -88,6 +88,78 @@ pnpm dev                                  # http://localhost:9000
 
 El frontend usa `http://localhost:8000` como API. Para cambiarlo, define `VITE_API_URL`.
 
+## Despliegue (Render + Neon)
+
+- **API:** Web Service de pago en Render (instancia `0.5c-512mb`, región Oregon) con gunicorn; whitenoise sirve los estáticos del admin. Se usa de pago porque el plan gratis bloquea el SMTP de Gmail.
+- **Frontend:** Static Site gratis en Render con el build de Quasar (`Front_Raite/dist/spa`) y la regla `/*` → `/index.html` (el router usa modo history).
+- **Base de datos:** PostgreSQL en Neon (plan gratis, región Oregon / AWS us-west-2).
+- **Correo:** SMTP de Gmail (`smtp.gmail.com`, 587, TLS) desde `raite.uacj@gmail.com` con contraseña de aplicación.
+
+Todo está en `render.yaml` (Blueprint). Los secretos y las URLs **solo** se escriben en el panel de Render, nunca en el repo.
+
+### 1. Neon
+
+1. Proyecto `raite` → **Connect** → rama `main`, base `neondb`, con **Connection pooling desactivado** (conexión directa).
+2. Copia la cadena. Es la `DATABASE_URL`:
+   `postgresql://usuario:clave@ep-xxx.us-west-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require`
+3. Las tablas las crea el `migrate` que corre Render antes de cada versión; no hay que hacer nada más en Neon.
+
+> Si la conexión falla por `channel_binding`, quita `&channel_binding=require` de `DATABASE_URL` (deja `sslmode=require`).
+
+### 2. Render
+
+1. Junta la rama `despliegue` en `main` y haz push.
+2. **New → Blueprint** → elige el repo y la rama **`main`**. Render lee `render.yaml` y crea `raite-api` y `raite-web`. Desde entonces, cada merge a `main` despliega solo (y solo el servicio cuya carpeta cambió).
+3. Render pide las variables marcadas con `sync: false`:
+
+   | Servicio | Variable | Valor |
+   |---|---|---|
+   | raite-api | `SECRET_KEY` | clave nueva (secreto) |
+   | raite-api | `DATABASE_URL` | cadena de Neon (secreto) |
+   | raite-api | `EMAIL_HOST_PASSWORD` | contraseña de aplicación de Gmail, sin espacios (secreto) |
+   | raite-api | `ALLOWED_HOSTS` | `raite-api.onrender.com` |
+   | raite-api | `CORS_ALLOWED_ORIGINS` | `https://raite-web.onrender.com` |
+   | raite-api | `CSRF_TRUSTED_ORIGINS` | `https://raite-web.onrender.com` |
+   | raite-web | `VITE_API_URL` | `https://raite-api.onrender.com` (sin `/` al final) |
+
+   El resto (`DEBUG=False`, `EMAIL_*`, `DEFAULT_FROM_EMAIL`, `PYTHON_VERSION`, `NODE_VERSION`) ya viene en `render.yaml`.
+4. Al terminar, revisa las URLs que asignó Render: si el nombre estaba ocupado, le agrega un sufijo (ej. `raite-api-x1y2.onrender.com`). Si cambiaron, corrige las cuatro variables de URL:
+   - `raite-api` se reinicia solo al guardar.
+   - `raite-web` necesita **Manual Deploy → Clear build cache & deploy**, porque `VITE_API_URL` se mete al compilar.
+5. En **Settings** de `raite-api`, confirma la instancia `0.5c-512mb` y la región Oregon.
+
+En cada versión, Render corre `migrate` y `cargar_datos_iniciales` (preDeploy). **No** se carga `crear_datos_demo` en producción.
+
+### 3. Superusuario
+
+En `raite-api` → pestaña **Shell** (`cd Back_Raite` si no estás ahí):
+
+```bash
+python manage.py createsuperuser
+```
+
+Pide correo, contraseña, nombre, apellidos, edad, sexo, carrera y teléfono. El admin no necesita correo `@alumnos.uacj.mx` y queda verificado. Entra en `https://raite-api.onrender.com/admin/`.
+
+### 4. Comprobar que funciona
+
+1. Logs de `raite-api`: el preDeploy muestra las migraciones y `Campus: … Puntos de referencia: …` sin errores.
+2. `https://raite-api.onrender.com/api/campus/` responde **401** (pide sesión: el API está en línea y el dominio es válido). `/admin/` muestra el login con estilos.
+3. `https://raite-web.onrender.com/inicio`, y recargar con F5 en `/buscar`: no debe dar 404.
+4. **Correo**, desde la Shell: `python manage.py probar_correo tu@alumnos.uacj.mx` debe llegar a la bandeja.
+   Si falla o no llega, revisa la bandeja de `raite.uacj@gmail.com` por una alerta de seguridad de Google por el inicio de sesión desde Render, confirma que fuiste tú y vuelve a probar.
+   Después, haz un registro real desde el frontend con un correo `@alumnos.uacj.mx`: llega el código, se verifica y se inicia sesión.
+5. Flujo completo con dos cuentas reales: registrar vehículo, publicar, buscar, solicitar, aceptar (se ven teléfono y placas), iniciar, finalizar y calificar.
+6. Consola del navegador sin errores de CORS, y el mapa carga.
+7. En el admin hay 5 campus y 128 puntos de referencia.
+
+Antes de cada despliegue, en local: `python manage.py test`,
+`DEBUG=False SECRET_KEY=<una larga> ALLOWED_HOSTS=x python manage.py check --deploy` (sin avisos) y
+`pnpm lint:check && pnpm typecheck && pnpm build`.
+
+### Teselas del mapa
+
+El mapa usa las teselas públicas de OpenStreetMap (`tile.openstreetmap.org`). Para una piloto chica está permitido: hay atribución visible y el navegador manda `Referer`. No tiene garantía de servicio; si el tráfico crece, se cambia la URL en `Front_Raite/src/components/MapaRaite.vue` por un proveedor con plan gratis (MapTiler o Stadia Maps, ambos con registro).
+
 ## Datos de mapas
 
 Los puntos de referencia provienen de [OpenStreetMap](https://www.openstreetmap.org/copyright)

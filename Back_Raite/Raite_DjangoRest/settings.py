@@ -42,6 +42,11 @@ SECRET_KEY = os.environ['SECRET_KEY']
 DEBUG = env_bool('DEBUG', False)
 
 ALLOWED_HOSTS = env_list('ALLOWED_HOSTS', 'localhost,127.0.0.1,testserver')
+# Render define el dominio del servicio en esta variable.
+if os.getenv('RENDER_EXTERNAL_HOSTNAME'):
+    ALLOWED_HOSTS.append(os.environ['RENDER_EXTERNAL_HOSTNAME'])
+
+CSRF_TRUSTED_ORIGINS = env_list('CSRF_TRUSTED_ORIGINS', '')
 
 
 # Application definition
@@ -68,6 +73,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -99,9 +105,13 @@ WSGI_APPLICATION = 'Raite_DjangoRest.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.1/ref/settings/#databases
 
-# PostgreSQL local de cada desarrollador, configurado solo con DATABASE_URL.
+# PostgreSQL configurado solo con DATABASE_URL: local en desarrollo, Neon en producción
+# (su URL ya trae sslmode=require). La revisión de conexión evita errores cuando Neon
+# suspende la base por inactividad y la conexión guardada se cae.
 DATABASES = {
-    'default': dj_database_url.parse(os.environ['DATABASE_URL'], conn_max_age=600),
+    'default': dj_database_url.parse(
+        os.environ['DATABASE_URL'], conn_max_age=600, conn_health_checks=True
+    ),
 }
 
 # Certificado opcional, solo para bases remotas que lo pidan (ej. certs/ca.pem).
@@ -148,6 +158,24 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.1/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'  # destino de collectstatic; lo sirve whitenoise
+
+STORAGES = {
+    'default': {'BACKEND': 'django.core.files.storage.FileSystemStorage'},
+    'staticfiles': {'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage'},
+}
+
+
+# HTTPS en producción (Render termina el TLS y avisa con X-Forwarded-Proto)
+if not DEBUG:
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = int(os.getenv('SECURE_HSTS_SECONDS', '3600'))
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    # La lista de precarga de HSTS solo acepta dominios propios, no un subdominio de onrender.com.
+    SILENCED_SYSTEM_CHECKS = ['security.W021']
 
 
 # Email
@@ -160,6 +188,7 @@ EMAIL_PORT = int(os.getenv('EMAIL_PORT', '25'))
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
 EMAIL_USE_TLS = env_bool('EMAIL_USE_TLS', False)
+EMAIL_TIMEOUT = 15  # segundos; el correo se manda dentro de la petición
 DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'Raite <no-reply@localhost>')
 
 AUTH_USER_MODEL = 'accounts.Usuario'

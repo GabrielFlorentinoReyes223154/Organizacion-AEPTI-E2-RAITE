@@ -235,3 +235,6 @@ Back_Raite/tmp_test.sqlite3
 
 # Caché generada por graphify
 graphify-out/cache/
+
+# Estáticos generados por collectstatic
+Back_Raite/staticfiles/
