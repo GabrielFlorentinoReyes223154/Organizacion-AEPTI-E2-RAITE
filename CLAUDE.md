@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Fuente de verdad del proyecto para Claude Code. Última revisión: 2026-11-07 (Capa 3 rediseñada para computadora).
+Fuente de verdad del proyecto para Claude Code. Última revisión: 2026-11-09 (despliegue en Render + Neon).
 Si algo de aquí contradice al código, revisa el código y actualiza este archivo.
 
 > **Nombre del proyecto:** [NOMBRE] — pendiente de confirmar (aparece como "Raite" en el SRS y en el código, "UniGo-UACJ" en la carta y "RutaClara" en el encabezado del PDF de la carta). En el código se mantiene "Raite": no renombrar nada hasta que se pida.
@@ -19,9 +19,9 @@ Lo que **realmente** hay en el repo (los docs de diseño mencionan más cosas: P
 
 ### Backend — `Back_Raite/` (Python)
 
-- Django 6.1.1, Django REST Framework 3.18, `djangorestframework-simplejwt` 5.5 (con `token_blacklist`), `django-cors-headers`, `dj-database-url`, `python-dotenv`, `psycopg2-binary`.
+- Django 6.1.1, Django REST Framework 3.18, `djangorestframework-simplejwt` 5.5 (con `token_blacklist`), `django-cors-headers`, `dj-database-url`, `python-dotenv`, `psycopg2-binary`; para producción `gunicorn` y `whitenoise` (estáticos del admin).
 - Base de datos: **PostgreSQL local** de cada desarrollador (sin PostGIS). Ya no se usa el Postgres remoto. Se configura con `DATABASE_URL` en `Back_Raite/.env` (gitignored); no hay respaldo SQLite. El certificado `certs/ca.pem` solo se usa si se configura por variable de entorno. Hay un virtualenv local en `Back_Raite/.venv/`.
-- Variables de entorno (plantilla en `Back_Raite/.env.example`): `SECRET_KEY` y `DATABASE_URL` obligatorias; `DEBUG`, `ALLOWED_HOSTS`, `CORS_ALLOWED_ORIGINS`, `DB_SSL_ROOTCERT` (opcional) y las de correo (`EMAIL_BACKEND`, por defecto consola).
+- Variables de entorno (plantilla en `Back_Raite/.env.example`): `SECRET_KEY` y `DATABASE_URL` obligatorias; `DEBUG`, `ALLOWED_HOSTS`, `CORS_ALLOWED_ORIGINS`, `CSRF_TRUSTED_ORIGINS`, `SECURE_HSTS_SECONDS`, `DB_SSL_ROOTCERT` (opcional) y las de correo (`EMAIL_BACKEND`, por defecto consola). Con `DEBUG=False` se activan la redirección a HTTPS, cookies seguras y HSTS (`check --deploy` pasa sin avisos).
 - `LANGUAGE_CODE = es-mx`, `TIME_ZONE = America/Ciudad_Juarez`. Constantes de la app en `settings.py`: `CORREO_DOMINIO_PERMITIDO`, `CODIGO_VERIFICACION_MINUTOS` (15), `CODIGO_VERIFICACION_MAX_INTENTOS` (5), `CODIGO_REENVIO_SEGUNDOS` (60), `BUSQUEDA_RADIO_KM` (3) / `BUSQUEDA_RADIO_MAX_KM` (15), `VENTANA_CRUCE_MINUTOS` (60), `INICIO_ANTICIPACION_MINUTOS` (30), `VENCIMIENTO_HORAS` (2).
 - Datos iniciales: `python manage.py cargar_datos_iniciales` (campus + puntos de referencia desde `apps/locations/data/*.json`; se puede repetir y no pisa lo editado en el admin, salvo `--actualizar-estados`, que copia `activo` del JSON).
 - Pasos completos para una máquina nueva: `README.md`.
@@ -60,15 +60,18 @@ pnpm lint:check
 pnpm typecheck    # vue-tsc --noEmit
 ```
 
-- `VITE_API_URL` define la URL del API (por defecto `http://localhost:8000`). El CORS del backend solo permite `http://localhost:9000` y `http://localhost:9002`.
+- `VITE_API_URL` define la URL del API (por defecto `http://localhost:8000`). Quasar solo pasa al cliente variables `QCLI_*`, así que `quasar.config.ts` agrega `VITE_` a `build.env.clientPrefix`; el tipo está en `env.d.ts`. El CORS del backend permite por defecto `http://localhost:9000` y `http://localhost:9002` (en producción, `CORS_ALLOWED_ORIGINS`).
 
 ### Decidido, aún no instalado
 
 - Notificaciones: la consulta periódica desde el frontend (a `GET /api/notificaciones/conteo/`) se hace en la Capa 3. Sin push ni WebSockets.
 
-### Por definir
+### Despliegue
 
-- Hospedaje / despliegue: **POR DEFINIR** (se decide al final).
+- **Render** (Blueprint en `render.yaml`): `raite-api` es un Web Service de pago (`0.5c-512mb`, Oregon) con gunicorn, que corre `migrate` y `cargar_datos_iniciales` antes de cada versión; `raite-web` es un Static Site gratis (`Front_Raite/dist/spa`, reescritura `/*` → `/index.html`). Se despliega solo con cada merge a `main`.
+- **Neon** (PostgreSQL gratis, Oregon) por `DATABASE_URL` con `sslmode=require`, conexión directa (sin pooler).
+- **Correo:** SMTP de Gmail desde `raite.uacj@gmail.com` (el plan gratis de Render bloquea el SMTP; por eso la API es de pago).
+- Secretos solo en el panel de Render. Pasos, superusuario y pruebas: `README.md`, sección "Despliegue". En producción no se carga `crear_datos_demo`.
 
 ## Estructura del repo
 
@@ -77,6 +80,7 @@ Raite/
 ├── CLAUDE.md            # este archivo (versionado)
 ├── AGENTS.md            # instrucciones para agentes (graphify)
 ├── README.md
+├── render.yaml          # Blueprint de Render (API + frontend)
 ├── Back_Raite/          # API Django
 │   ├── manage.py
 │   ├── requirements.txt
@@ -178,7 +182,7 @@ Fuente: `RaiteDocs/docs/2_SRS.md`. Estado según el código al 2026-11-07 (Capa 
 |----|---------------|--------|-------|
 | RNF-01 | Usabilidad: interfaz simple, puntos de referencia en vez de direcciones | ✅ | Origen siempre por catálogo (lista con búsqueda y mapa). Una acción principal por pantalla. |
 | RNF-02 | Seguridad: datos de contacto visibles solo entre conductor y pasajero tras confirmar | ✅ | Teléfono y placas solo con solicitud `ACEPTADA` (probado en API y en pantalla). JWT, permisos por rol y secretos por variable de entorno. |
-| RNF-03 | Disponibilidad | ⬜ | Sin despliegue. |
+| RNF-03 | Disponibilidad | 🟡 | Configurado para Render + Neon (`render.yaml`, guía en el README); falta crear los servicios y probarlo en línea. |
 | RNF-04 | Compatibilidad: diseño responsivo móvil/escritorio | ✅ | Escritorio: barra superior y menú lateral, vistas a todo el ancho (revisado a 1900 y 1280 px). Celular: encabezado y barra inferior; funciona, pero el rediseño se pulió para computadora. |
 | RNF-05 | Escalabilidad: poder agregar usuarios y funciones | 🟡 | 6 apps Django con servicios separados de las vistas; índices en las consultas principales; paginación. |
 | RNF-06 | Rendimiento en búsqueda y mapa | ⬜ | No aplica aún. |
@@ -218,7 +222,7 @@ Decididas el 2026-11-06. Tienen la misma prioridad que las reglas de negocio.
 7. **Mapa:** Leaflet + OpenStreetMap.
 8. **Notificaciones:** solo dentro de la app (modelo + consulta periódica). Sin push ni WebSockets.
 9. **Lugares por viaje:** 1 a 5. `Vehiculo.asientos_disponibles` también se limita a 1–5.
-10. **Despliegue:** se define al final.
+10. **Despliegue:** Render (API de pago en Oregon, frontend Static Site gratis) + Neon (PostgreSQL gratis) + SMTP de Gmail. Decidido el 2026-11-09.
 11. **Base de datos:** PostgreSQL local por desarrollador (son dos). `Back_Raite/.env.example` con todas las variables; `SECRET_KEY` y `DEBUG` por variable de entorno; `certs/ca.pem` opcional por variable; datos iniciales con un comando de `manage.py`; pasos para levantar desde cero en el `README.md`.
 
 ## Plan de trabajo
@@ -237,7 +241,7 @@ Se construye **por capas, no por funcionalidad**. El objetivo es dejar una base 
    - Variantes elegidas en el lienzo de diseño: búsqueda B (mapa con hoja de resultados), detalle A (con Llamar/WhatsApp), publicar A (con vista previa), solicitudes B (cupo como asientos).
    - Backend agregado en esta capa: `solicitudes_pendientes` en `viajes/mios/`, pasajero que registra vehículo pasa a AMBOS, comando `crear_datos_demo`.
    - **Rediseño (2026-11-07), solo frontend**, una rama por parte encadenada a la anterior: `capa/vistas-entrar` (tema, layout público, Entrar, logo) → `-navegacion` → `-busqueda` → `-acceso` (registro, verificar, vehículo) → `-inicio` (pantalla nueva) → `-detalle` (detalle y solicitudes) → `-mis-viajes` (mis raites, mis viajes, publicar) → `-cuenta` (avisos, historial, perfil) → `-calificar` (calificar, reportar, 404) → `-cierre`. Revisado con capturas a 1900 y 1280 px; `pnpm lint:check`, `pnpm typecheck` y `pnpm build` pasan.
-   - Logo decidido (ver `PRODUCT.md`). Pendiente: confirmar el nombre, pulir el celular, despliegue (RNF-03) y medir rendimiento (RNF-06).
+   - Logo decidido (ver `PRODUCT.md`). Pendiente: confirmar el nombre, pulir el celular, poner en línea el despliegue (RNF-03) y medir rendimiento (RNF-06).
 
 Al terminar cada capa, actualizar aquí su estado y la tabla de requerimientos.
 
