@@ -51,6 +51,23 @@
           />
         </div>
         <div>
+          <label for="reg-telefono" class="raite-etiqueta">Teléfono o WhatsApp</label>
+          <q-input
+            for="reg-telefono"
+            v-model="datos.telefono"
+            outlined
+            type="tel"
+            inputmode="tel"
+            autocomplete="tel-national"
+            mask="### ### ####"
+            unmasked-value
+            input-class="raite-dato"
+            hint="Solo lo ve quien confirme un raite contigo"
+            v-bind="campo('telefono')"
+          />
+        </div>
+
+        <div>
           <label for="reg-password" class="raite-etiqueta">Contraseña</label>
           <q-input
             for="reg-password"
@@ -72,22 +89,27 @@
             </template>
           </q-input>
         </div>
-
         <div>
-          <label for="reg-telefono" class="raite-etiqueta">Teléfono o WhatsApp</label>
+          <label for="reg-password2" class="raite-etiqueta">Confirma tu contraseña</label>
           <q-input
-            for="reg-telefono"
-            v-model="datos.telefono"
+            for="reg-password2"
+            v-model="confirmarPassword"
             outlined
-            type="tel"
-            inputmode="tel"
-            autocomplete="tel-national"
-            mask="### ### ####"
-            unmasked-value
-            input-class="raite-dato"
-            hint="Solo lo ve quien confirme un raite contigo"
-            v-bind="campo('telefono')"
-          />
+            :type="verPassword ? 'text' : 'password'"
+            autocomplete="new-password"
+            hint="Escríbela otra vez"
+            v-bind="campo('confirmarPassword')"
+          >
+            <template #append>
+              <q-btn
+                flat
+                round
+                :icon="verPassword ? 'visibility_off' : 'visibility'"
+                :aria-label="verPassword ? 'Ocultar contraseñas' : 'Mostrar contraseñas'"
+                @click="verPassword = !verPassword"
+              />
+            </template>
+          </q-input>
         </div>
         <div class="registro__par">
           <div>
@@ -240,6 +262,8 @@ const errores = reactive<Record<string, string>>({});
 const mensaje = ref('');
 const enviando = ref(false);
 const verPassword = ref(false);
+// Solo se compara en el navegador; no se manda al API.
+const confirmarPassword = ref('');
 
 const ayudaRol = computed(() =>
   datos.rol === Rol.PASAJERO
@@ -281,6 +305,9 @@ function validar(): boolean {
   if (!isEmail(correo)) errores.correo = 'Escribe un correo válido.';
   else if (!correo.endsWith('@alumnos.uacj.mx')) errores.correo = 'Usa tu correo @alumnos.uacj.mx.';
   if (datos.password.length < 8) errores.password = 'Usa al menos 8 caracteres.';
+  if (!confirmarPassword.value) errores.confirmarPassword = 'Vuelve a escribir tu contraseña.';
+  else if (confirmarPassword.value !== datos.password)
+    errores.confirmarPassword = 'Las contraseñas no coinciden.';
   if (!/^\d{10}$/.test(datos.telefono)) errores.telefono = 'Escribe los 10 dígitos de tu teléfono.';
   if (!datos.edad || datos.edad < 17 || datos.edad > 70) errores.edad = 'Entre 17 y 70 años.';
   if (!datos.carrera.trim()) errores.carrera = 'Escribe tu carrera.';
