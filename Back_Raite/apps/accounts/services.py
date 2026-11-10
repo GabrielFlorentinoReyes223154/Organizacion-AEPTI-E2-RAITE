@@ -1,88 +1,131 @@
 """Reglas de negocio de cuentas: registro, verificación de correo y edición de perfil/vehículo (RF-01, RF-07)."""
 
-from datetime import timedelta
+import hashlib
+import secrets
+import uuid
+from types import SimpleNamespace
 
 from django.conf import settings
+from django.core import signing
+from django.core.cache import cache
 from django.core.exceptions import PermissionDenied, ValidationError
-from django.db import transaction
-from django.utils import timezone
+from django.db import IntegrityError, transaction
+from django.utils.crypto import constant_time_compare, salted_hmac
 
 from Raite_DjangoRest.api import Conflicto
 
 from .correos import correo_codigo
-from .models import CodigoVerificacion, Usuario, Vehiculo
+from .models import Usuario, Vehiculo
 from .models_choices import Rol
 
 MENSAJE_CODIGO_INVALIDO = "El código es incorrecto o ya venció."
+MENSAJE_REGISTRO_VENCIDO = "Tu registro venció. Vuelve a registrarte."
+SAL_REGISTRO = "accounts.registro-pendiente"
+CAMPOS_REGISTRO = (
+    "correo",
+    "nombre",
+    "apellidos",
+    "edad",
+    "sexo",
+    "carrera",
+    "telefono",
+    "preferencia_compatibilidad",
+    "rol",
+    "password",
+)
 
 
-def enviar_codigo(usuario) -> None:
-    """Genera un código nuevo y lo manda al correo del usuario (en desarrollo sale en la terminal).
-    Se usa al registrarse y al pedir otro código."""
-    _, codigo = CodigoVerificacion.generar(usuario)
-    correo_codigo(usuario, codigo).send()
+def _clave_envio(correo: str) -> str:
+    return f"registro:envio:{hashlib.sha256(correo.encode()).hexdigest()}"
 
 
-@transaction.atomic
-def registrar(datos: dict) -> Usuario:
-    """Crea el usuario sin verificar (validando el modelo completo) y le envía el código."""
+def _hash_codigo(jti: str, codigo: str) -> str:
+    return salted_hmac(SAL_REGISTRO, f"{jti}:{codigo}").hexdigest()
+
+
+def _emitir_registro(datos: dict) -> str:
+    """Manda un código nuevo y devuelve el token firmado con los datos del registro.
+
+    El token lo conserva el navegador de quien se registra; en el servidor solo queda, por
+    60 s, el hash del correo para no permitir envíos seguidos.
+    """
+    espera = settings.CODIGO_REENVIO_SEGUNDOS
+    clave = _clave_envio(datos["correo"])
+    if not cache.add(clave, True, espera):
+        raise Conflicto(f"Espera {espera} segundos antes de pedir otro código.")
+
+    codigo = f"{secrets.randbelow(10**6):06d}"
+    jti = uuid.uuid4().hex
+    try:
+        correo_codigo(SimpleNamespace(nombre=datos["nombre"], correo=datos["correo"]), codigo).send()
+    except Exception:
+        cache.delete(clave)
+        raise
+    return signing.dumps({**datos, "jti": jti, "codigo_hash": _hash_codigo(jti, codigo)}, salt=SAL_REGISTRO, compress=True)
+
+
+def _leer_registro(token: str) -> dict:
+    try:
+        return signing.loads(token, salt=SAL_REGISTRO, max_age=settings.CODIGO_VERIFICACION_MINUTOS * 60)
+    except signing.BadSignature:
+        raise ValidationError({"codigo": MENSAJE_REGISTRO_VENCIDO})
+
+
+def registrar(datos: dict) -> tuple[Usuario, str]:
+    """Valida el registro y manda el código sin guardar nada en la base de datos.
+
+    Devuelve el usuario sin guardar (solo para armar la respuesta) y el token del registro.
+    El correo no queda apartado: la cuenta se crea hasta confirmar el código.
+    """
     datos = dict(datos)
     password = datos.pop("password")
     rol = datos.pop("rol", None) or Rol.PASAJERO
     usuario = Usuario(rol=rol, **datos)
     usuario.correo = Usuario.objects.normalize_email(usuario.correo).lower()
     usuario.set_password(password)
-    usuario.full_clean()
-    usuario.save()
-    enviar_codigo(usuario)
-    return usuario
+    usuario.full_clean(validate_unique=False)
+    return usuario, _emitir_registro({campo: getattr(usuario, campo) for campo in CAMPOS_REGISTRO})
 
 
-def _usuario_por_correo(correo):
-    return Usuario.objects.filter(correo__iexact=(correo or "").strip()).first()
+def verificar_correo(token: str, codigo: str) -> Usuario:
+    """Crea la cuenta, ya verificada, si el código del token coincide.
 
-
-def verificar_correo(correo: str, codigo: str) -> Usuario:
-    """Activa la cuenta si el código vigente más reciente coincide.
-
-    Los intentos fallidos se guardan aunque la petición termine en error, por eso
-    `comprobar()` no va dentro de una transacción que se revierta.
+    Una cuenta antigua que se quedó sin verificar se reemplaza, porque quien confirma el
+    código demuestra ser dueño del correo.
     """
-    usuario = _usuario_por_correo(correo)
-    if usuario is None:
-        raise ValidationError({"codigo": MENSAJE_CODIGO_INVALIDO})
-    if usuario.correo_verificado:
-        raise Conflicto("Tu correo ya está verificado. Inicia sesión.")
+    datos = _leer_registro(token)
+    clave = f"registro:intentos:{datos['jti']}"
+    cache.add(clave, 0, settings.CODIGO_VERIFICACION_MINUTOS * 60)
+    intentos = cache.incr(clave)
+    maximo = settings.CODIGO_VERIFICACION_MAX_INTENTOS
+    agotados = ValidationError({"codigo": "Agotaste los intentos. Pide un código nuevo."})
+    if intentos > maximo:
+        raise agotados
+    if not constant_time_compare(_hash_codigo(datos["jti"], codigo), datos["codigo_hash"]):
+        raise agotados if intentos >= maximo else ValidationError({"codigo": MENSAJE_CODIGO_INVALIDO})
 
-    registro = usuario.codigos_verificacion.filter(usado=False).first()
-    if registro is None or not registro.comprobar(codigo):
-        if registro is not None and registro.intentos_agotados():
-            raise ValidationError({"codigo": "Agotaste los intentos. Pide un código nuevo."})
-        raise ValidationError({"codigo": MENSAJE_CODIGO_INVALIDO})
-
-    with transaction.atomic():
-        registro.usado = True
-        registro.save(update_fields=["usado"])
-        usuario.correo_verificado = True
-        usuario.save(update_fields=["correo_verificado", "updated_at"])
+    conflicto = Conflicto("Tu correo ya está verificado. Inicia sesión.")
+    try:
+        with transaction.atomic():
+            previo = Usuario.objects.select_for_update().filter(correo__iexact=datos["correo"]).first()
+            if previo is not None and previo.correo_verificado:
+                raise conflicto
+            if previo is not None:
+                previo.delete()
+            usuario = Usuario(correo_verificado=True, **{campo: datos[campo] for campo in CAMPOS_REGISTRO})
+            usuario.full_clean()
+            usuario.save()
+    except IntegrityError:
+        raise conflicto
     return usuario
 
 
-@transaction.atomic
-def reenviar_codigo(correo: str) -> None:
-    """Anula los códigos anteriores y manda uno nuevo. Si el correo no existe o ya está
-    verificado no hace nada (la vista responde igual en todos los casos)."""
-    usuario = _usuario_por_correo(correo)
-    if usuario is None or usuario.correo_verificado:
-        return
-    ultimo = usuario.codigos_verificacion.first()
-    espera = timedelta(seconds=settings.CODIGO_REENVIO_SEGUNDOS)
-    if ultimo and timezone.now() - ultimo.creado_en < espera:
-        raise Conflicto(
-            f"Espera {settings.CODIGO_REENVIO_SEGUNDOS} segundos antes de pedir otro código."
-        )
-    usuario.codigos_verificacion.filter(usado=False).update(usado=True)
-    enviar_codigo(usuario)
+def reenviar_codigo(token: str) -> str:
+    """Manda un código nuevo y devuelve el token que reemplaza al anterior."""
+    datos = _leer_registro(token)
+    if Usuario.objects.filter(correo__iexact=datos["correo"], correo_verificado=True).exists():
+        raise Conflicto("Tu correo ya está verificado. Inicia sesión.")
+    return _emitir_registro({campo: datos[campo] for campo in CAMPOS_REGISTRO})
 
 
 @transaction.atomic

@@ -1,11 +1,12 @@
 """Registro con código, verificación, bloqueo de login, perfil y vehículo (RF-01, RF-07)."""
 
 import re
-from datetime import timedelta
+import time
+from unittest.mock import patch
 
-from django.core import mail
+from django.core import mail, signing
+from django.core.cache import cache
 from django.test import TestCase, override_settings
-from django.utils import timezone
 from rest_framework import status
 
 from apps.accounts.models import CodigoVerificacion, Usuario
@@ -13,6 +14,7 @@ from apps.accounts.models_choices import PreferenciaCompatibilidad, Rol
 from apps.accounts.tests.factories import cliente_para, crear_conductor, crear_usuario, crear_vehiculo
 from apps.rides.tests.factories import crear_viaje
 
+CORREO = "ana.lopez@alumnos.uacj.mx"
 DATOS_REGISTRO = {
     "nombre": "Ana",
     "apellidos": "López",
@@ -29,20 +31,57 @@ def codigo_del_correo(indice=-1) -> str:
     return re.search(r"\b(\d{6})\b", mail.outbox[indice].body).group(1)
 
 
-class RegistroTests(TestCase):
+class RegistroBase(TestCase):
+    def setUp(self):
+        cache.clear()
+
     def registrar(self, **cambios):
         return cliente_para().post("/api/auth/register/", {**DATOS_REGISTRO, **cambios}, format="json")
 
-    def test_registro_crea_usuario_sin_verificar_y_envia_codigo(self):
+    def verificar(self, token, codigo):
+        return cliente_para().post("/api/auth/verificar/", {"token": token, "codigo": codigo}, format="json")
+
+    def login(self, password="password123"):
+        return cliente_para().post(
+            "/api/auth/token/", {"correo": CORREO, "password": password}, format="json"
+        )
+
+
+class RegistroTests(RegistroBase):
+    def test_registro_no_guarda_nada_y_envia_codigo(self):
         respuesta = self.registrar()
         self.assertEqual(respuesta.status_code, status.HTTP_201_CREATED)
         self.assertTrue(respuesta.data["requiere_verificacion"])
-        usuario = Usuario.objects.get(correo="ana.lopez@alumnos.uacj.mx")
-        self.assertFalse(usuario.correo_verificado)
+        self.assertTrue(respuesta.data["token"])
+        self.assertFalse(Usuario.objects.exists())
+        self.assertFalse(CodigoVerificacion.objects.exists())
         self.assertEqual(len(mail.outbox), 1)
-        self.assertEqual(mail.outbox[0].to, ["ana.lopez@alumnos.uacj.mx"])
+        self.assertEqual(mail.outbox[0].to, [CORREO])
         self.assertRegex(codigo_del_correo(), r"^\d{6}$")
-        self.assertEqual(CodigoVerificacion.objects.filter(usuario=usuario).count(), 1)
+
+    def test_sin_verificar_el_correo_sigue_libre(self):
+        self.registrar()
+        cache.clear()  # pasó el minuto de espera
+        self.assertEqual(self.registrar().status_code, status.HTTP_201_CREATED)
+        self.assertEqual(len(mail.outbox), 2)
+        self.assertFalse(Usuario.objects.exists())
+
+    def test_no_se_mandan_dos_correos_seguidos(self):
+        self.registrar()
+        self.assertEqual(self.registrar().status_code, status.HTTP_409_CONFLICT)
+        self.assertEqual(len(mail.outbox), 1)
+
+    def test_si_falla_el_envio_se_puede_reintentar_de_inmediato(self):
+        with patch("apps.accounts.services.correo_codigo", side_effect=RuntimeError):
+            with self.assertRaises(RuntimeError):
+                self.registrar()
+        self.assertEqual(self.registrar().status_code, status.HTTP_201_CREATED)
+
+    def test_el_token_no_lleva_la_contrasena_ni_el_codigo_en_claro(self):
+        token = self.registrar().data["token"]
+        contenido = str(signing.loads(token, salt="accounts.registro-pendiente"))
+        self.assertNotIn("password123", contenido)
+        self.assertNotIn(codigo_del_correo(), contenido)
 
     def test_registro_rechaza_correo_no_institucional(self):
         respuesta = self.registrar(correo="ana@gmail.com")
@@ -56,46 +95,39 @@ class RegistroTests(TestCase):
         self.assertEqual(respuesta.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("telefono", respuesta.data)
 
-    def test_registro_rechaza_correo_repetido_sin_importar_mayusculas(self):
-        crear_usuario(correo="ana.lopez@alumnos.uacj.mx")
+    def test_registro_rechaza_correo_verificado_sin_importar_mayusculas(self):
+        crear_usuario(correo=CORREO)
         respuesta = self.registrar(correo="ANA.LOPEZ@alumnos.uacj.mx")
         self.assertEqual(respuesta.status_code, status.HTTP_400_BAD_REQUEST)
 
+    def test_cuenta_antigua_sin_verificar_no_aparta_el_correo(self):
+        crear_usuario(correo=CORREO, correo_verificado=False)
+        self.assertEqual(self.registrar().status_code, status.HTTP_201_CREATED)
+
     def test_registro_acepta_preferencia(self):
-        self.registrar(preferencia_compatibilidad=PreferenciaCompatibilidad.MISMO_SEXO)
+        token = self.registrar(preferencia_compatibilidad=PreferenciaCompatibilidad.MISMO_SEXO).data["token"]
+        self.verificar(token, codigo_del_correo())
         self.assertEqual(
             Usuario.objects.get().preferencia_compatibilidad, PreferenciaCompatibilidad.MISMO_SEXO
         )
 
 
-class VerificacionTests(TestCase):
+class VerificacionTests(RegistroBase):
     def setUp(self):
-        cliente_para().post("/api/auth/register/", DATOS_REGISTRO, format="json")
-        self.usuario = Usuario.objects.get()
+        super().setUp()
+        self.token = self.registrar().data["token"]
         self.codigo = codigo_del_correo()
+        self.malo = "000000" if self.codigo != "000000" else "111111"
 
-    def verificar(self, codigo, correo="ana.lopez@alumnos.uacj.mx"):
-        return cliente_para().post("/api/auth/verificar/", {"correo": correo, "codigo": codigo}, format="json")
-
-    def login(self):
-        return cliente_para().post(
-            "/api/auth/token/", {"correo": "ana.lopez@alumnos.uacj.mx", "password": "password123"}, format="json"
-        )
-
-    def test_login_sin_verificar_es_403(self):
-        respuesta = self.login()
-        self.assertEqual(respuesta.status_code, status.HTTP_403_FORBIDDEN)
-        self.assertEqual(respuesta.data["codigo"], "correo_no_verificado")
-        self.assertNotIn("access", respuesta.data)
-
-    def test_verificar_activa_la_cuenta_y_devuelve_tokens(self):
-        respuesta = self.verificar(self.codigo)
+    def test_verificar_crea_la_cuenta_y_devuelve_tokens(self):
+        respuesta = self.verificar(self.token, self.codigo)
         self.assertEqual(respuesta.status_code, status.HTTP_200_OK)
         self.assertIn("access", respuesta.data)
         self.assertIn("refresh", respuesta.data)
         self.assertTrue(respuesta.data["usuario"]["correo_verificado"])
-        self.usuario.refresh_from_db()
-        self.assertTrue(self.usuario.correo_verificado)
+        usuario = Usuario.objects.get()
+        self.assertEqual(usuario.correo, CORREO)
+        self.assertTrue(usuario.correo_verificado)
         self.assertEqual(self.login().status_code, status.HTTP_200_OK)
 
         # El token sirve para el paso siguiente
@@ -103,74 +135,92 @@ class VerificacionTests(TestCase):
         cliente.credentials(HTTP_AUTHORIZATION=f"Bearer {respuesta.data['access']}")
         self.assertEqual(cliente.get("/api/auth/me/").status_code, status.HTTP_200_OK)
 
-    def test_verificar_acepta_correo_con_mayusculas(self):
-        self.assertEqual(self.verificar(self.codigo, correo="ANA.LOPEZ@alumnos.uacj.mx").status_code, 200)
+    def test_sin_verificar_no_se_puede_iniciar_sesion(self):
+        self.assertEqual(self.login().status_code, status.HTTP_401_UNAUTHORIZED)
 
-    def test_codigo_incorrecto(self):
-        malo = "000000" if self.codigo != "000000" else "111111"
-        respuesta = self.verificar(malo)
+    def test_codigo_incorrecto_no_crea_la_cuenta(self):
+        respuesta = self.verificar(self.token, self.malo)
         self.assertEqual(respuesta.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("codigo", respuesta.data)
-        self.assertEqual(CodigoVerificacion.objects.get().intentos, 1)  # el intento se guarda
+        self.assertFalse(Usuario.objects.exists())
 
     def test_codigo_con_formato_invalido(self):
-        self.assertEqual(self.verificar("12ab").status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(self.verificar(self.token, "12ab").status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_codigo_vencido(self):
-        CodigoVerificacion.objects.update(expira_en=timezone.now() - timedelta(seconds=1))
-        self.assertEqual(self.verificar(self.codigo).status_code, status.HTTP_400_BAD_REQUEST)
+    def test_registro_vencido(self):
+        with patch("django.core.signing.time.time", return_value=time.time() + 16 * 60):
+            respuesta = self.verificar(self.token, self.codigo)
+        self.assertEqual(respuesta.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("venció", str(respuesta.data["codigo"]))
+        self.assertFalse(Usuario.objects.exists())
+
+    def test_token_alterado(self):
+        self.assertEqual(self.verificar(self.token + "x", self.codigo).status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertFalse(Usuario.objects.exists())
 
     @override_settings(CODIGO_VERIFICACION_MAX_INTENTOS=5)
     def test_intentos_agotados_bloquean_incluso_el_codigo_correcto(self):
-        malo = "000000" if self.codigo != "000000" else "111111"
         for _ in range(5):
-            self.verificar(malo)
-        respuesta = self.verificar(self.codigo)
+            self.verificar(self.token, self.malo)
+        respuesta = self.verificar(self.token, self.codigo)
         self.assertEqual(respuesta.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("Agotaste", str(respuesta.data["codigo"]))
+        self.assertFalse(Usuario.objects.exists())
 
     def test_codigo_no_se_reutiliza(self):
-        self.verificar(self.codigo)
-        self.assertEqual(self.verificar(self.codigo).status_code, status.HTTP_409_CONFLICT)
+        self.verificar(self.token, self.codigo)
+        self.assertEqual(self.verificar(self.token, self.codigo).status_code, status.HTTP_409_CONFLICT)
+        self.assertEqual(Usuario.objects.count(), 1)
 
-    def test_correo_inexistente(self):
-        self.assertEqual(self.verificar(self.codigo, correo="nadie@alumnos.uacj.mx").status_code, 400)
+    def test_reemplaza_una_cuenta_antigua_sin_verificar(self):
+        crear_usuario(correo=CORREO, correo_verificado=False, nombre="Vieja")
+        self.assertEqual(self.verificar(self.token, self.codigo).status_code, status.HTTP_200_OK)
+        usuario = Usuario.objects.get(correo=CORREO)
+        self.assertEqual(usuario.nombre, "Ana")
+        self.assertTrue(usuario.correo_verificado)
+        self.assertEqual(self.login().status_code, status.HTTP_200_OK)
+
+    def test_no_reemplaza_una_cuenta_verificada(self):
+        crear_usuario(correo=CORREO, nombre="Dueña")
+        self.assertEqual(self.verificar(self.token, self.codigo).status_code, status.HTTP_409_CONFLICT)
+        self.assertEqual(Usuario.objects.get(correo=CORREO).nombre, "Dueña")
 
 
-class ReenviarCodigoTests(TestCase):
+class ReenviarCodigoTests(RegistroBase):
     def setUp(self):
-        cliente_para().post("/api/auth/register/", DATOS_REGISTRO, format="json")
+        super().setUp()
+        self.token = self.registrar().data["token"]
 
-    def reenviar(self, correo="ana.lopez@alumnos.uacj.mx"):
-        return cliente_para().post("/api/auth/reenviar-codigo/", {"correo": correo}, format="json")
+    def reenviar(self, token=None):
+        return cliente_para().post("/api/auth/reenviar-codigo/", {"token": token or self.token}, format="json")
 
     def test_antes_de_la_espera_es_409(self):
         self.assertEqual(self.reenviar().status_code, status.HTTP_409_CONFLICT)
         self.assertEqual(len(mail.outbox), 1)
 
-    def test_reenvio_anula_el_codigo_anterior(self):
+    def test_reenvio_cambia_el_codigo_y_el_token(self):
         anterior = codigo_del_correo()
-        CodigoVerificacion.objects.update(creado_en=timezone.now() - timedelta(minutes=2))
-        self.assertEqual(self.reenviar().status_code, status.HTTP_200_OK)
+        cache.clear()
+        respuesta = self.reenviar()
+        self.assertEqual(respuesta.status_code, status.HTTP_200_OK)
         self.assertEqual(len(mail.outbox), 2)
         nuevo = codigo_del_correo()
-
-        verificar = lambda codigo: cliente_para().post(  # noqa: E731
-            "/api/auth/verificar/", {"correo": "ana.lopez@alumnos.uacj.mx", "codigo": codigo}, format="json"
-        )
         if anterior != nuevo:
-            self.assertEqual(verificar(anterior).status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(verificar(nuevo).status_code, status.HTTP_200_OK)
+            self.assertEqual(self.verificar(respuesta.data["token"], anterior).status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(self.verificar(respuesta.data["token"], nuevo).status_code, status.HTTP_200_OK)
 
-    def test_correo_inexistente_o_verificado_responde_igual_sin_enviar(self):
-        verificado = crear_usuario()
-        for correo in ("nadie@alumnos.uacj.mx", verificado.correo):
-            with self.subTest(correo=correo):
-                self.assertEqual(self.reenviar(correo).status_code, status.HTTP_200_OK)
+    def test_token_invalido_no_envia(self):
+        self.assertEqual(self.reenviar("no-es-un-token").status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(len(mail.outbox), 1)
+
+    def test_correo_ya_verificado_es_409_y_no_envia(self):
+        crear_usuario(correo=CORREO)
+        cache.clear()
+        self.assertEqual(self.reenviar().status_code, status.HTTP_409_CONFLICT)
         self.assertEqual(len(mail.outbox), 1)
 
 
-class CorreoCodigoTests(TestCase):
+class CorreoCodigoTests(RegistroBase):
     """El correo del código trae HTML, texto plano y el logo incrustado (RF-01)."""
 
     def partes(self, correo):
@@ -196,16 +246,14 @@ class CorreoCodigoTests(TestCase):
         self.assertTrue(logo.get_content().startswith(b"\x89PNG"))
 
     def test_registro_manda_html_con_logo(self):
-        cliente_para().post("/api/auth/register/", DATOS_REGISTRO, format="json")
+        self.registrar()
         self.assertEqual(len(mail.outbox), 1)
         self.revisar_correo(mail.outbox[0])
 
     def test_reenvio_usa_el_mismo_correo(self):
-        cliente_para().post("/api/auth/register/", DATOS_REGISTRO, format="json")
-        CodigoVerificacion.objects.update(creado_en=timezone.now() - timedelta(minutes=2))
-        cliente_para().post(
-            "/api/auth/reenviar-codigo/", {"correo": "ana.lopez@alumnos.uacj.mx"}, format="json"
-        )
+        token = self.registrar().data["token"]
+        cache.clear()
+        cliente_para().post("/api/auth/reenviar-codigo/", {"token": token}, format="json")
         self.assertEqual(len(mail.outbox), 2)
         self.revisar_correo(mail.outbox[1])
 

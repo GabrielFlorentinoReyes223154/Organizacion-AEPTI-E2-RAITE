@@ -95,7 +95,8 @@ class RegistroSerializer(serializers.ModelSerializer):
         }
 
     def validate_correo(self, value):
-        if Usuario.objects.filter(correo__iexact=value).exists():
+        # Una cuenta sin verificar no aparta el correo.
+        if Usuario.objects.filter(correo__iexact=value, correo_verificado=True).exists():
             raise serializers.ValidationError("Este correo ya está registrado.")
         return value.lower()
 
@@ -106,22 +107,21 @@ class RegistroSerializer(serializers.ModelSerializer):
 
 
 class RegistroResponseSerializer(serializers.Serializer):
-    id = serializers.UUIDField()
     correo = serializers.EmailField()
     rol = serializers.IntegerField()
     rol_display = serializers.CharField()
-    suspendido = serializers.BooleanField()
     requiere_vehiculo = serializers.BooleanField()
     requiere_verificacion = serializers.BooleanField()
+    token = serializers.CharField()
 
 
 class VerificarCorreoSerializer(serializers.Serializer):
-    correo = serializers.EmailField()
+    token = serializers.CharField()
     codigo = serializers.RegexField(r"^\d{6}$", error_messages={"invalid": "El código tiene 6 dígitos."})
 
 
-class CorreoSerializer(serializers.Serializer):
-    correo = serializers.EmailField()
+class ReenviarCodigoSerializer(serializers.Serializer):
+    token = serializers.CharField()
 
 
 class CorreoNoVerificado(APIException):
@@ -131,7 +131,7 @@ class CorreoNoVerificado(APIException):
     def __init__(self):
         super().__init__(
             {
-                "detail": "Verifica tu correo institucional antes de iniciar sesión.",
+                "detail": "No completaste la verificación de esta cuenta. Regístrate de nuevo con este correo.",
                 "codigo": "correo_no_verificado",
             }
         )

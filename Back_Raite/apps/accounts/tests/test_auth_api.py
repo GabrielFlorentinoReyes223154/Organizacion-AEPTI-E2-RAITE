@@ -1,4 +1,8 @@
+import re
+
 from django.contrib.auth import get_user_model
+from django.core import mail
+from django.core.cache import cache
 from django.test import TestCase
 from rest_framework.test import APIClient
 from rest_framework import status
@@ -8,6 +12,7 @@ from apps.accounts.models import Rol, Sexo
 
 class AuthAPITests(TestCase):
     def setUp(self):
+        cache.clear()
         self.client = APIClient()
         self.User = get_user_model()
         self.user = self.User.objects.create_user(
@@ -22,6 +27,12 @@ class AuthAPITests(TestCase):
             rol=Rol.PASAJERO,
             correo_verificado=True,
         )
+
+    def verificar(self, registro):
+        """Confirma el código del último correo y devuelve la cuenta recién creada."""
+        codigo = re.search(r"\b(\d{6})\b", mail.outbox[-1].body).group(1)
+        self.client.post("/api/auth/verificar/", {"token": registro.data["token"], "codigo": codigo}, format="json")
+        return self.User.objects.get(correo=registro.data["correo"])
 
     def test_obtener_token_login_valido(self):
         response = self.client.post(
@@ -119,7 +130,7 @@ class AuthAPITests(TestCase):
             format="json",
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        user = self.User.objects.get(correo="pasajero@alumnos.uacj.mx")
+        user = self.verificar(response)
         self.assertEqual(user.rol, Rol.PASAJERO)
         self.assertTrue(user.es_pasajero)
         self.assertFalse(user.es_conductor)
@@ -141,7 +152,7 @@ class AuthAPITests(TestCase):
             format="json",
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        user = self.User.objects.get(correo="conductor@alumnos.uacj.mx")
+        user = self.verificar(response)
         self.assertEqual(user.rol, Rol.CONDUCTOR)
         self.assertTrue(user.es_conductor)
         self.assertFalse(user.es_pasajero)
@@ -162,7 +173,7 @@ class AuthAPITests(TestCase):
             format="json",
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        user = self.User.objects.get(correo="default@alumnos.uacj.mx")
+        user = self.verificar(response)
         self.assertEqual(user.rol, Rol.PASAJERO)
         self.assertTrue(user.es_pasajero)
 
