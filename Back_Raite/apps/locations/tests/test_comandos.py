@@ -8,7 +8,7 @@ from django.core.management import call_command
 from django.test import SimpleTestCase, TestCase
 
 from apps.locations import osm
-from apps.locations.models import Campus, PuntoReferencia
+from apps.locations.models import Campus, Carrera, PuntoReferencia
 
 DATOS_REALES = Path(__file__).resolve().parents[1] / "data"
 
@@ -126,9 +126,19 @@ class CargarDatosInicialesTests(TestCase):
             {"osm_id": "node/2", "nombre": "Oxxo – (sin calle)", "latitud": "31.71", "longitud": "-106.41", "activo": False},
         ]
         with tempfile.TemporaryDirectory() as tmp:
-            args = {"campus": self.escribir(tmp, "c.json", campus), "puntos": self.escribir(tmp, "p.json", puntos)}
+            carreras = [
+                {"campus": "CU", "nombre": "Licenciatura en Derecho", "area": "Sociales"},
+                {"campus": "ICSA", "nombre": "Licenciatura en Derecho", "area": "Sociales"},
+            ]
+            args = {
+                "campus": self.escribir(tmp, "c.json", campus),
+                "puntos": self.escribir(tmp, "p.json", puntos),
+                "carreras": self.escribir(tmp, "k.json", carreras),
+            }
             call_command("cargar_datos_iniciales", stdout=StringIO(), **args)
             self.assertEqual(Campus.objects.count(), 5)
+            self.assertEqual(Carrera.objects.count(), 2)
+            Carrera.objects.filter(campus__codigo="CU").update(activo=False)
             self.assertEqual(PuntoReferencia.objects.count(), 2)
             self.assertFalse(PuntoReferencia.objects.get(osm_id="node/2").activo)
 
@@ -142,6 +152,21 @@ class CargarDatosInicialesTests(TestCase):
             punto = PuntoReferencia.objects.get(osm_id="node/2")
             self.assertEqual((punto.nombre, punto.activo), ("Oxxo Dunas", True))
             self.assertIn("0 creados, 5 actualizados", salida.getvalue())
+            self.assertIn("Carreras: 0 creadas, 2 actualizadas", salida.getvalue())
+            self.assertEqual(Carrera.objects.count(), 2)
+            self.assertFalse(Carrera.objects.get(campus__codigo="CU").activo)
+
+    def test_carrera_de_campus_inexistente_falla(self):
+        from django.core.management.base import CommandError
+
+        with tempfile.TemporaryDirectory() as tmp:
+            args = {
+                "campus": self.escribir(tmp, "c.json", []),
+                "puntos": self.escribir(tmp, "p.json", []),
+                "carreras": self.escribir(tmp, "k.json", [{"campus": "XYZ", "nombre": "Derecho"}]),
+            }
+            with self.assertRaises(CommandError):
+                call_command("cargar_datos_iniciales", stdout=StringIO(), **args)
 
     def test_actualizar_estados_copia_activo_a_puntos_existentes(self):
         puntos = [
@@ -149,7 +174,11 @@ class CargarDatosInicialesTests(TestCase):
             {"osm_id": "node/2", "nombre": "Oxxo – (sin calle)", "latitud": "31.71", "longitud": "-106.41", "activo": False},
         ]
         with tempfile.TemporaryDirectory() as tmp:
-            args = {"campus": self.escribir(tmp, "c.json", []), "puntos": self.escribir(tmp, "p.json", puntos)}
+            args = {
+                "campus": self.escribir(tmp, "c.json", []),
+                "puntos": self.escribir(tmp, "p.json", puntos),
+                "carreras": self.escribir(tmp, "k.json", []),
+            }
             call_command("cargar_datos_iniciales", stdout=StringIO(), **args)
             PuntoReferencia.objects.filter(osm_id="node/1").update(activo=False, nombre="Oxxo Dunas")
             PuntoReferencia.objects.filter(osm_id="node/2").update(activo=True)
@@ -166,7 +195,11 @@ class CargarDatosInicialesTests(TestCase):
 
         puntos = [{"osm_id": "node/9", "nombre": "Oxxo", "latitud": "25.6", "longitud": "-100.1"}]
         with tempfile.TemporaryDirectory() as tmp:
-            args = {"campus": self.escribir(tmp, "c.json", []), "puntos": self.escribir(tmp, "p.json", puntos)}
+            args = {
+                "campus": self.escribir(tmp, "c.json", []),
+                "puntos": self.escribir(tmp, "p.json", puntos),
+                "carreras": self.escribir(tmp, "k.json", []),
+            }
             with self.assertRaises(ValidationError):
                 call_command("cargar_datos_iniciales", stdout=StringIO(), **args)
         self.assertEqual(PuntoReferencia.objects.count(), 0)
@@ -178,6 +211,10 @@ class CargarDatosInicialesTests(TestCase):
             set(Campus.objects.values_list("codigo", flat=True)), {"CU", "IIT", "ICB", "ICSA", "IADA"}
         )
         self.assertGreater(PuntoReferencia.objects.count(), 100)
+        self.assertEqual(Carrera.objects.count(), 74)
+        self.assertEqual(
+            set(Carrera.objects.values_list("campus__codigo", flat=True)), {"CU", "IIT", "ICB", "ICSA", "IADA"}
+        )
 
     def test_json_versionado_sigue_la_regla_de_activo(self):
         datos = json.loads((DATOS_REALES / "puntos_referencia.json").read_text(encoding="utf-8"))

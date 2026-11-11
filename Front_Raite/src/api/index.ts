@@ -4,6 +4,7 @@ import { api } from '@/boot/axios';
 import type {
   CalificacionPendiente,
   Campus,
+  Carrera,
   DatosRegistro,
   DatosVehiculo,
   DatosViaje,
@@ -52,20 +53,20 @@ export const cuenta = {
   salir: (refresh: string) => post<unknown>('/api/auth/token/blacklist/', { refresh }),
   registrar: (datos: DatosRegistro) =>
     post<{
-      id: Uuid;
       correo: string;
       rol: RolId;
       requiere_vehiculo: boolean;
       requiere_verificacion: boolean;
+      token: string;
     }>('/api/auth/register/', datos),
-  verificar: (correo: string, codigo: string) =>
-    post<Tokens & { usuario: Usuario }>('/api/auth/verificar/', { correo, codigo }),
-  reenviarCodigo: (correo: string) =>
-    post<{ detail: string }>('/api/auth/reenviar-codigo/', { correo }),
+  verificar: (token: string, codigo: string) =>
+    post<Tokens & { usuario: Usuario }>('/api/auth/verificar/', { token, codigo }),
+  reenviarCodigo: (token: string) =>
+    post<{ detail: string; token: string }>('/api/auth/reenviar-codigo/', { token }),
   yo: () => get<Usuario>('/api/auth/me/'),
   editarPerfil: (datos: {
     telefono?: string;
-    carrera?: string;
+    carrera?: number;
     preferencia_compatibilidad?: Preferencia;
   }) => patch<Usuario>('/api/auth/me/', datos),
   vehiculo: () => get<Vehiculo>('/api/auth/vehicle/'),
@@ -83,6 +84,8 @@ export const cuenta = {
 
 export const catalogos = {
   campus: () => get<Campus[]>('/api/campus/'),
+  /** Público (lo usa el registro). Sin `campus`, todas las carreras activas. */
+  carreras: (params?: { campus?: number }) => get<Carrera[]>('/api/carreras/', params),
   puntos: (params?: { q?: string; lat?: number; lon?: number }) =>
     get<PuntoReferencia[]>('/api/puntos/', params),
 };

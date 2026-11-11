@@ -10,9 +10,9 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from . import services
 from .permissions import CorreoVerificado
 from .serializers import (
-    CorreoSerializer,
     LoginSerializer,
     PerfilEditableSerializer,
+    ReenviarCodigoSerializer,
     RegistroResponseSerializer,
     RegistroSerializer,
     UsuarioSerializer,
@@ -49,31 +49,31 @@ class MeView(APIView):
 
 
 class RegistroView(APIView):
-    """Paso 1: crea el usuario sin verificar y le manda el código. Si tiene rol conductor,
-    devuelve requiere_vehiculo=True (el vehículo se registra después de verificar)."""
+    """Paso 1: valida los datos y manda el código, sin guardar nada. Devuelve el token que se
+    presenta en `verificar/`. Si tiene rol conductor, devuelve requiere_vehiculo=True (el
+    vehículo se registra después de verificar)."""
 
     permission_classes = [AllowAny]
 
     def post(self, request):
         serializer = RegistroSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        user = services.registrar(serializer.validated_data)
+        user, token = services.registrar(serializer.validated_data)
         response_serializer = RegistroResponseSerializer(
             {
-                "id": user.id,
                 "correo": user.correo,
                 "rol": user.rol,
                 "rol_display": user.get_rol_display(),
-                "suspendido": user.suspendido,
                 "requiere_vehiculo": user.es_conductor,
                 "requiere_verificacion": True,
+                "token": token,
             }
         )
         return Response(response_serializer.data, status=status.HTTP_201_CREATED)
 
 
 class VerificarCorreoView(APIView):
-    """Activa la cuenta con el código de 6 dígitos y devuelve los tokens de sesión."""
+    """Crea la cuenta con el token del registro y el código, y devuelve los tokens de sesión."""
 
     permission_classes = [AllowAny]
 
@@ -85,17 +85,15 @@ class VerificarCorreoView(APIView):
 
 
 class ReenviarCodigoView(APIView):
-    """Manda un código nuevo. Responde igual exista o no el correo."""
+    """Manda un código nuevo y devuelve el token que reemplaza al anterior."""
 
     permission_classes = [AllowAny]
 
     def post(self, request):
-        serializer = CorreoSerializer(data=request.data)
+        serializer = ReenviarCodigoSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        services.reenviar_codigo(serializer.validated_data["correo"])
-        return Response(
-            {"detail": "Si el correo está registrado y sin verificar, te enviamos un código nuevo."}
-        )
+        token = services.reenviar_codigo(serializer.validated_data["token"])
+        return Response({"detail": "Te enviamos un código nuevo.", "token": token})
 
 
 class VehiculoView(APIView):

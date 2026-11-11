@@ -5,26 +5,10 @@
         <q-icon name="mark_email_unread" size="28px" />
       </span>
       <h1 class="raite-titulo raite-titulo--marca verificar__titulo">Revisa tu correo</h1>
-      <p v-if="correoFijo" class="verificar__texto">
+      <p class="verificar__texto">
         Te mandamos un código de 6 dígitos a <strong class="text-negro">{{ correo }}</strong
-        >. Vence en 15 minutos.
+        >. Vence en 15 minutos. Tu cuenta se crea al confirmarlo.
       </p>
-      <p v-else class="verificar__texto">
-        Escribe tu correo y el código de 6 dígitos que te mandamos.
-      </p>
-    </div>
-
-    <div v-if="!correoFijo">
-      <label for="ver-correo" class="raite-etiqueta">Correo institucional</label>
-      <q-input
-        hide-bottom-space
-        for="ver-correo"
-        v-model="correo"
-        outlined
-        type="email"
-        inputmode="email"
-        autocomplete="email"
-      />
     </div>
 
     <div>
@@ -60,7 +44,7 @@
         color="primary"
         no-caps
         :label="espera > 0 ? `Reenviar código en ${espera} s` : 'Reenviar código'"
-        :disable="espera > 0 || !correo"
+        :disable="espera > 0"
         :loading="reenviando"
         @click="reenviar"
       />
@@ -68,7 +52,7 @@
     </div>
 
     <p class="raite-ayuda text-center">
-      <router-link to="/entrar" class="text-weight-bold">Volver a entrar</router-link>
+      <router-link to="/registro" class="text-weight-bold">Volver al registro</router-link>
     </p>
   </q-form>
 </template>
@@ -81,6 +65,11 @@ import { cuenta } from '@/api';
 import { leerError } from '@/api/errores';
 import { useSesionStore } from '@/stores/sesion';
 import { avisarError, avisarExito } from '@/utils/avisar';
+import {
+  guardarRegistroPendiente,
+  leerRegistroPendiente,
+  olvidarRegistroPendiente,
+} from '@/utils/registro-pendiente';
 
 definePage({ meta: { publico: true, titulo: 'Verificar correo' } });
 
@@ -90,14 +79,16 @@ const route = useRoute();
 const router = useRouter();
 const sesion = useSesionStore();
 
-const correoInicial = typeof route.query.correo === 'string' ? route.query.correo : '';
-const correoFijo = !!correoInicial;
-const correo = ref(correoInicial);
+const correo = typeof route.query.correo === 'string' ? route.query.correo : '';
+const token = ref(leerRegistroPendiente());
 const codigo = ref('');
 const errorCodigo = ref('');
 const enviando = ref(false);
 const reenviando = ref(false);
-const espera = ref(correoFijo ? ESPERA_SEGUNDOS : 0);
+const espera = ref(ESPERA_SEGUNDOS);
+
+// Sin registro en curso (otra pestaña, o ya venció) no hay nada que verificar.
+if (!token.value) void router.replace('/registro');
 
 const reloj = setInterval(() => {
   if (espera.value > 0) espera.value -= 1;
@@ -112,7 +103,7 @@ async function enviar() {
   }
   enviando.value = true;
   try {
-    await sesion.verificar(correo.value, codigo.value);
+    await sesion.verificar(token.value ?? '', codigo.value);
     avisarExito(`¡Listo, ${sesion.usuario?.nombre ?? ''}! Tu cuenta está activa.`);
     const necesitaVehiculo = sesion.usuario?.es_conductor && !sesion.usuario.vehiculo;
     await router.replace(
@@ -121,8 +112,9 @@ async function enviar() {
   } catch (error) {
     const legible = leerError(error);
     if (legible.status === 409) {
+      olvidarRegistroPendiente();
       avisarExito(legible.mensaje);
-      await router.replace({ path: '/entrar', query: { correo: correo.value } });
+      await router.replace({ path: '/entrar', query: { correo } });
       return;
     }
     errorCodigo.value = legible.campos.codigo ?? legible.mensaje;
@@ -134,8 +126,10 @@ async function enviar() {
 async function reenviar() {
   reenviando.value = true;
   try {
-    const { detail } = await cuenta.reenviarCodigo(correo.value.trim().toLowerCase());
-    avisarExito(detail);
+    const respuesta = await cuenta.reenviarCodigo(token.value ?? '');
+    token.value = respuesta.token;
+    guardarRegistroPendiente(respuesta.token);
+    avisarExito(respuesta.detail);
     espera.value = ESPERA_SEGUNDOS;
   } catch (error) {
     avisarError(error);

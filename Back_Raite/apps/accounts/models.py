@@ -81,7 +81,14 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
     sexo = models.CharField(
         max_length=20, choices=Sexo.choices
     )
-    carrera = models.CharField(max_length=120, default="")
+    carrera = models.ForeignKey(
+        "locations.Carrera",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="alumnos",
+        help_text="Del catálogo de la UACJ; el campus del alumno sale de aquí. Vacía solo en administradores.",
+    )
     telefono = models.CharField(
         "teléfono / WhatsApp",
         max_length=10,
@@ -121,7 +128,7 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
     updated_at = models.DateTimeField(auto_now=True)
 
     USERNAME_FIELD = "correo"
-    REQUIRED_FIELDS = ["nombre", "apellidos", "edad", "sexo", "carrera", "telefono"]
+    REQUIRED_FIELDS = ["nombre", "apellidos", "edad", "sexo", "telefono"]
 
     objects = UsuarioManager()
 
@@ -142,6 +149,8 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
             raise ValidationError(
                 {"correo": f"Usa tu correo institucional @{settings.CORREO_DOMINIO_PERMITIDO}."}
             )
+        if not self.es_admin and self.carrera_id is None:
+            raise ValidationError({"carrera": "Elige tu campus y tu carrera."})
 
     def save(self, *args, **kwargs):
         if self.is_staff or self.is_superuser:
@@ -170,6 +179,11 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
     @property
     def nombre_completo(self) -> str:
         return f"{self.nombre} {self.apellidos}".strip()
+
+    @property
+    def campus(self):
+        """Campus de la carrera del alumno (None en administradores)."""
+        return self.carrera.campus if self.carrera_id else None
 
     @property
     def vehiculo_valido(self) -> bool:

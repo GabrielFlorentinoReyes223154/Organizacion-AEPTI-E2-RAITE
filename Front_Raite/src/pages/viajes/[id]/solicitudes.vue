@@ -77,7 +77,7 @@
                   <p class="raite-ayuda solicitud__resumen">
                     <q-icon name="star" size="14px" aria-hidden="true" />
                     {{ calificacion(s.pasajero.calificacion) ?? 'Nuevo' }} ·
-                    {{ s.pasajero.carrera }}
+                    {{ conCampus(s.pasajero) }}
                   </p>
                 </div>
               </div>
@@ -178,7 +178,7 @@ import ChipEstado from '@/components/ChipEstado.vue';
 import EstadoVacio from '@/components/EstadoVacio.vue';
 import PlacaCampus from '@/components/PlacaCampus.vue';
 import { avisarError, avisarExito, confirmar } from '@/utils/avisar';
-import { calificacion, diaCorto, hora, iniciales, telefono } from '@/utils/formato';
+import { calificacion, conCampus, diaCorto, hora, iniciales, telefono } from '@/utils/formato';
 
 definePage({ meta: { titulo: 'Solicitudes', papel: 'conductor', atras: '/mis-viajes' } });
 

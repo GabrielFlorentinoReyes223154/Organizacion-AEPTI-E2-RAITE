@@ -1,13 +1,45 @@
 """Funciones para crear datos de prueba. Las usan los tests de todas las apps."""
 
+from decimal import Decimal
 from itertools import count
 
 from django.contrib.auth import get_user_model
 
 from apps.accounts.models import Vehiculo
 from apps.accounts.models_choices import Rol, Sexo, TipoVehiculo
+from apps.locations.models import Campus, Carrera
 
 _secuencia = count(1)
+
+
+def crear_carrera(campus=None, **datos):
+    """Crea una carrera del catálogo. Sin `campus`, usa uno nuevo y activo."""
+    n = next(_secuencia)
+    if campus is None:
+        campus = Campus.objects.create(
+            codigo=f"K{n}", nombre=f"Campus {n}", latitud=Decimal("31.742765"), longitud=Decimal("-106.431511")
+        )
+    valores = {"nombre": f"Licenciatura {n}", "area": "Ingenierías"}
+    valores.update(datos)
+    return Carrera.objects.create(campus=campus, **valores)
+
+
+def carrera_por_defecto():
+    """Carrera compartida por los usuarios de prueba.
+
+    Su campus está inactivo para no aparecer en los catálogos que revisan las pruebas.
+    """
+    campus, _ = Campus.objects.get_or_create(
+        codigo="PRUEBA",
+        defaults={
+            "nombre": "Campus de prueba",
+            "latitud": Decimal("31.742765"),
+            "longitud": Decimal("-106.431511"),
+            "activo": False,
+        },
+    )
+    carrera, _ = Carrera.objects.get_or_create(campus=campus, nombre="Ingeniería en Sistemas Computacionales")
+    return carrera
 
 
 def crear_usuario(**datos):
@@ -20,12 +52,13 @@ def crear_usuario(**datos):
         "apellidos": "Prueba",
         "edad": 20,
         "sexo": Sexo.M,
-        "carrera": "Ingeniería en Sistemas",
         "telefono": f"656{n:07d}",
         "rol": Rol.PASAJERO,
         "correo_verificado": True,
     }
     valores.update(datos)
+    if "carrera" not in valores and valores["rol"] != Rol.ADMIN:
+        valores["carrera"] = carrera_por_defecto()
     return get_user_model().objects.create_user(**valores)
 
 

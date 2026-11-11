@@ -27,7 +27,7 @@
               <AvatarIniciales :nombre="p.nombre_completo" :tam="44" />
               <span class="reportar__persona-texto">
                 <span class="reportar__persona-nombre">{{ p.nombre_completo }}</span>
-                <span class="reportar__persona-detalle">{{ p.carrera }}</span>
+                <span class="reportar__persona-detalle">{{ conCampus(p) }}</span>
               </span>
               <span class="reportar__marca" aria-hidden="true">
                 <q-icon name="check" size="16px" />
@@ -119,6 +119,7 @@ import AvatarIniciales from '@/components/AvatarIniciales.vue';
 import EstadoVacio from '@/components/EstadoVacio.vue';
 import { useSesionStore } from '@/stores/sesion';
 import { avisarExito } from '@/utils/avisar';
+import { conCampus } from '@/utils/formato';
 
 definePage({ meta: { titulo: 'Reportar un problema', atras: '/historial' } });
 

@@ -52,7 +52,11 @@ export interface Usuario {
   nombre_completo: string;
   edad: number;
   sexo: Sexo;
+  /** Nombre de la carrera ("" en administradores). */
   carrera: string;
+  carrera_id: number | null;
+  /** Campus de su carrera (null en administradores). */
+  campus: Pick<Campus, 'id' | 'codigo' | 'nombre'> | null;
   telefono: string;
   preferencia_compatibilidad: Preferencia;
   /** "0.00" a "5.00"; "0.00" = sin calificaciones todavía. */
@@ -74,6 +78,8 @@ export interface UsuarioPublico {
   nombre_completo: string;
   sexo: Sexo;
   carrera: string;
+  /** Código del campus de su carrera (ej. IIT). */
+  campus: string | null;
   calificacion: string;
   telefono?: string;
 }
@@ -84,6 +90,14 @@ export interface Campus {
   nombre: string;
   latitud: string;
   longitud: string;
+}
+
+/** Carrera del catálogo de la UACJ; `campus` es el id del campus donde se imparte. */
+export interface Carrera {
+  id: number;
+  campus: number;
+  nombre: string;
+  area: string;
 }
 
 export interface PuntoReferencia {
@@ -203,7 +217,8 @@ export interface DatosRegistro {
   password: string;
   edad: number;
   sexo: Sexo;
-  carrera: string;
+  /** Id de la carrera del catálogo. */
+  carrera: number;
   telefono: string;
   preferencia_compatibilidad: Preferencia;
   rol: RolId;

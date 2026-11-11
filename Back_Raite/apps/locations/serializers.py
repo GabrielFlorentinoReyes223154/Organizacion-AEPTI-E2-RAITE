@@ -1,12 +1,18 @@
 from rest_framework import serializers
 
-from .models import Campus, PuntoReferencia
+from .models import Campus, Carrera, PuntoReferencia
 
 
 class CampusSerializer(serializers.ModelSerializer):
     class Meta:
         model = Campus
         fields = ["id", "codigo", "nombre", "latitud", "longitud"]
+
+
+class CarreraSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Carrera
+        fields = ["id", "campus", "nombre", "area"]
 
 
 class PuntoReferenciaSerializer(serializers.ModelSerializer):

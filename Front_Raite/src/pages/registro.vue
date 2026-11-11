@@ -51,6 +51,23 @@
           />
         </div>
         <div>
+          <label for="reg-telefono" class="raite-etiqueta">Teléfono o WhatsApp</label>
+          <q-input
+            for="reg-telefono"
+            v-model="datos.telefono"
+            outlined
+            type="tel"
+            inputmode="tel"
+            autocomplete="tel-national"
+            mask="### ### ####"
+            unmasked-value
+            input-class="raite-dato"
+            hint="Solo lo ve quien confirme un raite contigo"
+            v-bind="campo('telefono')"
+          />
+        </div>
+
+        <div>
           <label for="reg-password" class="raite-etiqueta">Contraseña</label>
           <q-input
             for="reg-password"
@@ -72,49 +89,46 @@
             </template>
           </q-input>
         </div>
-
         <div>
-          <label for="reg-telefono" class="raite-etiqueta">Teléfono o WhatsApp</label>
+          <label for="reg-password2" class="raite-etiqueta">Confirma tu contraseña</label>
           <q-input
-            for="reg-telefono"
-            v-model="datos.telefono"
+            for="reg-password2"
+            v-model="confirmarPassword"
             outlined
-            type="tel"
-            inputmode="tel"
-            autocomplete="tel-national"
-            mask="### ### ####"
-            unmasked-value
-            input-class="raite-dato"
-            hint="Solo lo ve quien confirme un raite contigo"
-            v-bind="campo('telefono')"
+            :type="verPassword ? 'text' : 'password'"
+            autocomplete="new-password"
+            hint="Escríbela otra vez"
+            v-bind="campo('confirmarPassword')"
+          >
+            <template #append>
+              <q-btn
+                flat
+                round
+                :icon="verPassword ? 'visibility_off' : 'visibility'"
+                :aria-label="verPassword ? 'Ocultar contraseñas' : 'Mostrar contraseñas'"
+                @click="verPassword = !verPassword"
+              />
+            </template>
+          </q-input>
+        </div>
+        <div class="registro__edad">
+          <label for="reg-edad" class="raite-etiqueta">Edad</label>
+          <q-input
+            for="reg-edad"
+            v-model.number="datos.edad"
+            outlined
+            type="number"
+            inputmode="numeric"
+            min="17"
+            max="70"
+            v-bind="campo('edad')"
           />
         </div>
-        <div class="registro__par">
-          <div>
-            <label for="reg-edad" class="raite-etiqueta">Edad</label>
-            <q-input
-              for="reg-edad"
-              v-model.number="datos.edad"
-              outlined
-              type="number"
-              inputmode="numeric"
-              min="17"
-              max="70"
-              v-bind="campo('edad')"
-            />
-          </div>
-          <div>
-            <label for="reg-carrera" class="raite-etiqueta">Carrera</label>
-            <q-input
-              for="reg-carrera"
-              v-model="datos.carrera"
-              outlined
-              maxlength="120"
-              placeholder="Ej. Ingeniería Industrial"
-              v-bind="campo('carrera')"
-            />
-          </div>
-        </div>
+        <SelectorCarrera
+          v-model="datos.carrera"
+          class="registro__completo"
+          :error="errores.carrera ?? ''"
+        />
       </div>
     </section>
 
@@ -212,6 +226,7 @@ import { useRouter } from 'vue-router';
 import isEmail from 'validator/lib/isEmail';
 import { leerError } from '@/api/errores';
 import { Rol, type DatosRegistro } from '@/api/tipos';
+import SelectorCarrera from '@/components/SelectorCarrera.vue';
 import { useSesionStore } from '@/stores/sesion';
 
 definePage({ meta: { publico: true, titulo: 'Crear cuenta', amplio: true } });
@@ -219,8 +234,9 @@ definePage({ meta: { publico: true, titulo: 'Crear cuenta', amplio: true } });
 const router = useRouter();
 const sesion = useSesionStore();
 
-interface FormRegistro extends Omit<DatosRegistro, 'edad' | 'sexo'> {
+interface FormRegistro extends Omit<DatosRegistro, 'edad' | 'sexo' | 'carrera'> {
   edad: number | null;
+  carrera: number | null;
   sexo: DatosRegistro['sexo'] | null;
 }
 
@@ -231,7 +247,7 @@ const datos = reactive<FormRegistro>({
   password: '',
   telefono: '',
   edad: null,
-  carrera: '',
+  carrera: null,
   sexo: null,
   preferencia_compatibilidad: 'MIXTO',
   rol: Rol.PASAJERO,
@@ -240,6 +256,8 @@ const errores = reactive<Record<string, string>>({});
 const mensaje = ref('');
 const enviando = ref(false);
 const verPassword = ref(false);
+// Solo se compara en el navegador; no se manda al API.
+const confirmarPassword = ref('');
 
 const ayudaRol = computed(() =>
   datos.rol === Rol.PASAJERO
@@ -281,9 +299,12 @@ function validar(): boolean {
   if (!isEmail(correo)) errores.correo = 'Escribe un correo válido.';
   else if (!correo.endsWith('@alumnos.uacj.mx')) errores.correo = 'Usa tu correo @alumnos.uacj.mx.';
   if (datos.password.length < 8) errores.password = 'Usa al menos 8 caracteres.';
+  if (!confirmarPassword.value) errores.confirmarPassword = 'Vuelve a escribir tu contraseña.';
+  else if (confirmarPassword.value !== datos.password)
+    errores.confirmarPassword = 'Las contraseñas no coinciden.';
   if (!/^\d{10}$/.test(datos.telefono)) errores.telefono = 'Escribe los 10 dígitos de tu teléfono.';
   if (!datos.edad || datos.edad < 17 || datos.edad > 70) errores.edad = 'Entre 17 y 70 años.';
-  if (!datos.carrera.trim()) errores.carrera = 'Escribe tu carrera.';
+  if (!datos.carrera) errores.carrera = 'Elige tu campus y tu carrera.';
   if (!datos.sexo) errores.sexo = 'Elige una opción.';
   return Object.keys(errores).length === 0;
 }
@@ -300,7 +321,7 @@ async function enviar() {
       ...datos,
       nombre: datos.nombre.trim(),
       apellidos: datos.apellidos.trim(),
-      carrera: datos.carrera.trim(),
+      carrera: datos.carrera ?? 0,
       edad: datos.edad ?? 0,
       sexo: datos.sexo ?? 'X',
     });
@@ -362,10 +383,8 @@ async function enviar() {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
-.registro__par {
-  display: grid;
-  grid-template-columns: 96px minmax(0, 1fr);
-  gap: 16px;
+.registro__edad {
+  max-width: 160px;
 }
 .registro__completo {
   grid-column: 1 / -1;

@@ -7,7 +7,7 @@ from django.test import TestCase
 
 from apps.accounts.models import Rol, Sexo, Vehiculo
 from apps.accounts.models_choices import PreferenciaCompatibilidad
-from apps.accounts.tests.factories import crear_conductor, crear_usuario, crear_vehiculo
+from apps.accounts.tests.factories import crear_carrera, crear_conductor, crear_usuario, crear_vehiculo
 
 
 class UsuarioModelTests(TestCase):
@@ -22,7 +22,6 @@ class UsuarioModelTests(TestCase):
             "apellidos": "Raite",
             "edad": 30,
             "sexo": Sexo.M,
-            "carrera": "Administración",
             "telefono": "6560000000",
         }
         valores.update(datos)
@@ -55,7 +54,7 @@ class UsuarioModelTests(TestCase):
             nombre="Defecto",
             apellidos="Test",
             sexo=Sexo.F,
-            carrera="Derecho",
+            carrera=crear_carrera(),
             telefono="6561112233",
         )
         self.assertEqual(user.rol, Rol.PASAJERO)
@@ -97,6 +96,21 @@ class UsuarioModelTests(TestCase):
 
     def test_admin_puede_tener_cualquier_correo(self):
         self.crear_admin(correo="coordinacion@gmail.com").full_clean()
+
+    def test_alumno_necesita_carrera_y_admin_no(self):
+        alumno = crear_usuario()
+        alumno.carrera = None
+        with self.assertRaises(ValidationError) as error:
+            alumno.full_clean()
+        self.assertIn("carrera", error.exception.message_dict)
+        admin = self.crear_admin()
+        self.assertIsNone(admin.carrera)
+        self.assertIsNone(admin.campus)
+        admin.full_clean()
+
+    def test_campus_sale_de_la_carrera(self):
+        carrera = crear_carrera()
+        self.assertEqual(crear_usuario(carrera=carrera).campus, carrera.campus)
 
     # --- Teléfono ---
 
@@ -274,3 +288,32 @@ class VehiculoModelTests(TestCase):
         self.assertTrue(vehiculo.tiene_capacidad(3))
         self.assertFalse(vehiculo.tiene_capacidad(4))
 
+
+
+
+class MigracionBorrarAlumnosTests(TestCase):
+    """Migración 0014: borra a los alumnos (y lo que depende de ellos) y conserva a los admins."""
+
+    def test_borra_alumnos_con_sus_viajes_y_conserva_admins(self):
+        import importlib
+
+        from django.apps import apps
+
+        from apps.rides.models import Solicitud, Viaje
+        from apps.rides.tests.factories import crear_solicitud, crear_viaje
+
+        admin = get_user_model().objects.create_superuser(
+            correo="admin@ejemplo.com", password="password123", nombre="Admin", apellidos="Raite",
+            edad=30, sexo=Sexo.M, telefono="6560000000",
+        )
+        conductor = crear_conductor()
+        viaje = crear_viaje(conductor)
+        crear_solicitud(viaje, crear_usuario())
+
+        migracion = importlib.import_module("apps.accounts.migrations.0014_borrar_alumnos")
+        migracion.borrar_alumnos(apps, None)
+
+        self.assertEqual(list(get_user_model().objects.all()), [admin])
+        self.assertFalse(Viaje.objects.exists())
+        self.assertFalse(Solicitud.objects.exists())
+        self.assertFalse(Vehiculo.objects.exists())

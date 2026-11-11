@@ -153,3 +153,8 @@ export const TEXTO_ESTADO_SOLICITUD: Record<EstadoSolicitud, string> = {
   RECHAZADA: 'Rechazada',
   CANCELADA: 'Cancelada',
 };
+
+/** "Ingeniería de Software · IIT": carrera de otra persona con el campus donde estudia. */
+export function conCampus(persona: { carrera: string; campus?: string | null }): string {
+  return persona.campus ? `${persona.carrera} · ${persona.campus}` : persona.carrera;
+}

@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Campus, PuntoReferencia
+from .models import Campus, Carrera, PuntoReferencia
 
 
 @admin.register(Campus)
@@ -9,6 +9,15 @@ class CampusAdmin(admin.ModelAdmin):
     list_editable = ("activo",)
     list_filter = ("activo",)
     search_fields = ("codigo", "nombre")
+
+
+@admin.register(Carrera)
+class CarreraAdmin(admin.ModelAdmin):
+    list_display = ("nombre", "campus", "area", "activo")
+    list_editable = ("activo",)
+    list_filter = ("campus", "area", "activo")
+    search_fields = ("nombre",)
+    list_select_related = ("campus",)
 
 
 @admin.register(PuntoReferencia)

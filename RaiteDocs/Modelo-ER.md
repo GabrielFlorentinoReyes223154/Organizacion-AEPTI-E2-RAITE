@@ -15,6 +15,8 @@ erDiagram
     VEHICULO ||--o{ VIAJE : "se usa en"
     PUNTO_REFERENCIA ||--o{ VIAJE : "origen / destino"
     CAMPUS ||--o{ VIAJE : "destino / origen"
+    CAMPUS ||--o{ CARRERA : "imparte"
+    CARRERA |o--o{ USUARIO : "estudia"
     VIAJE ||--o{ SOLICITUD : "recibe"
     USUARIO ||--o{ SOLICITUD : "pide lugar"
     USUARIO ||--o{ NOTIFICACION : "recibe"
@@ -31,7 +33,7 @@ erDiagram
         string apellidos
         int edad "17 a 70"
         string sexo "M, F, X"
-        string carrera
+        int carrera_id FK "catálogo; vacía solo en ADMIN"
         string telefono "10 dígitos; visible solo con raite confirmado"
         string preferencia_compatibilidad "MISMO_SEXO, MIXTO"
         int rol "1 ADMIN, 2 PASAJERO, 3 CONDUCTOR, 4 AMBOS"
@@ -65,6 +67,13 @@ erDiagram
         string nombre
         decimal latitud "dentro de Cd. Juárez"
         decimal longitud
+        bool activo
+    }
+    CARRERA {
+        int id PK
+        int campus_id FK
+        string nombre "UK junto con campus"
+        string area "ej. Ingenierías"
         bool activo
     }
     PUNTO_REFERENCIA {
@@ -162,6 +171,8 @@ stateDiagram-v2
 |-------|-------|
 | Correo `@alumnos.uacj.mx` (el ADMIN queda exento) | `Usuario.clean()` |
 | Teléfono de 10 dígitos | validador de `Usuario.telefono` |
+| Alumno con carrera del catálogo (el ADMIN queda exento); el campus del alumno es el de su carrera | `Usuario.clean()`, `Usuario.campus` |
+| Una carrera por nombre y campus | `UniqueConstraint` de `Carrera` |
 | Asientos del vehículo y lugares del viaje: 1 a 5 | validadores + `CheckConstraint` |
 | Lugares del viaje ≤ asientos del vehículo; vehículo del conductor y activo | `Viaje.clean()` |
 | Viaje nuevo: fecha futura, punto y campus activos | `Viaje.clean()` |

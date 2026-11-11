@@ -1,17 +1,39 @@
 from rest_framework import generics
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
 from .geo import haversine_km
-from .models import Campus, PuntoReferencia
-from .serializers import CampusSerializer, CoordenadasSerializer, PuntoReferenciaSerializer
+from .models import Campus, Carrera, PuntoReferencia
+from .serializers import CampusSerializer, CarreraSerializer, CoordenadasSerializer, PuntoReferenciaSerializer
 
 
 class CampusListView(generics.ListAPIView):
-    """Campus activos (sin paginar: son 5)."""
+    """Campus activos (sin paginar: son 5). Público: el registro lo usa para elegir la carrera."""
 
+    permission_classes = [AllowAny]
     serializer_class = CampusSerializer
     pagination_class = None
     queryset = Campus.objects.filter(activo=True).order_by("codigo")
+
+
+class CarreraListView(generics.ListAPIView):
+    """Carreras activas de campus activos (sin paginar). Público, para el registro.
+
+    `?campus=<id>` deja solo las de ese campus.
+    """
+
+    permission_classes = [AllowAny]
+    serializer_class = CarreraSerializer
+    pagination_class = None
+
+    def get_queryset(self):
+        carreras = Carrera.objects.filter(activo=True, campus__activo=True).order_by("nombre")
+        campus = self.request.query_params.get("campus", "").strip()
+        if campus:
+            if not campus.isdigit():
+                return carreras.none()
+            carreras = carreras.filter(campus_id=int(campus))
+        return carreras
 
 
 class PuntoReferenciaListView(generics.GenericAPIView):

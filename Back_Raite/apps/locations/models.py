@@ -73,3 +73,31 @@ class PuntoReferencia(UbicacionBase):
 
     def __str__(self):
         return self.nombre
+
+
+class Carrera(models.Model):
+    """Licenciatura o ingeniería que se ofrece en un campus (catálogo oficial de la UACJ).
+
+    Una misma carrera puede darse en varios campus; cada combinación es un registro.
+    El campus del alumno se obtiene de su carrera.
+    """
+
+    campus = models.ForeignKey(Campus, on_delete=models.PROTECT, related_name="carreras")
+    nombre = models.CharField(max_length=120)
+    area = models.CharField(max_length=80, blank=True, help_text="Área del conocimiento (ej. Ingenierías).")
+    activo = models.BooleanField(default=True, help_text="Si está inactiva no se puede elegir en la app.")
+
+    class Meta:
+        verbose_name = "carrera"
+        verbose_name_plural = "carreras"
+        ordering = ["campus__codigo", "nombre"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["campus", "nombre"],
+                name="carrera_unica_por_campus",
+                violation_error_message="Esa carrera ya existe en este campus.",
+            ),
+        ]
+
+    def __str__(self):
+        return f"{self.nombre} ({self.campus.codigo})"

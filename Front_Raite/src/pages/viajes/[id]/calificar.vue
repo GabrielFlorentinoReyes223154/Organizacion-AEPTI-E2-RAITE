@@ -48,7 +48,7 @@
               <AvatarIniciales :nombre="p.usuario.nombre_completo" :tam="56" />
               <div>
                 <h3 class="calificar__nombre">{{ p.usuario.nombre_completo }}</h3>
-                <p class="raite-ayuda">{{ p.usuario.carrera }}</p>
+                <p class="raite-ayuda">{{ conCampus(p.usuario) }}</p>
               </div>
             </div>
 
@@ -110,7 +110,7 @@ import type { CalificacionPendiente } from '@/api/tipos';
 import AvatarIniciales from '@/components/AvatarIniciales.vue';
 import EstadoVacio from '@/components/EstadoVacio.vue';
 import { avisarError, avisarExito } from '@/utils/avisar';
-import { diaLargo, hora } from '@/utils/formato';
+import { conCampus, diaLargo, hora } from '@/utils/formato';
 
 definePage({ meta: { titulo: 'Calificar', atras: '/historial' } });
 

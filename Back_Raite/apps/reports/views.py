@@ -21,4 +21,4 @@ class MisReportesView(generics.ListAPIView):
     serializer_class = ReporteSerializer
 
     def get_queryset(self):
-        return Reporte.objects.filter(reportante=self.request.user).select_related("reportado")
+        return Reporte.objects.filter(reportante=self.request.user).select_related("reportado__carrera__campus")

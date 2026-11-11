@@ -18,7 +18,7 @@ from django.utils import timezone
 from apps.accounts.models import Vehiculo
 from apps.accounts.models_choices import PreferenciaCompatibilidad, Rol, Sexo, TipoVehiculo
 from apps.locations.geo import haversine_km
-from apps.locations.models import Campus, PuntoReferencia
+from apps.locations.models import Campus, Carrera, PuntoReferencia
 from apps.ratings.models import Calificacion
 from apps.ratings.services import calificar
 from apps.reports.models import Reporte
@@ -34,17 +34,17 @@ PUNTO_ANCLA = "Triunfo de la República"  # punto donde se juntan varios viajes 
 MIXTO, MISMO = PreferenciaCompatibilidad.MIXTO, PreferenciaCompatibilidad.MISMO_SEXO
 
 USUARIOS = {
-    # clave: (nombre, apellidos, sexo, edad, carrera, rol, preferencia, vehículo o None)
-    "mariana": ("Mariana", "López Villa", Sexo.F, 22, "Ingeniería en Sistemas Computacionales", Rol.CONDUCTOR, MIXTO,
+    # clave: (nombre, apellidos, sexo, edad, (campus, carrera del catálogo), rol, preferencia, vehículo o None)
+    "mariana": ("Mariana", "López Villa", Sexo.F, 22, ("IIT", "Ingeniería en Sistemas Computacionales"), Rol.CONDUCTOR, MIXTO,
                 ("Nissan", "Versa", "Gris", "EFH4821", TipoVehiculo.COCHE, 4)),
-    "diego": ("Diego", "Hernández Soto", Sexo.M, 23, "Ingeniería Industrial", Rol.CONDUCTOR, MIXTO,
+    "diego": ("Diego", "Hernández Soto", Sexo.M, 23, ("IIT", "Ingeniería Industrial y de Sistemas"), Rol.CONDUCTOR, MIXTO,
               ("Chevrolet", "Aveo", "Blanco", "EKL1093", TipoVehiculo.COCHE, 4)),
-    "valeria": ("Valeria", "Ruiz Campos", Sexo.F, 21, "Médico Cirujano", Rol.AMBOS, MISMO,
+    "valeria": ("Valeria", "Ruiz Campos", Sexo.F, 21, ("ICB", "Licenciatura en Médico Cirujano"), Rol.AMBOS, MISMO,
                 ("Kia", "Rio", "Rojo", "ESD7754", TipoVehiculo.COCHE, 3)),
-    "andrea": ("Andrea", "Martínez Olivas", Sexo.F, 20, "Psicología", Rol.PASAJERO, MIXTO, None),
-    "luis": ("Luis", "Ortega Ramos", Sexo.M, 19, "Arquitectura", Rol.PASAJERO, MIXTO, None),
-    "sofia": ("Sofía", "Chávez Durán", Sexo.F, 20, "Enfermería", Rol.PASAJERO, MISMO, None),
-    "alex": ("Alex", "Ramírez Luna", Sexo.X, 21, "Diseño Gráfico", Rol.PASAJERO, MIXTO, None),
+    "andrea": ("Andrea", "Martínez Olivas", Sexo.F, 20, ("ICSA", "Licenciatura en Psicología"), Rol.PASAJERO, MIXTO, None),
+    "luis": ("Luis", "Ortega Ramos", Sexo.M, 19, ("IADA", "Licenciatura en Arquitectura"), Rol.PASAJERO, MIXTO, None),
+    "sofia": ("Sofía", "Chávez Durán", Sexo.F, 20, ("ICB", "Licenciatura en Enfermería"), Rol.PASAJERO, MISMO, None),
+    "alex": ("Alex", "Ramírez Luna", Sexo.X, 21, ("IADA", "Licenciatura en Diseño Digital de Medios Interactivos"), Rol.PASAJERO, MIXTO, None),
 }
 
 
@@ -74,7 +74,7 @@ class Command(BaseCommand):
                 raise CommandError("Ya hay datos de demo. Usa --reiniciar para borrarlos y crearlos de nuevo.")
             self._borrar(existentes)
 
-        if not Campus.objects.exists() or not PuntoReferencia.objects.exists():
+        if not (Campus.objects.exists() and PuntoReferencia.objects.exists() and Carrera.objects.exists()):
             call_command("cargar_datos_iniciales", verbosity=0)
 
         with transaction.atomic():
@@ -106,7 +106,7 @@ class Command(BaseCommand):
             apellidos=apellidos,
             sexo=sexo,
             edad=edad,
-            carrera=carrera,
+            carrera=Carrera.objects.get(campus__codigo=carrera[0], nombre=carrera[1]),
             rol=rol,
             preferencia_compatibilidad=preferencia,
             telefono=f"65611{n:05d}",

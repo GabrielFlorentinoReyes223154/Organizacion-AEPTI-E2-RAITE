@@ -59,7 +59,7 @@ def pendientes(usuario) -> list[tuple[Viaje, object]]:
             solicitudes__pasajero=usuario,
             solicitudes__estado=EstadoSolicitud.ACEPTADA,
         )
-        .select_related("conductor", "punto_referencia", "campus")
+        .select_related("conductor__carrera__campus", "punto_referencia", "campus")
         .order_by("-fecha_hora")
     )
     for viaje in como_pasajero:
