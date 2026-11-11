@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Fuente de verdad del proyecto para Claude Code. Última revisión: 2026-11-09 (despliegue en Render + Neon).
+Fuente de verdad del proyecto para Claude Code. Última revisión: 2026-11-10 (catálogo de carreras por campus).
 Si algo de aquí contradice al código, revisa el código y actualiza este archivo.
 
 > **Nombre del proyecto:** [NOMBRE] — pendiente de confirmar (aparece como "Raite" en el SRS y en el código, "UniGo-UACJ" en la carta y "RutaClara" en el encabezado del PDF de la carta). En el código se mantiene "Raite": no renombrar nada hasta que se pida.
@@ -23,7 +23,7 @@ Lo que **realmente** hay en el repo (los docs de diseño mencionan más cosas: P
 - Base de datos: **PostgreSQL local** de cada desarrollador (sin PostGIS). Ya no se usa el Postgres remoto. Se configura con `DATABASE_URL` en `Back_Raite/.env` (gitignored); no hay respaldo SQLite. El certificado `certs/ca.pem` solo se usa si se configura por variable de entorno. Hay un virtualenv local en `Back_Raite/.venv/`.
 - Variables de entorno (plantilla en `Back_Raite/.env.example`): `SECRET_KEY` y `DATABASE_URL` obligatorias; `DEBUG`, `ALLOWED_HOSTS`, `CORS_ALLOWED_ORIGINS`, `CSRF_TRUSTED_ORIGINS`, `SECURE_HSTS_SECONDS`, `DB_SSL_ROOTCERT` (opcional) y las de correo (`EMAIL_BACKEND`, por defecto consola). Con `DEBUG=False` se activan la redirección a HTTPS, cookies seguras y HSTS (`check --deploy` pasa sin avisos).
 - `LANGUAGE_CODE = es-mx`, `TIME_ZONE = America/Ciudad_Juarez`. Constantes de la app en `settings.py`: `CORREO_DOMINIO_PERMITIDO`, `CODIGO_VERIFICACION_MINUTOS` (15), `CODIGO_VERIFICACION_MAX_INTENTOS` (5), `CODIGO_REENVIO_SEGUNDOS` (60), `BUSQUEDA_RADIO_KM` (3) / `BUSQUEDA_RADIO_MAX_KM` (15), `VENTANA_CRUCE_MINUTOS` (60), `INICIO_ANTICIPACION_MINUTOS` (30), `VENCIMIENTO_HORAS` (2).
-- Datos iniciales: `python manage.py cargar_datos_iniciales` (campus + puntos de referencia desde `apps/locations/data/*.json`; se puede repetir y no pisa lo editado en el admin, salvo `--actualizar-estados`, que copia `activo` del JSON).
+- Datos iniciales: `python manage.py cargar_datos_iniciales` (campus, carreras y puntos de referencia desde `apps/locations/data/*.json`; se puede repetir y no pisa lo editado en el admin, salvo `--actualizar-estados`, que copia `activo` del JSON).
 - Pasos completos para una máquina nueva: `README.md`.
 
 ```bash
@@ -33,7 +33,7 @@ python manage.py runserver            # http://localhost:8000
 python manage.py migrate
 python manage.py makemigrations
 python manage.py check
-python manage.py cargar_datos_iniciales                 # campus y puntos de referencia
+python manage.py cargar_datos_iniciales                 # campus, carreras y puntos de referencia
 python manage.py crear_datos_demo --reiniciar           # usuarios, viajes y solicitudes de demo (correos *.demo@, contraseña raite1234)
 python manage.py probar_correo tu@alumnos.uacj.mx otro@gmail.com   # muestra del correo del código (usa el EMAIL_BACKEND del .env)
 python manage.py generar_puntos_osm                     # SOLO para regenerar puntos_referencia.json (usa internet, ~3 min)
@@ -89,7 +89,7 @@ Raite/
 │   ├── .env.example     # plantilla de variables de entorno
 │   └── apps/            # cada app: models.py, models_choices.py, services.py, serializers.py, views.py, urls.py, admin.py, migrations/, tests/
 │       ├── accounts/    # Usuario, Vehiculo, CodigoVerificacion + auth JWT y verificación de correo (urls_auth.py, permissions.py)
-│       ├── locations/   # Campus, PuntoReferencia, geo.py (haversine); data/*.json; comandos cargar_datos_iniciales y generar_puntos_osm
+│       ├── locations/   # Campus, Carrera, PuntoReferencia, geo.py (haversine); data/*.json; comandos cargar_datos_iniciales y generar_puntos_osm
 │       ├── rides/       # Viaje, Solicitud, compatibilidad.py; búsqueda e historial (estados y transiciones en models_choices.py)
 │       ├── notifications/ # Notificacion
 │       ├── ratings/     # Calificacion
@@ -122,6 +122,7 @@ Raite/
 
 - `AUTH_USER_MODEL = 'accounts.Usuario'` (PK UUID), `USERNAME_FIELD = "correo"`: el `ModelBackend` normal inicia sesión por correo, no hace falta backend propio.
 - Campos y modelos **en español** (`correo`, `nombre`, `apellidos`, `edad` 17–70, `sexo`, `carrera`, `calificacion` 0.00–5.00, `suspendido`, …). Mantener esa convención.
+- **Carrera por catálogo:** `Usuario.carrera` es una FK a `locations.Carrera` (catálogo oficial de la UACJ en `apps/locations/data/carreras.json`, 74 carreras de los 5 campus de Juárez; una por `(campus, nombre)`). El campus del alumno sale de su carrera (`Usuario.campus`). Obligatoria para alumnos (`Usuario.clean()`), vacía en administradores; ya no está en `REQUIRED_FIELDS`. El API la recibe como id y la devuelve como nombre (`carrera`) más `carrera_id` y `campus`. `campus/` y `carreras/` son públicos porque los usa el registro.
 - **Un solo campo `rol`** (entero): `1=ADMIN`, `2=PASAJERO`, `3=CONDUCTOR`, `4=AMBOS`. Helpers: `es_pasajero`, `es_conductor`, `es_admin`, `puede_publicar_viaje()`, `puede_solicitar_lugar()`. ADMIN no se puede obtener en el registro público.
 - `Usuario` además tiene `telefono` (10 dígitos), `preferencia_compatibilidad` (`MISMO_SEXO`/`MIXTO`, por defecto `MIXTO`), `correo_verificado` y `suspendido`. El dominio `@alumnos.uacj.mx` se valida en `Usuario.clean()` (el ADMIN queda exento). Las cachés antiguas `activo`/`cuenta_activa` se eliminaron.
 - `Sexo`: `M`, `F`, `X` ("Otro"). Se mantienen los tres (ver Decisiones tomadas).
@@ -135,7 +136,7 @@ Raite/
 - **Viaje vencido:** un `PUBLICADO` con más de 2 h de retraso. Se calcula (`Viaje.esta_vencido`, `Viaje.objects.vencidos()` / `vigentes()`), no se guarda: solo se puede cancelar y no cuenta para cruces ni búsquedas.
 - Paginación de 20 en los listados; los catálogos y las calificaciones pendientes no se paginan.
 - JWT: acceso 30 min, refresh 1 día, rotación + blacklist.
-- Migraciones de `accounts`: 0001–0012 vienen del equipo anterior (la 0009 se corrigió para que funcione en un PostgreSQL vacío); 0013 es de la Capa 1.
+- Migraciones de `accounts`: 0001–0012 vienen del equipo anterior (la 0009 se corrigió para que funcione en un PostgreSQL vacío); 0013 es de la Capa 1; **0014 borra las cuentas de alumnos existentes** (y sus viajes, solicitudes, calificaciones, reportes, avisos y vehículos; los administradores se conservan) y 0015 cambia `carrera` de texto a FK. Van separadas porque PostgreSQL no deja alterar una tabla en la transacción en que se borraron filas que la referencian.
 
 ### Detalles del frontend que importan
 
@@ -147,6 +148,7 @@ Raite/
 - **`BarraAccion`:** en celular es la barra fija de abajo (la página lleva `con-barra`); en computadora se dibuja donde esté como una tarjeta, para no tapar el menú lateral.
 - Rutas por archivo (`filenameBasedRouting: true`), modo **`history`**. Cada página declara con `definePage({ meta })` si es `publico`, el `papel` que necesita (`pasajero`/`conductor`), su `titulo`, si es secundaria `atras` (ruta de regreso; sin barra inferior) y, en públicas, `amplio`. `App.vue` elige `PublicoLayout` o `AppLayout` según `meta.publico`.
 - **Ojo con el servidor de desarrollo:** al reescribir un `.vue` completo, el plugin de rutas a veces deja de leer su `definePage` (la pantalla sale con título "Raite" y sin "Regresar"). Se arregla reiniciando `pnpm dev`; no es un error del código.
+- `SelectorCarrera.vue` (registro y perfil) usa `SelectorCampus` y un `q-select` con búsqueda sin acentos; la carrera se habilita al elegir campus y se borra si se cambia a un campus que no la imparte. `conCampus()` de `formato.ts` muestra "carrera · campus" de otras personas.
 - Páginas: `/entrar`, `/registro`, `/verificar`, `/inicio`, `/vehiculo`, `/buscar`, `/mis-raites`, `/mis-viajes`, `/publicar` (`?editar=id`), `/viajes/[id]` (detalle para pasajero y conductor), `/viajes/[id]/solicitudes`, `/viajes/[id]/calificar`, `/viajes/[id]/reportar`, `/avisos`, `/historial`, `/perfil` y la 404.
 - Guarda global en `router/index.ts`: sin sesión todo lo no público manda a `/entrar?siguiente=…`; `/` y el inicio de sesión mandan a `/inicio` (la misma para los dos papeles; su contenido cambia con el papel). Con rol AMBOS, abrir una pantalla del otro papel cambia el papel activo.
 - Capas: `src/api/` (una función por endpoint, `tipos.ts`, `errores.ts`), `src/stores/` (`sesion`, `catalogos`, `avisos` con la consulta periódica de 30 s), `src/utils/` (`formato.ts` con horas en `America/Ciudad_Juarez`, `avisar.ts` con Notify y diálogos de confirmación), `src/components/` (tarjeta de viaje, placa de campus, mapa, selectores…).
@@ -224,6 +226,7 @@ Decididas el 2026-11-06. Tienen la misma prioridad que las reglas de negocio.
 8. **Notificaciones:** solo dentro de la app (modelo + consulta periódica). Sin push ni WebSockets.
 9. **Lugares por viaje:** 1 a 5. `Vehiculo.asientos_disponibles` también se limita a 1–5.
 10. **Despliegue:** Render (API de pago en Oregon, frontend Static Site gratis) + Neon (PostgreSQL gratis) + SMTP de Gmail. Decidido el 2026-11-09.
+12. **Carrera por catálogo** (2026-11-10): el alumno elige campus y luego carrera (selección en cascada en registro y perfil) del catálogo oficial de la UACJ; ya no se escribe a mano. Cuauhtémoc y Nuevo Casas Grandes quedan fuera (fuera de Ciudad Juárez). Las cuentas de alumnos que existían se borran con la migración en lugar de empatar su texto.
 11. **Base de datos:** PostgreSQL local por desarrollador (son dos). `Back_Raite/.env.example` con todas las variables; `SECRET_KEY` y `DEBUG` por variable de entorno; `certs/ca.pem` opcional por variable; datos iniciales con un comando de `manage.py`; pasos para levantar desde cero en el `README.md`.
 
 ## Plan de trabajo

@@ -22,13 +22,13 @@ Fuente de verdad: el código en `Back_Raite/apps/*/urls.py`; actualiza esta pág
 
 | Método | URL | Quién | Qué hace |
 |--------|-----|-------|----------|
-| POST | `auth/register/` | Público | Valida los datos (`@alumnos.uacj.mx`, teléfono de 10 dígitos) y envía un código de 6 dígitos **sin guardar nada ni apartar el correo**. Responde `token` (firmado, vence a los 15 min), `requiere_vehiculo` y `requiere_verificacion`. 409 si se pidió un código para ese correo hace menos de 60 s. |
+| POST | `auth/register/` | Público | Valida los datos (`@alumnos.uacj.mx`, teléfono de 10 dígitos, `carrera` como id de una carrera activa del catálogo) y envía un código de 6 dígitos **sin guardar nada ni apartar el correo**. Responde `token` (firmado, vence a los 15 min), `requiere_vehiculo` y `requiere_verificacion`. 409 si se pidió un código para ese correo hace menos de 60 s. |
 | POST | `auth/verificar/` | Público | `{token, codigo}`. Crea la cuenta ya verificada y devuelve `access`, `refresh` y `usuario`. Máximo 5 intentos. Reemplaza una cuenta antigua que se haya quedado sin verificar. 409 si el correo ya está verificado. |
 | POST | `auth/reenviar-codigo/` | Público | `{token}`. Manda un código nuevo y devuelve el `token` que reemplaza al anterior. 409 si no han pasado 60 s o el correo ya está verificado. |
 | POST | `auth/token/` | Público | Login con `{correo, password}`. Responde 403 `correo_no_verificado` en cuentas antiguas que no completaron la verificación. |
 | POST | `auth/token/refresh/`, `auth/token/blacklist/` | Público (con refresh) | Renovar sesión o cerrarla. |
-| GET | `auth/me/` | Verificado | Perfil propio, con teléfono y vehículo (placas incluidas). |
-| PATCH | `auth/me/` | Verificado | Edita `telefono`, `carrera` y `preferencia_compatibilidad`. |
+| GET | `auth/me/` | Verificado | Perfil propio, con teléfono y vehículo (placas incluidas). `carrera` es el nombre, `carrera_id` el id y `campus` `{id, codigo, nombre}` (vacíos en administradores). |
+| PATCH | `auth/me/` | Verificado | Edita `telefono`, `carrera` (id de una carrera activa del catálogo) y `preferencia_compatibilidad`. |
 | POST | `auth/vehicle/` | Verificado (no admin) | Registra el vehículo (uno por usuario; 409 si ya tiene). Si el usuario era `PASAJERO`, su rol pasa a `AMBOS`. Responde `rol` y `rol_display`. |
 | GET / PATCH | `auth/vehicle/` | Verificado | Ver o editar marca, modelo, color y asientos (1–5; no menos que los lugares de un viaje vigente). 404 si no tiene vehículo. |
 
@@ -36,7 +36,8 @@ Fuente de verdad: el código en `Back_Raite/apps/*/urls.py`; actualiza esta pág
 
 | Método | URL | Quién | Qué hace |
 |--------|-----|-------|----------|
-| GET | `campus/` | Verificado | Campus activos (sin paginar). |
+| GET | `campus/` | Público | Campus activos (sin paginar). Público porque el registro lo usa para elegir la carrera. |
+| GET | `carreras/` | Público | Carreras activas de campus activos (sin paginar): `{id, campus, nombre, area}`. `?campus=<id>` filtra. |
 | GET | `puntos/` | Verificado | Puntos de referencia activos (sin paginar). `?q=` busca por nombre. `?lat=&lon=` ordena por cercanía y agrega `distancia_km`. |
 
 ## Viajes
