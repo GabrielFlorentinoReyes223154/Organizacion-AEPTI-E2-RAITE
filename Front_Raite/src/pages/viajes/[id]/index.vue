@@ -100,7 +100,7 @@
             <AvatarIniciales :nombre="viaje.conductor.nombre_completo" :tam="64" />
             <div class="detalle__persona-datos">
               <p class="detalle__persona-nombre">{{ viaje.conductor.nombre_completo }}</p>
-              <p class="raite-ayuda">{{ viaje.conductor.carrera }}</p>
+              <p class="raite-ayuda">{{ conCampus(viaje.conductor) }}</p>
             </div>
           </div>
           <span class="detalle__calif">
@@ -363,6 +363,7 @@ import { useSesionStore } from '@/stores/sesion';
 import { avisarError, avisarExito, confirmar } from '@/utils/avisar';
 import {
   calificacion,
+  conCampus,
   diaLargo,
   enlaceWhatsApp,
   hora,

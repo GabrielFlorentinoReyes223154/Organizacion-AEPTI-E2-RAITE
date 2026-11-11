@@ -111,32 +111,24 @@
             </template>
           </q-input>
         </div>
-        <div class="registro__par">
-          <div>
-            <label for="reg-edad" class="raite-etiqueta">Edad</label>
-            <q-input
-              for="reg-edad"
-              v-model.number="datos.edad"
-              outlined
-              type="number"
-              inputmode="numeric"
-              min="17"
-              max="70"
-              v-bind="campo('edad')"
-            />
-          </div>
-          <div>
-            <label for="reg-carrera" class="raite-etiqueta">Carrera</label>
-            <q-input
-              for="reg-carrera"
-              v-model="datos.carrera"
-              outlined
-              maxlength="120"
-              placeholder="Ej. Ingeniería Industrial"
-              v-bind="campo('carrera')"
-            />
-          </div>
+        <div class="registro__edad">
+          <label for="reg-edad" class="raite-etiqueta">Edad</label>
+          <q-input
+            for="reg-edad"
+            v-model.number="datos.edad"
+            outlined
+            type="number"
+            inputmode="numeric"
+            min="17"
+            max="70"
+            v-bind="campo('edad')"
+          />
         </div>
+        <SelectorCarrera
+          v-model="datos.carrera"
+          class="registro__completo"
+          :error="errores.carrera ?? ''"
+        />
       </div>
     </section>
 
@@ -234,6 +226,7 @@ import { useRouter } from 'vue-router';
 import isEmail from 'validator/lib/isEmail';
 import { leerError } from '@/api/errores';
 import { Rol, type DatosRegistro } from '@/api/tipos';
+import SelectorCarrera from '@/components/SelectorCarrera.vue';
 import { useSesionStore } from '@/stores/sesion';
 
 definePage({ meta: { publico: true, titulo: 'Crear cuenta', amplio: true } });
@@ -241,8 +234,9 @@ definePage({ meta: { publico: true, titulo: 'Crear cuenta', amplio: true } });
 const router = useRouter();
 const sesion = useSesionStore();
 
-interface FormRegistro extends Omit<DatosRegistro, 'edad' | 'sexo'> {
+interface FormRegistro extends Omit<DatosRegistro, 'edad' | 'sexo' | 'carrera'> {
   edad: number | null;
+  carrera: number | null;
   sexo: DatosRegistro['sexo'] | null;
 }
 
@@ -253,7 +247,7 @@ const datos = reactive<FormRegistro>({
   password: '',
   telefono: '',
   edad: null,
-  carrera: '',
+  carrera: null,
   sexo: null,
   preferencia_compatibilidad: 'MIXTO',
   rol: Rol.PASAJERO,
@@ -310,7 +304,7 @@ function validar(): boolean {
     errores.confirmarPassword = 'Las contraseñas no coinciden.';
   if (!/^\d{10}$/.test(datos.telefono)) errores.telefono = 'Escribe los 10 dígitos de tu teléfono.';
   if (!datos.edad || datos.edad < 17 || datos.edad > 70) errores.edad = 'Entre 17 y 70 años.';
-  if (!datos.carrera.trim()) errores.carrera = 'Escribe tu carrera.';
+  if (!datos.carrera) errores.carrera = 'Elige tu campus y tu carrera.';
   if (!datos.sexo) errores.sexo = 'Elige una opción.';
   return Object.keys(errores).length === 0;
 }
@@ -327,7 +321,7 @@ async function enviar() {
       ...datos,
       nombre: datos.nombre.trim(),
       apellidos: datos.apellidos.trim(),
-      carrera: datos.carrera.trim(),
+      carrera: datos.carrera ?? 0,
       edad: datos.edad ?? 0,
       sexo: datos.sexo ?? 'X',
     });
@@ -389,10 +383,8 @@ async function enviar() {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
-.registro__par {
-  display: grid;
-  grid-template-columns: 96px minmax(0, 1fr);
-  gap: 16px;
+.registro__edad {
+  max-width: 160px;
 }
 .registro__completo {
   grid-column: 1 / -1;

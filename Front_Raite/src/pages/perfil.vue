@@ -8,7 +8,10 @@
         <section class="raite-tarjeta perfil__resumen" aria-label="Tu cuenta">
           <AvatarIniciales :nombre="usuario.nombre_completo" :tam="112" class="perfil__avatar" />
           <h2 class="perfil__nombre">{{ usuario.nombre_completo }}</h2>
-          <p class="perfil__carrera">{{ usuario.carrera }}</p>
+          <p class="perfil__carrera">
+            {{ usuario.carrera
+            }}<template v-if="usuario.campus"> · {{ usuario.campus.codigo }}</template>
+          </p>
           <p class="perfil__correo">{{ usuario.correo }}</p>
           <span class="perfil__verificado">
             <q-icon name="verified" size="18px" aria-hidden="true" />
@@ -94,18 +97,12 @@
                 :error-message="errores.telefono"
               />
             </div>
-            <div>
-              <label for="perfil-carrera" class="raite-etiqueta">Carrera</label>
-              <q-input
-                hide-bottom-space
-                for="perfil-carrera"
-                v-model="datos.carrera"
-                outlined
-                maxlength="120"
-                :error="!!errores.carrera"
-                :error-message="errores.carrera"
-              />
-            </div>
+            <SelectorCarrera
+              v-if="!usuario.es_admin"
+              v-model="datos.carrera"
+              class="perfil__completo"
+              :error="errores.carrera ?? ''"
+            />
           </div>
 
           <fieldset class="perfil__grupo">
@@ -209,6 +206,7 @@ import { comoLista, cuenta, reportes as apiReportes } from '@/api';
 import { leerError } from '@/api/errores';
 import { Rol, type Papel, type Preferencia, type Reporte } from '@/api/tipos';
 import AvatarIniciales from '@/components/AvatarIniciales.vue';
+import SelectorCarrera from '@/components/SelectorCarrera.vue';
 import { useSesionStore } from '@/stores/sesion';
 import { avisarError, avisarExito } from '@/utils/avisar';
 import { calificacion, diaCorto } from '@/utils/formato';
@@ -221,11 +219,11 @@ const usuario = computed(() => sesion.usuario);
 
 const datos = reactive<{
   telefono: string;
-  carrera: string;
+  carrera: number | null;
   preferencia_compatibilidad: Preferencia;
 }>({
   telefono: usuario.value?.telefono ?? '',
-  carrera: usuario.value?.carrera ?? '',
+  carrera: usuario.value?.carrera_id ?? null,
   preferencia_compatibilidad: usuario.value?.preferencia_compatibilidad ?? 'MIXTO',
 });
 const errores = reactive<Record<string, string>>({});
@@ -258,18 +256,22 @@ const hayCambios = computed(
   () =>
     !!usuario.value &&
     (datos.telefono !== usuario.value.telefono ||
-      datos.carrera.trim() !== usuario.value.carrera ||
+      datos.carrera !== usuario.value.carrera_id ||
       datos.preferencia_compatibilidad !== usuario.value.preferencia_compatibilidad),
 );
 
 async function guardar() {
   for (const clave of Object.keys(errores)) delete errores[clave];
   if (!/^\d{10}$/.test(datos.telefono)) errores.telefono = 'Escribe los 10 dígitos de tu teléfono.';
-  if (!datos.carrera.trim()) errores.carrera = 'Escribe tu carrera.';
+  const esAdmin = !!usuario.value?.es_admin;
+  if (!esAdmin && !datos.carrera) errores.carrera = 'Elige tu campus y tu carrera.';
   if (Object.keys(errores).length) return;
   guardando.value = true;
   try {
-    sesion.usuario = await cuenta.editarPerfil({ ...datos, carrera: datos.carrera.trim() });
+    const { carrera, ...resto } = datos;
+    sesion.usuario = await cuenta.editarPerfil(
+      esAdmin || carrera === null ? resto : { ...resto, carrera },
+    );
     avisarExito('Guardamos tus datos.');
   } catch (e) {
     Object.assign(errores, leerError(e).campos);
@@ -374,6 +376,9 @@ async function salir() {
   font-size: 0.875rem;
   font-weight: 600;
 }
+.perfil__completo {
+  grid-column: 1 / -1;
+}
 .perfil__cifras {
   width: 100%;
   margin: 16px 0 0;
@@ -443,7 +448,7 @@ async function salir() {
 }
 .perfil__campos {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: 16px 24px;
 }
 .perfil__grupo {

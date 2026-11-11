@@ -4,6 +4,7 @@ import { api } from '@/boot/axios';
 import type {
   CalificacionPendiente,
   Campus,
+  Carrera,
   DatosRegistro,
   DatosVehiculo,
   DatosViaje,
@@ -65,7 +66,7 @@ export const cuenta = {
   yo: () => get<Usuario>('/api/auth/me/'),
   editarPerfil: (datos: {
     telefono?: string;
-    carrera?: string;
+    carrera?: number;
     preferencia_compatibilidad?: Preferencia;
   }) => patch<Usuario>('/api/auth/me/', datos),
   vehiculo: () => get<Vehiculo>('/api/auth/vehicle/'),
@@ -83,6 +84,8 @@ export const cuenta = {
 
 export const catalogos = {
   campus: () => get<Campus[]>('/api/campus/'),
+  /** Público (lo usa el registro). Sin `campus`, todas las carreras activas. */
+  carreras: (params?: { campus?: number }) => get<Carrera[]>('/api/carreras/', params),
   puntos: (params?: { q?: string; lat?: number; lon?: number }) =>
     get<PuntoReferencia[]>('/api/puntos/', params),
 };
