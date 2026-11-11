@@ -23,7 +23,7 @@ from .serializers import (
     ViajeSerializer,
 )
 
-VIAJE_RELACIONES = ("conductor", "vehiculo", "punto_referencia", "campus")
+VIAJE_RELACIONES = ("conductor__carrera__campus", "vehiculo", "punto_referencia", "campus")
 
 
 def estado_de_la_peticion(request, opciones):
@@ -73,7 +73,7 @@ class MisViajesView(generics.ListAPIView):
 
     def get_queryset(self):
         estado = estado_de_la_peticion(self.request, EstadoViaje)
-        return services.viajes_del_conductor(self.request.user, estado).select_related("conductor")
+        return services.viajes_del_conductor(self.request.user, estado).select_related("conductor__carrera__campus")
 
     def get_serializer_context(self):
         return {**super().get_serializer_context(), "es_conductor": True}

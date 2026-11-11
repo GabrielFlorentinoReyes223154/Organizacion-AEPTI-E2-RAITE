@@ -316,13 +316,13 @@ def cancelar_solicitud(solicitud_id, pasajero) -> Solicitud:
 
 def solicitudes_del_viaje(viaje, conductor):
     exigir_conductor(viaje, conductor)
-    return viaje.solicitudes.select_related("pasajero").order_by("created_at")
+    return viaje.solicitudes.select_related("pasajero__carrera__campus").order_by("created_at")
 
 
 def solicitudes_del_pasajero(pasajero, estado=None):
     solicitudes = (
         Solicitud.objects.filter(pasajero=pasajero)
-        .select_related("viaje__conductor", "viaje__vehiculo", "viaje__punto_referencia", "viaje__campus")
+        .select_related("viaje__conductor__carrera__campus", "viaje__vehiculo", "viaje__punto_referencia", "viaje__campus")
         .order_by("-created_at")
     )
     return solicitudes.filter(estado=estado) if estado else solicitudes
@@ -383,7 +383,7 @@ def historial(usuario, papel=None):
         Viaje.objects.filter(estado__in=(EstadoViaje.FINALIZADO, EstadoViaje.CANCELADO))
         .filter(condicion)
         .distinct()
-        .select_related("conductor", "vehiculo", "punto_referencia", "campus")
+        .select_related("conductor__carrera__campus", "vehiculo", "punto_referencia", "campus")
         .order_by("-fecha_hora")
     )
 
@@ -400,11 +400,11 @@ def buscar_viajes(usuario, filtros: dict) -> list[Viaje]:
     viajes = (
         Viaje.objects.filter(estado=EstadoViaje.PUBLICADO, fecha_hora__gt=timezone.now())
         .exclude(conductor=usuario)
-        .select_related("conductor", "vehiculo", "punto_referencia", "campus")
+        .select_related("conductor__carrera__campus", "vehiculo", "punto_referencia", "campus")
         .prefetch_related(
             Prefetch(
                 "solicitudes",
-                queryset=Solicitud.objects.filter(estado=EstadoSolicitud.ACEPTADA).select_related("pasajero"),
+                queryset=Solicitud.objects.filter(estado=EstadoSolicitud.ACEPTADA).select_related("pasajero__carrera__campus"),
                 to_attr="aceptadas_cache",
             )
         )

@@ -8,11 +8,13 @@ from rest_framework.test import APIClient
 from rest_framework import status
 
 from apps.accounts.models import Rol, Sexo
+from apps.accounts.tests.factories import crear_carrera
 
 
 class AuthAPITests(TestCase):
     def setUp(self):
         cache.clear()
+        self.carrera = crear_carrera(nombre="Ingeniería en Mecatrónica")
         self.client = APIClient()
         self.User = get_user_model()
         self.user = self.User.objects.create_user(
@@ -22,7 +24,7 @@ class AuthAPITests(TestCase):
             apellidos="User",
             edad=20,
             sexo=Sexo.F,
-            carrera="Ingeniería",
+            carrera=self.carrera,
             telefono="6561234567",
             rol=Rol.PASAJERO,
             correo_verificado=True,
@@ -123,7 +125,7 @@ class AuthAPITests(TestCase):
                 "password": "password123",
                 "edad": 20,
                 "sexo": "M",
-                "carrera": "Ingeniería",
+                "carrera": self.carrera.pk,
                 "telefono": "6567654321",
                 "rol": Rol.PASAJERO,
             },
@@ -145,7 +147,7 @@ class AuthAPITests(TestCase):
                 "password": "password123",
                 "edad": 20,
                 "sexo": "M",
-                "carrera": "Ingeniería",
+                "carrera": self.carrera.pk,
                 "telefono": "6567654321",
                 "rol": Rol.CONDUCTOR,
             },
@@ -167,7 +169,7 @@ class AuthAPITests(TestCase):
                 "password": "password123",
                 "edad": 20,
                 "sexo": "M",
-                "carrera": "Ingeniería",
+                "carrera": self.carrera.pk,
                 "telefono": "6567654321",
             },
             format="json",
@@ -187,7 +189,7 @@ class AuthAPITests(TestCase):
                 "password": "password123",
                 "edad": 20,
                 "sexo": "M",
-                "carrera": "Ingeniería",
+                "carrera": self.carrera.pk,
                 "telefono": "6567654321",
                 "rol": Rol.ADMIN,
             },
@@ -206,7 +208,7 @@ class AuthAPITests(TestCase):
                 "password": "password123",
                 "edad": 20,
                 "sexo": "M",
-                "carrera": "Ingeniería",
+                "carrera": self.carrera.pk,
                 "telefono": "6567654321",
                 "rol": Rol.CONDUCTOR,
             },
@@ -226,7 +228,7 @@ class AuthAPITests(TestCase):
                 "password": "password123",
                 "edad": 20,
                 "sexo": "F",
-                "carrera": "Ingeniería",
+                "carrera": self.carrera.pk,
                 "telefono": "6567654321",
                 "rol": Rol.PASAJERO,
             },

@@ -102,6 +102,5 @@ def get_admin():
         apellidos="Raite",
         edad=30,
         sexo="M",
-        carrera="Administración",
         telefono="6560000000",
     )

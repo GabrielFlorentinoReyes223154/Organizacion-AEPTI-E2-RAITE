@@ -140,7 +140,7 @@ class UsuarioAdmin(BaseUserAdmin):
         "is_staff",
         "is_superuser",
     )
-    search_fields = ("correo", "nombre", "apellidos", "carrera")
+    search_fields = ("correo", "nombre", "apellidos", "carrera__nombre")
     ordering = ("correo",)
     readonly_fields = (
         "last_login",

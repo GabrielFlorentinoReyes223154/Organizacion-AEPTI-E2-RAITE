@@ -20,11 +20,20 @@ class UsuarioPublicoSerializer(serializers.ModelSerializer):
     """Lo que cualquier usuario puede ver de otro."""
 
     nombre_completo = serializers.CharField(read_only=True)
+    carrera = serializers.SerializerMethodField()
+    campus = serializers.SerializerMethodField()
 
     class Meta:
         model = Usuario
-        fields = ["id", "nombre", "nombre_completo", "sexo", "carrera", "calificacion"]
+        fields = ["id", "nombre", "nombre_completo", "sexo", "carrera", "campus", "calificacion"]
         read_only_fields = fields
+
+    def get_carrera(self, usuario):
+        return usuario.carrera.nombre if usuario.carrera_id else ""
+
+    def get_campus(self, usuario):
+        """Código del campus de su carrera (ej. IIT)."""
+        return usuario.carrera.campus.codigo if usuario.carrera_id else None
 
 
 class UsuarioConContactoSerializer(UsuarioPublicoSerializer):

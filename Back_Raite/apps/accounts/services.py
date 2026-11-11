@@ -27,7 +27,7 @@ CAMPOS_REGISTRO = (
     "apellidos",
     "edad",
     "sexo",
-    "carrera",
+    "carrera_id",
     "telefono",
     "preferencia_compatibilidad",
     "rol",
@@ -112,7 +112,9 @@ def verificar_correo(token: str, codigo: str) -> Usuario:
                 raise conflicto
             if previo is not None:
                 previo.delete()
-            usuario = Usuario(correo_verificado=True, **{campo: datos[campo] for campo in CAMPOS_REGISTRO})
+            # .get(): un token emitido antes de que existiera el catálogo no trae carrera_id
+            # y falla en full_clean() con un mensaje claro en lugar de un error 500.
+            usuario = Usuario(correo_verificado=True, **{campo: datos.get(campo) for campo in CAMPOS_REGISTRO})
             usuario.full_clean()
             usuario.save()
     except IntegrityError:
@@ -125,7 +127,7 @@ def reenviar_codigo(token: str) -> str:
     datos = _leer_registro(token)
     if Usuario.objects.filter(correo__iexact=datos["correo"], correo_verificado=True).exists():
         raise Conflicto("Tu correo ya está verificado. Inicia sesión.")
-    return _emitir_registro({campo: datos[campo] for campo in CAMPOS_REGISTRO})
+    return _emitir_registro({campo: datos.get(campo) for campo in CAMPOS_REGISTRO})
 
 
 @transaction.atomic

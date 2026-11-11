@@ -11,7 +11,7 @@ from rest_framework import status
 
 from apps.accounts.models import CodigoVerificacion, Usuario
 from apps.accounts.models_choices import PreferenciaCompatibilidad, Rol
-from apps.accounts.tests.factories import cliente_para, crear_conductor, crear_usuario, crear_vehiculo
+from apps.accounts.tests.factories import cliente_para, crear_carrera, crear_conductor, crear_usuario, crear_vehiculo
 from apps.rides.tests.factories import crear_viaje
 
 CORREO = "ana.lopez@alumnos.uacj.mx"
@@ -22,7 +22,6 @@ DATOS_REGISTRO = {
     "password": "password123",
     "edad": 21,
     "sexo": "F",
-    "carrera": "Psicología",
     "telefono": "6561112233",
 }
 
@@ -34,9 +33,11 @@ def codigo_del_correo(indice=-1) -> str:
 class RegistroBase(TestCase):
     def setUp(self):
         cache.clear()
+        self.carrera = crear_carrera(nombre="Licenciatura en Psicología")
 
     def registrar(self, **cambios):
-        return cliente_para().post("/api/auth/register/", {**DATOS_REGISTRO, **cambios}, format="json")
+        datos = {**DATOS_REGISTRO, "carrera": self.carrera.pk, **cambios}
+        return cliente_para().post("/api/auth/register/", datos, format="json")
 
     def verificar(self, token, codigo):
         return cliente_para().post("/api/auth/verificar/", {"token": token, "codigo": codigo}, format="json")
@@ -48,6 +49,20 @@ class RegistroBase(TestCase):
 
 
 class RegistroTests(RegistroBase):
+    def test_registro_pide_carrera_del_catalogo(self):
+        inactiva = crear_carrera(activo=False)
+        for valor in (None, 999999, inactiva.pk, "Psicología"):
+            with self.subTest(valor=valor):
+                respuesta = self.registrar(carrera=valor)
+                self.assertEqual(respuesta.status_code, status.HTTP_400_BAD_REQUEST)
+                self.assertIn("carrera", respuesta.data)
+        self.assertEqual(len(mail.outbox), 0)
+
+    def test_cuenta_verificada_guarda_la_carrera(self):
+        respuesta = self.registrar()
+        self.verificar(respuesta.data["token"], codigo_del_correo())
+        self.assertEqual(Usuario.objects.get(correo=CORREO).carrera, self.carrera)
+
     def test_registro_no_guarda_nada_y_envia_codigo(self):
         respuesta = self.registrar()
         self.assertEqual(respuesta.status_code, status.HTTP_201_CREATED)
@@ -267,17 +282,30 @@ class PerfilTests(TestCase):
 
     def test_patch_me_edita_campos_permitidos(self):
         usuario = crear_usuario()
+        derecho = crear_carrera(nombre="Licenciatura en Derecho")
         respuesta = cliente_para(usuario).patch(
             "/api/auth/me/",
-            {"telefono": "6569998877", "carrera": "Derecho", "preferencia_compatibilidad": "MISMO_SEXO"},
+            {"telefono": "6569998877", "carrera": derecho.pk, "preferencia_compatibilidad": "MISMO_SEXO"},
             format="json",
         )
         self.assertEqual(respuesta.status_code, status.HTTP_200_OK)
         usuario.refresh_from_db()
         self.assertEqual(
             (usuario.telefono, usuario.carrera, usuario.preferencia_compatibilidad),
-            ("6569998877", "Derecho", "MISMO_SEXO"),
+            ("6569998877", derecho, "MISMO_SEXO"),
         )
+        self.assertEqual(respuesta.data["carrera"], "Licenciatura en Derecho")
+        self.assertEqual(respuesta.data["carrera_id"], derecho.pk)
+        self.assertEqual(respuesta.data["campus"]["codigo"], derecho.campus.codigo)
+
+    def test_patch_me_rechaza_carrera_inactiva_o_inexistente(self):
+        usuario = crear_usuario()
+        inactiva = crear_carrera(activo=False)
+        for valor in (inactiva.pk, 999999, None):
+            with self.subTest(valor=valor):
+                respuesta = cliente_para(usuario).patch("/api/auth/me/", {"carrera": valor}, format="json")
+                self.assertEqual(respuesta.status_code, status.HTTP_400_BAD_REQUEST)
+                self.assertIn("carrera", respuesta.data)
 
     def test_patch_me_ignora_campos_protegidos(self):
         usuario = crear_usuario(sexo="M")

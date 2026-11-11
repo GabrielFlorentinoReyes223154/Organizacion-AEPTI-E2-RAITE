@@ -1,7 +1,7 @@
 from django.test import SimpleTestCase, TestCase
 from rest_framework import status
 
-from apps.accounts.tests.factories import cliente_para, crear_usuario
+from apps.accounts.tests.factories import cliente_para, crear_carrera, crear_usuario
 from apps.locations.geo import filtro_recuadro, haversine_km
 from apps.locations.models import PuntoReferencia
 from apps.rides.tests.factories import crear_campus, crear_punto
@@ -53,7 +53,37 @@ class CatalogosApiTests(TestCase):
     def test_lat_sin_lon_es_400(self):
         self.assertEqual(self.cliente.get("/api/puntos/", {"lat": 31.7}).status_code, 400)
 
-    def test_requiere_sesion_verificada(self):
-        self.assertEqual(cliente_para().get("/api/campus/").status_code, 401)
+    def test_puntos_requieren_sesion_verificada(self):
+        self.assertEqual(cliente_para().get("/api/puntos/").status_code, 401)
         self.assertEqual(cliente_para(crear_usuario(correo_verificado=False)).get("/api/puntos/").status_code, 403)
         self.assertEqual(PuntoReferencia.objects.count(), 0)
+
+    def test_campus_y_carreras_son_publicos(self):
+        """El registro elige campus y carrera antes de tener sesión."""
+        crear_carrera()
+        self.assertEqual(cliente_para().get("/api/campus/").status_code, 200)
+        self.assertEqual(cliente_para().get("/api/carreras/").status_code, 200)
+
+
+class CarrerasApiTests(TestCase):
+    def setUp(self):
+        self.cu = crear_campus(codigo="CU")
+        self.iit = crear_campus(codigo="IIT")
+        self.software = crear_carrera(self.cu, nombre="Ingeniería de Software", area="Ingenierías")
+        self.derecho_cu = crear_carrera(self.cu, nombre="Licenciatura en Derecho")
+        self.mecatronica = crear_carrera(self.iit, nombre="Ingeniería en Mecatrónica")
+        crear_carrera(self.cu, nombre="Carrera cerrada", activo=False)
+        crear_carrera(crear_campus(codigo="OLD", activo=False), nombre="De campus inactivo")
+
+    def test_lista_activas_de_campus_activos(self):
+        datos = cliente_para().get("/api/carreras/").data
+        self.assertEqual(
+            {c["id"] for c in datos}, {self.software.id, self.derecho_cu.id, self.mecatronica.id}
+        )
+        software = next(c for c in datos if c["id"] == self.software.id)
+        self.assertEqual(software, {"id": self.software.id, "campus": self.cu.id, "nombre": "Ingeniería de Software", "area": "Ingenierías"})
+
+    def test_filtra_por_campus(self):
+        datos = cliente_para().get("/api/carreras/", {"campus": self.iit.id}).data
+        self.assertEqual([c["nombre"] for c in datos], ["Ingeniería en Mecatrónica"])
+        self.assertEqual(cliente_para().get("/api/carreras/", {"campus": "abc"}).data, [])
