@@ -35,6 +35,7 @@ erDiagram
         string sexo "M, F, X"
         int carrera_id FK "catálogo; vacía solo en ADMIN"
         string telefono "10 dígitos; visible solo con raite confirmado"
+        string foto "opcional; WebP de 512 px en R2 (o media/ en local)"
         string preferencia_compatibilidad "MISMO_SEXO, MIXTO"
         int rol "1 ADMIN, 2 PASAJERO, 3 CONDUCTOR, 4 AMBOS"
         decimal calificacion "promedio 0.00 a 5.00"
@@ -171,6 +172,7 @@ stateDiagram-v2
 |-------|-------|
 | Correo `@alumnos.uacj.mx` (el ADMIN queda exento) | `Usuario.clean()` |
 | Teléfono de 10 dígitos | validador de `Usuario.telefono` |
+| Foto de perfil: JPG, PNG o WebP de hasta 5 MB, guardada como WebP de 512 px | `accounts/fotos.py` (al subirla; el campo solo guarda la ruta) |
 | Alumno con carrera del catálogo (el ADMIN queda exento); el campus del alumno es el de su carrera | `Usuario.clean()`, `Usuario.campus` |
 | Una carrera por nombre y campus | `UniqueConstraint` de `Carrera` |
 | Asientos del vehículo y lugares del viaje: 1 a 5 | validadores + `CheckConstraint` |

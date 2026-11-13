@@ -76,6 +76,12 @@ python manage.py test
 
 Con la configuración por defecto, los correos (por ejemplo, los códigos de verificación) se imprimen en la terminal de `runserver` en lugar de enviarse.
 
+#### Fotos de perfil
+
+- **Sin R2** (lo normal en desarrollo): deja vacías las variables `R2_*`. Las fotos se guardan en `Back_Raite/media/` (ignorada por git) y `runserver` las sirve en `/media/`.
+- **Con R2:** pon en `.env` las cuatro variables `R2_BUCKET`, `R2_ENDPOINT_URL`, `R2_ACCESS_KEY_ID` y `R2_SECRET_ACCESS_KEY` (los valores los da quien administra la cuenta de Cloudflare; nunca se suben al repo) y reinicia `runserver`. Las fotos van al bucket privado y el API entrega URLs firmadas que vencen en una hora.
+- `python manage.py test` nunca usa R2, aunque el `.env` tenga las variables: guarda las fotos en memoria.
+
 ### 4. Frontend
 
 En otra terminal:
@@ -120,9 +126,13 @@ Todo está en `render.yaml` (Blueprint). Los secretos y las URLs **solo** se esc
    | raite-api | `ALLOWED_HOSTS` | `raite-api.onrender.com` |
    | raite-api | `CORS_ALLOWED_ORIGINS` | `https://raite-web.onrender.com` |
    | raite-api | `CSRF_TRUSTED_ORIGINS` | `https://raite-web.onrender.com` |
+   | raite-api | `R2_BUCKET` | `raite-fotos` |
+   | raite-api | `R2_ENDPOINT_URL` | `https://<id-de-cuenta>.r2.cloudflarestorage.com` |
+   | raite-api | `R2_ACCESS_KEY_ID` | clave de acceso de R2 (secreto) |
+   | raite-api | `R2_SECRET_ACCESS_KEY` | secreto de R2 (secreto) |
    | raite-web | `VITE_API_URL` | `https://raite-api.onrender.com` (sin `/` al final) |
 
-   El resto (`DEBUG=False`, `EMAIL_*`, `DEFAULT_FROM_EMAIL`, `PYTHON_VERSION`, `NODE_VERSION`) ya viene en `render.yaml`.
+   El resto (`DEBUG=False`, `EMAIL_*`, `DEFAULT_FROM_EMAIL`, `PYTHON_VERSION`, `NODE_VERSION`) ya viene en `render.yaml`. Sin las cuatro `R2_*` las fotos se guardarían en el disco de Render, que se borra en cada despliegue.
 4. Al terminar, revisa las URLs que asignó Render: si el nombre estaba ocupado, le agrega un sufijo (ej. `raite-api-x1y2.onrender.com`). Si cambiaron, corrige las cuatro variables de URL:
    - `raite-api` se reinicia solo al guardar.
    - `raite-web` necesita **Manual Deploy → Clear build cache & deploy**, porque `VITE_API_URL` se mete al compilar.

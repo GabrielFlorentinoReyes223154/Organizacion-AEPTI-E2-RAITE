@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Fuente de verdad del proyecto para Claude Code. Última revisión: 2026-11-10 (catálogo de carreras por campus).
+Fuente de verdad del proyecto para Claude Code. Última revisión: 2026-11-13 (fotos de perfil en Cloudflare R2).
 Si algo de aquí contradice al código, revisa el código y actualiza este archivo.
 
 > **Nombre del proyecto:** [NOMBRE] — pendiente de confirmar (aparece como "Raite" en el SRS y en el código, "UniGo-UACJ" en la carta y "RutaClara" en el encabezado del PDF de la carta). En el código se mantiene "Raite": no renombrar nada hasta que se pida.
@@ -19,10 +19,10 @@ Lo que **realmente** hay en el repo (los docs de diseño mencionan más cosas: P
 
 ### Backend — `Back_Raite/` (Python)
 
-- Django 6.1.1, Django REST Framework 3.18, `djangorestframework-simplejwt` 5.5 (con `token_blacklist`), `django-cors-headers`, `dj-database-url`, `python-dotenv`, `psycopg2-binary`; para producción `gunicorn` y `whitenoise` (estáticos del admin).
+- Django 6.1.1, Django REST Framework 3.18, `djangorestframework-simplejwt` 5.5 (con `token_blacklist`), `django-cors-headers`, `dj-database-url`, `python-dotenv`, `psycopg2-binary`, `Pillow` y `django-storages[s3]` con `boto3` (fotos de perfil en Cloudflare R2); para producción `gunicorn` y `whitenoise` (estáticos del admin).
 - Base de datos: **PostgreSQL local** de cada desarrollador (sin PostGIS). Ya no se usa el Postgres remoto. Se configura con `DATABASE_URL` en `Back_Raite/.env` (gitignored); no hay respaldo SQLite. El certificado `certs/ca.pem` solo se usa si se configura por variable de entorno. Hay un virtualenv local en `Back_Raite/.venv/`.
-- Variables de entorno (plantilla en `Back_Raite/.env.example`): `SECRET_KEY` y `DATABASE_URL` obligatorias; `DEBUG`, `ALLOWED_HOSTS`, `CORS_ALLOWED_ORIGINS`, `CSRF_TRUSTED_ORIGINS`, `SECURE_HSTS_SECONDS`, `DB_SSL_ROOTCERT` (opcional) y las de correo (`EMAIL_BACKEND`, por defecto consola). Con `DEBUG=False` se activan la redirección a HTTPS, cookies seguras y HSTS (`check --deploy` pasa sin avisos).
-- `LANGUAGE_CODE = es-mx`, `TIME_ZONE = America/Ciudad_Juarez`. Constantes de la app en `settings.py`: `CORREO_DOMINIO_PERMITIDO`, `CODIGO_VERIFICACION_MINUTOS` (15), `CODIGO_VERIFICACION_MAX_INTENTOS` (5), `CODIGO_REENVIO_SEGUNDOS` (60), `BUSQUEDA_RADIO_KM` (3) / `BUSQUEDA_RADIO_MAX_KM` (15), `VENTANA_CRUCE_MINUTOS` (60), `INICIO_ANTICIPACION_MINUTOS` (30), `VENCIMIENTO_HORAS` (2).
+- Variables de entorno (plantilla en `Back_Raite/.env.example`): `SECRET_KEY` y `DATABASE_URL` obligatorias; `DEBUG`, `ALLOWED_HOSTS`, `CORS_ALLOWED_ORIGINS`, `CSRF_TRUSTED_ORIGINS`, `SECURE_HSTS_SECONDS`, `DB_SSL_ROOTCERT` (opcional), las de correo (`EMAIL_BACKEND`, por defecto consola) y las cuatro de R2 (`R2_BUCKET`, `R2_ENDPOINT_URL`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`; sin ellas las fotos van a `Back_Raite/media/`). Con `DEBUG=False` se activan la redirección a HTTPS, cookies seguras y HSTS (`check --deploy` pasa sin avisos).
+- `LANGUAGE_CODE = es-mx`, `TIME_ZONE = America/Ciudad_Juarez`. Constantes de la app en `settings.py`: `CORREO_DOMINIO_PERMITIDO`, `CODIGO_VERIFICACION_MINUTOS` (15), `CODIGO_VERIFICACION_MAX_INTENTOS` (5), `CODIGO_REENVIO_SEGUNDOS` (60), `BUSQUEDA_RADIO_KM` (3) / `BUSQUEDA_RADIO_MAX_KM` (15), `VENTANA_CRUCE_MINUTOS` (60), `INICIO_ANTICIPACION_MINUTOS` (30), `VENCIMIENTO_HORAS` (2), `FOTO_MAX_MB` (5), `FOTO_MAX_PX` (512).
 - Datos iniciales: `python manage.py cargar_datos_iniciales` (campus, carreras y puntos de referencia desde `apps/locations/data/*.json`; se puede repetir y no pisa lo editado en el admin, salvo `--actualizar-estados`, que copia `activo` del JSON).
 - Pasos completos para una máquina nueva: `README.md`.
 
@@ -71,6 +71,7 @@ pnpm typecheck    # vue-tsc --noEmit
 - **Render** (Blueprint en `render.yaml`): `raite-api` es un Web Service de pago (`0.5c-512mb`, Oregon) con gunicorn, que corre `migrate` y `cargar_datos_iniciales` antes de cada versión; `raite-web` es un Static Site gratis (`Front_Raite/dist/spa`, reescritura `/*` → `/index.html`). Se despliega solo con cada merge a `main`.
 - **Neon** (PostgreSQL gratis, Oregon) por `DATABASE_URL` con `sslmode=require`, conexión directa (sin pooler).
 - **Correo:** SMTP de Gmail desde `raite.uacj@gmail.com` (el plan gratis de Render bloquea el SMTP; por eso la API es de pago).
+- **Fotos:** Cloudflare R2, bucket privado `raite-fotos`; las variables `R2_*` van en el panel de Render.
 - Secretos solo en el panel de Render. Pasos, superusuario y pruebas: `README.md`, sección "Despliegue". En producción no se carga `crear_datos_demo`.
 
 ## Estructura del repo
@@ -126,6 +127,7 @@ Raite/
 - **Un solo campo `rol`** (entero): `1=ADMIN`, `2=PASAJERO`, `3=CONDUCTOR`, `4=AMBOS`. Helpers: `es_pasajero`, `es_conductor`, `es_admin`, `puede_publicar_viaje()`, `puede_solicitar_lugar()`. ADMIN no se puede obtener en el registro público.
 - `Usuario` además tiene `telefono` (10 dígitos), `preferencia_compatibilidad` (`MISMO_SEXO`/`MIXTO`, por defecto `MIXTO`), `correo_verificado` y `suspendido`. El dominio `@alumnos.uacj.mx` se valida en `Usuario.clean()` (el ADMIN queda exento). Las cachés antiguas `activo`/`cuenta_activa` se eliminaron.
 - `Sexo`: `M`, `F`, `X` ("Otro"). Se mantienen los tres (ver Decisiones tomadas).
+- **Foto de perfil** (`Usuario.foto`, opcional): se sube por `PUT /api/auth/me/foto/` y se quita con `DELETE`. `accounts/fotos.py` acepta solo JPG/PNG/WebP de hasta 5 MB (revisa el contenido con Pillow), la endereza, le quita el EXIF y la guarda como WebP de 512 px; el archivo anterior se borra al confirmar la transacción (también al eliminar al usuario). Almacenamiento: R2 con las cuatro variables `R2_*` (URLs firmadas de 1 h), si no `MEDIA_ROOT`, y en `manage.py test` siempre `InMemoryStorage`. La URL (`foto`) va en `UsuarioSerializer` y `UsuarioPublicoSerializer`, que solo se sirven con sesión.
 - `Vehiculo` (1 a 1 con el usuario): marca, modelo, color, placas (únicas), tipo (`COCHE`/`CAMIONETA`/`TROCA`), `asientos_disponibles` 1–5.
 - Modelo completo, estados y qué regla vive en cada modelo: **`RaiteDocs/Modelo-ER.md`**. Endpoints: **`RaiteDocs/API.md`**.
 - **Dónde va cada cosa:** los modelos solo validan un registro (`clean()`, validadores, restricciones de BD). Las reglas entre varios registros están en `services.py` de cada app: funciones dentro de `transaction.atomic()` que llaman `full_clean()` antes de guardar y crean las notificaciones con `apps/notifications/services.notificar()`. Los serializers solo dan forma a la entrada y la salida; las vistas son delgadas.
@@ -136,7 +138,7 @@ Raite/
 - **Viaje vencido:** un `PUBLICADO` con más de 2 h de retraso. Se calcula (`Viaje.esta_vencido`, `Viaje.objects.vencidos()` / `vigentes()`), no se guarda: solo se puede cancelar y no cuenta para cruces ni búsquedas.
 - Paginación de 20 en los listados; los catálogos y las calificaciones pendientes no se paginan.
 - JWT: acceso 30 min, refresh 1 día, rotación + blacklist.
-- Migraciones de `accounts`: 0001–0012 vienen del equipo anterior (la 0009 se corrigió para que funcione en un PostgreSQL vacío); 0013 es de la Capa 1; **0014 borra las cuentas de alumnos existentes** (y sus viajes, solicitudes, calificaciones, reportes, avisos y vehículos; los administradores se conservan) y 0015 cambia `carrera` de texto a FK. Van separadas porque PostgreSQL no deja alterar una tabla en la transacción en que se borraron filas que la referencian.
+- Migraciones de `accounts`: 0001–0012 vienen del equipo anterior (la 0009 se corrigió para que funcione en un PostgreSQL vacío); 0013 es de la Capa 1; **0014 borra las cuentas de alumnos existentes** (y sus viajes, solicitudes, calificaciones, reportes, avisos y vehículos; los administradores se conservan) 0015 cambia `carrera` de texto a FK y 0016 agrega `foto`. Van separadas porque PostgreSQL no deja alterar una tabla en la transacción en que se borraron filas que la referencian.
 
 ### Detalles del frontend que importan
 
@@ -148,6 +150,7 @@ Raite/
 - **`BarraAccion`:** en celular es la barra fija de abajo (la página lleva `con-barra`); en computadora se dibuja donde esté como una tarjeta, para no tapar el menú lateral.
 - Rutas por archivo (`filenameBasedRouting: true`), modo **`history`**. Cada página declara con `definePage({ meta })` si es `publico`, el `papel` que necesita (`pasajero`/`conductor`), su `titulo`, si es secundaria `atras` (ruta de regreso; sin barra inferior) y, en públicas, `amplio`. `App.vue` elige `PublicoLayout` o `AppLayout` según `meta.publico`.
 - **Ojo con el servidor de desarrollo:** al reescribir un `.vue` completo, el plugin de rutas a veces deja de leer su `definePage` (la pantalla sale con título "Raite" y sin "Regresar"). Se arregla reiniciando `pnpm dev`; no es un error del código.
+- **Fotos:** `AvatarIniciales` recibe `foto` (opcional) y muestra las iniciales si no hay o si la URL firmada venció; `urlFoto()` de `formato.ts` completa las rutas `/media/` con `VITE_API_URL`. `RecortarFoto.vue` recorta en un `<canvas>` (sin dependencias) y exporta 512 px; se usa en `/perfil`.
 - `SelectorCarrera.vue` (registro y perfil) usa `SelectorCampus` y un `q-select` con búsqueda sin acentos; la carrera se habilita al elegir campus y se borra si se cambia a un campus que no la imparte. `conCampus()` de `formato.ts` muestra "carrera · campus" de otras personas.
 - Páginas: `/entrar`, `/registro`, `/verificar`, `/inicio`, `/vehiculo`, `/buscar`, `/mis-raites`, `/mis-viajes`, `/publicar` (`?editar=id`), `/viajes/[id]` (detalle para pasajero y conductor), `/viajes/[id]/solicitudes`, `/viajes/[id]/calificar`, `/viajes/[id]/reportar`, `/avisos`, `/historial`, `/perfil` y la 404.
 - Guarda global en `router/index.ts`: sin sesión todo lo no público manda a `/entrar?siguiente=…`; `/` y el inicio de sesión mandan a `/inicio` (la misma para los dos papeles; su contenido cambia con el papel). Con rol AMBOS, abrir una pantalla del otro papel cambia el papel activo.
@@ -227,6 +230,7 @@ Decididas el 2026-11-06. Tienen la misma prioridad que las reglas de negocio.
 9. **Lugares por viaje:** 1 a 5. `Vehiculo.asientos_disponibles` también se limita a 1–5.
 10. **Despliegue:** Render (API de pago en Oregon, frontend Static Site gratis) + Neon (PostgreSQL gratis) + SMTP de Gmail. Decidido el 2026-11-09.
 12. **Carrera por catálogo** (2026-11-10): el alumno elige campus y luego carrera (selección en cascada en registro y perfil) del catálogo oficial de la UACJ; ya no se escribe a mano. Cuauhtémoc y Nuevo Casas Grandes quedan fuera (fuera de Ciudad Juárez). Las cuentas de alumnos que existían se borran con la migración en lugar de empatar su texto.
+13. **Fotos de perfil** (2026-11-13, rama `feature/fotos-perfil`): opcionales, en Cloudflare R2 (privado, URLs firmadas) porque el disco de Render se borra en cada despliegue; solo las ven usuarios con sesión. No se junta a `main` hasta después de la presentación.
 11. **Base de datos:** PostgreSQL local por desarrollador (son dos). `Back_Raite/.env.example` con todas las variables; `SECRET_KEY` y `DEBUG` por variable de entorno; `certs/ca.pem` opcional por variable; datos iniciales con un comando de `manage.py`; pasos para levantar desde cero en el `README.md`.
 
 ## Plan de trabajo

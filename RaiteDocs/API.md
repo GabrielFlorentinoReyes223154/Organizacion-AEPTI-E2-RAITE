@@ -29,8 +29,12 @@ Fuente de verdad: el código en `Back_Raite/apps/*/urls.py`; actualiza esta pág
 | POST | `auth/token/refresh/`, `auth/token/blacklist/` | Público (con refresh) | Renovar sesión o cerrarla. |
 | GET | `auth/me/` | Verificado | Perfil propio, con teléfono y vehículo (placas incluidas). `carrera` es el nombre, `carrera_id` el id y `campus` `{id, codigo, nombre}` (vacíos en administradores). |
 | PATCH | `auth/me/` | Verificado | Edita `telefono`, `carrera` (id de una carrera activa del catálogo) y `preferencia_compatibilidad`. |
+| PUT | `auth/me/foto/` | Verificado | Sube o cambia la foto de perfil (`multipart/form-data`, campo `foto`). Solo JPG, PNG o WebP de hasta 5 MB (se revisa el contenido, no la extensión). Se endereza según el EXIF, se le quitan los metadatos, se reduce a 512 px y se guarda como WebP; la anterior se borra. Responde el perfil propio. |
+| DELETE | `auth/me/foto/` | Verificado | Quita la foto y borra el archivo. Responde el perfil propio. |
 | POST | `auth/vehicle/` | Verificado (no admin) | Registra el vehículo (uno por usuario; 409 si ya tiene). Si el usuario era `PASAJERO`, su rol pasa a `AMBOS`. Responde `rol` y `rol_display`. |
 | GET / PATCH | `auth/vehicle/` | Verificado | Ver o editar marca, modelo, color y asientos (1–5; no menos que los lugares de un viaje vigente). 404 si no tiene vehículo. |
+
+**Foto de perfil.** `foto` viene en el perfil propio y en todos los usuarios que aparecen en viajes, solicitudes, calificaciones y reportes (`null` si no hay). Con R2 es una URL firmada que vence en una hora (el bucket es privado); sin R2, una ruta `/media/...` relativa al API. Solo la reciben usuarios con sesión.
 
 ## Catálogos
 
