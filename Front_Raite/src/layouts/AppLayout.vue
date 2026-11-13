@@ -57,7 +57,12 @@
             </q-badge>
           </q-btn>
           <router-link to="/perfil" class="encabezado__usuario" aria-label="Tu perfil">
-            <AvatarIniciales :nombre="nombreCompleto" :tam="36" tono="solido" />
+            <AvatarIniciales
+              :nombre="nombreCompleto"
+              :foto="sesion.usuario?.foto ?? null"
+              :tam="36"
+              tono="solido"
+            />
             <span>{{ nombreCorto }}</span>
           </router-link>
         </div>

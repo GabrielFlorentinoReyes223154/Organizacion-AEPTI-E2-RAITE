@@ -102,6 +102,14 @@ export function lugares(libres: number, ofrecidos: number): string {
   return `${libres} de ${ofrecidos} ${ofrecidos === 1 ? 'lugar' : 'lugares'}`;
 }
 
+/** URL lista para <img>. Sin R2 el API manda `/media/...` (relativa al API), con R2 ya es absoluta. */
+export function urlFoto(foto: string | null | undefined): string | null {
+  if (!foto) return null;
+  if (/^https?:\/\//.test(foto)) return foto;
+  const base = (import.meta.env.VITE_API_URL || 'http://localhost:8000').replace(/\/$/, '');
+  return `${base}${foto.startsWith('/') ? '' : '/'}${foto}`;
+}
+
 export function iniciales(nombre: string): string {
   return nombre
     .split(/\s+/)

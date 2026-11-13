@@ -97,7 +97,11 @@
         >
           <h2 id="det-maneja" class="detalle__etiqueta">Quién maneja</h2>
           <div class="detalle__persona-fila">
-            <AvatarIniciales :nombre="viaje.conductor.nombre_completo" :tam="64" />
+            <AvatarIniciales
+              :nombre="viaje.conductor.nombre_completo"
+              :foto="viaje.conductor.foto"
+              :tam="64"
+            />
             <div class="detalle__persona-datos">
               <p class="detalle__persona-nombre">{{ viaje.conductor.nombre_completo }}</p>
               <p class="raite-ayuda">{{ conCampus(viaje.conductor) }}</p>
@@ -129,7 +133,7 @@
           </p>
           <ul v-else class="detalle__lista">
             <li v-for="p in viaje.pasajeros_confirmados" :key="p.id" class="detalle__pasajero">
-              <AvatarIniciales :nombre="p.nombre_completo" :tam="44" tono="verde" />
+              <AvatarIniciales :nombre="p.nombre_completo" :foto="p.foto" :tam="44" tono="verde" />
               <div class="detalle__persona-datos">
                 <p class="detalle__pasajero-nombre">{{ p.nombre_completo }}</p>
                 <p class="raite-dato detalle__telefono">{{ telefono(p.telefono) }}</p>

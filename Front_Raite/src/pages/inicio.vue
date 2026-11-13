@@ -51,7 +51,11 @@
           </template>
           <template v-if="proxima" #pie>
             <span class="inicio__persona">
-              <AvatarIniciales :nombre="proxima.viaje.conductor.nombre_completo" :tam="48" />
+              <AvatarIniciales
+                :nombre="proxima.viaje.conductor.nombre_completo"
+                :foto="proxima.viaje.conductor.foto"
+                :tam="48"
+              />
               <span class="inicio__persona-texto">
                 <span class="inicio__persona-nombre">
                   {{ nombreCorto(proxima.viaje.conductor.nombre_completo) }}

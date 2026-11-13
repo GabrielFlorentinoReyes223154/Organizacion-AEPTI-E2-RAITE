@@ -45,7 +45,11 @@
         <li v-for="p in porCalificar" :key="p.usuario.id">
           <q-form class="raite-tarjeta calificar__persona" @submit="enviar(p)">
             <div class="calificar__quien">
-              <AvatarIniciales :nombre="p.usuario.nombre_completo" :tam="56" />
+              <AvatarIniciales
+                :nombre="p.usuario.nombre_completo"
+                :foto="p.usuario.foto"
+                :tam="56"
+              />
               <div>
                 <h3 class="calificar__nombre">{{ p.usuario.nombre_completo }}</h3>
                 <p class="raite-ayuda">{{ conCampus(p.usuario) }}</p>

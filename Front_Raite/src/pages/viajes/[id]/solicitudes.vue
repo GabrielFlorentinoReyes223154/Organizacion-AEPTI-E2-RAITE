@@ -71,7 +71,11 @@
               :aria-label="`Solicitud de ${s.pasajero.nombre_completo}`"
             >
               <div class="solicitud__persona">
-                <AvatarIniciales :nombre="s.pasajero.nombre_completo" :tam="52" />
+                <AvatarIniciales
+                  :nombre="s.pasajero.nombre_completo"
+                  :foto="s.pasajero.foto"
+                  :tam="52"
+                />
                 <div class="solicitud__datos">
                   <p class="solicitud__nombre">{{ s.pasajero.nombre_completo }}</p>
                   <p class="raite-ayuda solicitud__resumen">
@@ -122,7 +126,12 @@
           </h2>
           <ul class="lista">
             <li v-for="s in confirmados" :key="s.id" class="confirmado">
-              <AvatarIniciales :nombre="s.pasajero.nombre_completo" :tam="44" tono="verde" />
+              <AvatarIniciales
+                :nombre="s.pasajero.nombre_completo"
+                :foto="s.pasajero.foto"
+                :tam="44"
+                tono="verde"
+              />
               <div class="solicitud__datos">
                 <p class="solicitud__nombre">{{ s.pasajero.nombre_completo }}</p>
                 <p class="raite-dato confirmado__telefono">{{ telefono(s.pasajero.telefono) }}</p>

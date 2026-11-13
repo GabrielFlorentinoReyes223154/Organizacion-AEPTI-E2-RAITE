@@ -50,6 +50,8 @@ export interface Usuario {
   nombre: string;
   apellidos: string;
   nombre_completo: string;
+  /** URL de la foto de perfil o null. Con R2 es una URL firmada que vence en una hora. */
+  foto: string | null;
   edad: number;
   sexo: Sexo;
   /** Nombre de la carrera ("" en administradores). */
@@ -76,6 +78,7 @@ export interface UsuarioPublico {
   id: Uuid;
   nombre: string;
   nombre_completo: string;
+  foto: string | null;
   sexo: Sexo;
   carrera: string;
   /** Código del campus de su carrera (ej. IIT). */

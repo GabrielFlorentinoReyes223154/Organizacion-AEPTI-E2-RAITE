@@ -24,7 +24,7 @@
               :aria-pressed="reportado === p.id"
               @click="reportado = p.id"
             >
-              <AvatarIniciales :nombre="p.nombre_completo" :tam="44" />
+              <AvatarIniciales :nombre="p.nombre_completo" :foto="p.foto" :tam="44" />
               <span class="reportar__persona-texto">
                 <span class="reportar__persona-nombre">{{ p.nombre_completo }}</span>
                 <span class="reportar__persona-detalle">{{ conCampus(p) }}</span>

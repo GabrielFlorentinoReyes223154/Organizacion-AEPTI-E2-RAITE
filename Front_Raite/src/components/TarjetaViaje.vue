@@ -18,7 +18,14 @@
       />
 
       <div class="tarjeta-viaje__abajo">
-        <span v-if="mostrarConductor">{{ conductorTexto }}</span>
+        <span v-if="mostrarConductor" class="tarjeta-viaje__conductor">
+          <AvatarIniciales
+            :nombre="viaje.conductor.nombre_completo"
+            :foto="viaje.conductor.foto"
+            :tam="28"
+          />
+          {{ conductorTexto }}
+        </span>
         <span v-if="mostrarConductor" class="tarjeta-viaje__calif">
           <q-icon name="star" size="16px" aria-hidden="true" />
           {{ califTexto }}
@@ -45,6 +52,7 @@ import {
   nombreCorto,
   textoSentido,
 } from '@/utils/formato';
+import AvatarIniciales from './AvatarIniciales.vue';
 import RutaViaje from './RutaViaje.vue';
 
 const props = withDefaults(
@@ -149,6 +157,11 @@ const etiqueta = computed(() => {
   &:empty {
     display: none;
   }
+}
+.tarjeta-viaje__conductor {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 }
 .tarjeta-viaje__calif {
   display: inline-flex;
