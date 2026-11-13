@@ -67,6 +67,7 @@ class UsuarioAdmin(BaseUserAdmin):
                     "sexo",
                     "carrera",
                     "telefono",
+                    "foto",
                     "preferencia_compatibilidad",
                     "rol",
                 )

@@ -1,4 +1,5 @@
-"""Reglas de negocio de cuentas: registro, verificación de correo y edición de perfil/vehículo (RF-01, RF-07)."""
+"""Reglas de negocio de cuentas: registro, verificación de correo, edición de perfil/vehículo
+y foto de perfil (RF-01, RF-07)."""
 
 import hashlib
 import secrets
@@ -15,6 +16,7 @@ from django.utils.crypto import constant_time_compare, salted_hmac
 from Raite_DjangoRest.api import Conflicto
 
 from .correos import correo_codigo
+from .fotos import procesar_foto
 from .models import Usuario, Vehiculo
 from .models_choices import Rol
 
@@ -136,6 +138,37 @@ def actualizar_perfil(usuario: Usuario, datos: dict) -> Usuario:
         setattr(usuario, campo, valor)
     usuario.full_clean()
     usuario.save()
+    return usuario
+
+
+def borrar_foto_al_confirmar(usuario: Usuario, nombre: str) -> None:
+    """Borra un archivo de foto del almacenamiento cuando la transacción se confirma.
+    Si algo falla antes, la foto anterior sigue en su lugar."""
+    if not nombre:
+        return
+    almacen = usuario.foto.storage
+    transaction.on_commit(lambda: almacen.delete(nombre))
+
+
+@transaction.atomic
+def cambiar_foto(usuario: Usuario, archivo) -> Usuario:
+    """Revisa y reduce la foto (fotos.py), la guarda y borra la anterior."""
+    foto = procesar_foto(archivo)
+    anterior = usuario.foto.name
+    usuario.foto.save(foto.name, foto, save=False)
+    usuario.full_clean()
+    usuario.save(update_fields=["foto", "updated_at"])
+    borrar_foto_al_confirmar(usuario, anterior)
+    return usuario
+
+
+@transaction.atomic
+def quitar_foto(usuario: Usuario) -> Usuario:
+    anterior = usuario.foto.name
+    if anterior:
+        usuario.foto = ""
+        usuario.save(update_fields=["foto", "updated_at"])
+        borrar_foto_al_confirmar(usuario, anterior)
     return usuario
 
 

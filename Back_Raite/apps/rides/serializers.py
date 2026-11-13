@@ -9,6 +9,7 @@ from django.conf import settings
 from rest_framework import serializers
 
 from apps.accounts.models import Usuario
+from apps.accounts.serializers import url_foto
 from apps.locations.models import Campus, PuntoReferencia
 from apps.locations.serializers import CampusSerializer, PuntoReferenciaSerializer
 
@@ -22,14 +23,18 @@ class UsuarioPublicoSerializer(serializers.ModelSerializer):
     nombre_completo = serializers.CharField(read_only=True)
     carrera = serializers.SerializerMethodField()
     campus = serializers.SerializerMethodField()
+    foto = serializers.SerializerMethodField()
 
     class Meta:
         model = Usuario
-        fields = ["id", "nombre", "nombre_completo", "sexo", "carrera", "campus", "calificacion"]
+        fields = ["id", "nombre", "nombre_completo", "foto", "sexo", "carrera", "campus", "calificacion"]
         read_only_fields = fields
 
     def get_carrera(self, usuario):
         return usuario.carrera.nombre if usuario.carrera_id else ""
+
+    def get_foto(self, usuario):
+        return url_foto(usuario)
 
     def get_campus(self, usuario):
         """Código del campus de su carrera (ej. IIT)."""

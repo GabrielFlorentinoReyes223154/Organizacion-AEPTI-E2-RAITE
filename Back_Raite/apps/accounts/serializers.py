@@ -24,6 +24,12 @@ def campo_carrera(**opciones):
     )
 
 
+def url_foto(usuario):
+    """URL de la foto o None. Con R2 es una URL firmada que vence en una hora; sin R2, `/media/...`.
+    Solo sale en respuestas que piden sesión."""
+    return usuario.foto.url if usuario.foto else None
+
+
 def campus_de(usuario):
     campus = usuario.campus
     return {"id": campus.id, "codigo": campus.codigo, "nombre": campus.nombre} if campus else None
@@ -51,6 +57,7 @@ class UsuarioSerializer(serializers.ModelSerializer):
     carrera = serializers.SerializerMethodField()
     campus = serializers.SerializerMethodField()
     vehiculo = serializers.SerializerMethodField()
+    foto = serializers.SerializerMethodField()
 
     class Meta:
         model = Usuario
@@ -60,6 +67,7 @@ class UsuarioSerializer(serializers.ModelSerializer):
             "nombre",
             "apellidos",
             "nombre_completo",
+            "foto",
             "edad",
             "sexo",
             "carrera",
@@ -85,6 +93,9 @@ class UsuarioSerializer(serializers.ModelSerializer):
     def get_campus(self, usuario):
         return campus_de(usuario)
 
+    def get_foto(self, usuario):
+        return url_foto(usuario)
+
     def get_vehiculo(self, usuario):
         vehiculo = getattr(usuario, "vehiculo", None)
         return VehiculoSerializer(vehiculo).data if vehiculo else None
@@ -98,6 +109,14 @@ class PerfilEditableSerializer(serializers.ModelSerializer):
     class Meta:
         model = Usuario
         fields = ["telefono", "carrera", "preferencia_compatibilidad"]
+
+
+class FotoSerializer(serializers.Serializer):
+    """Entrada de `me/foto/`: el archivo se revisa a fondo en fotos.py."""
+
+    foto = serializers.FileField(
+        error_messages={"required": "Elige una foto.", "empty": "La foto está vacía.", "invalid": "Elige una foto."}
+    )
 
 
 class RegistroSerializer(serializers.ModelSerializer):

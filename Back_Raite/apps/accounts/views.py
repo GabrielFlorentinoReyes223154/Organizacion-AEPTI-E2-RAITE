@@ -1,5 +1,6 @@
 from rest_framework import status
 from rest_framework.exceptions import NotFound
+from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -10,6 +11,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from . import services
 from .permissions import CorreoVerificado
 from .serializers import (
+    FotoSerializer,
     LoginSerializer,
     PerfilEditableSerializer,
     ReenviarCodigoSerializer,
@@ -45,6 +47,23 @@ class MeView(APIView):
         serializer = PerfilEditableSerializer(request.user, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         usuario = services.actualizar_perfil(request.user, serializer.validated_data)
+        return Response(UsuarioSerializer(usuario).data)
+
+
+class FotoView(APIView):
+    """PUT (multipart, campo `foto`): sube o cambia la foto de perfil. DELETE: la quita.
+    Las dos devuelven el perfil propio con la URL nueva."""
+
+    parser_classes = [MultiPartParser, FormParser]
+
+    def put(self, request):
+        serializer = FotoSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        usuario = services.cambiar_foto(request.user, serializer.validated_data["foto"])
+        return Response(UsuarioSerializer(usuario).data)
+
+    def delete(self, request):
+        usuario = services.quitar_foto(request.user)
         return Response(UsuarioSerializer(usuario).data)
 
 
