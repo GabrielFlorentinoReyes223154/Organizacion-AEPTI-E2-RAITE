@@ -69,6 +69,20 @@ export const cuenta = {
     carrera?: number;
     preferencia_compatibilidad?: Preferencia;
   }) => patch<Usuario>('/api/auth/me/', datos),
+  /** Sube o cambia la foto de perfil (multipart, campo `foto`). */
+  subirFoto: async (foto: Blob, nombre: string) => {
+    const formulario = new FormData();
+    formulario.append('foto', foto, nombre);
+    // La instancia manda JSON por defecto; con FormData hay que pedir multipart explícitamente.
+    const { data } = await api.put<Usuario>('/api/auth/me/foto/', formulario, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return data;
+  },
+  quitarFoto: async () => {
+    const { data } = await api.delete<Usuario>('/api/auth/me/foto/');
+    return data;
+  },
   vehiculo: () => get<Vehiculo>('/api/auth/vehicle/'),
   registrarVehiculo: (datos: DatosVehiculo) =>
     post<{ id: Uuid; placas: string; vehiculo_valido: boolean; rol: RolId; rol_display: string }>(

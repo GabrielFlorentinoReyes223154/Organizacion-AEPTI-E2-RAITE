@@ -6,7 +6,43 @@
       <!-- Izquierda: quién eres en Raite -->
       <aside class="perfil__lateral">
         <section class="raite-tarjeta perfil__resumen" aria-label="Tu cuenta">
-          <AvatarIniciales :nombre="usuario.nombre_completo" :tam="112" class="perfil__avatar" />
+          <AvatarIniciales
+            :nombre="usuario.nombre_completo"
+            :foto="usuario.foto"
+            :tam="112"
+            class="perfil__avatar"
+          />
+          <div class="perfil__foto-acciones">
+            <q-btn
+              flat
+              dense
+              no-caps
+              color="primary"
+              icon="photo_camera"
+              :label="usuario.foto ? 'Cambiar foto' : 'Agregar foto'"
+              :disable="subiendoFoto"
+              @click="elegirFoto"
+            />
+            <q-btn
+              v-if="usuario.foto"
+              flat
+              dense
+              no-caps
+              color="negative"
+              label="Quitar"
+              :disable="subiendoFoto"
+              @click="quitarFoto"
+            />
+          </div>
+          <input
+            ref="entradaFoto"
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            class="perfil__entrada-foto"
+            tabindex="-1"
+            aria-hidden="true"
+            @change="fotoElegida"
+          />
           <h2 class="perfil__nombre">{{ usuario.nombre_completo }}</h2>
           <p class="perfil__carrera">
             {{ usuario.carrera
@@ -195,6 +231,13 @@
         </q-expansion-item>
       </div>
     </div>
+
+    <RecortarFoto
+      :archivo="archivoFoto"
+      :guardando="subiendoFoto"
+      @guardar="subirFoto"
+      @cancelar="archivoFoto = null"
+    />
   </q-page>
 </template>
 
@@ -206,9 +249,10 @@ import { comoLista, cuenta, reportes as apiReportes } from '@/api';
 import { leerError } from '@/api/errores';
 import { Rol, type Papel, type Preferencia, type Reporte } from '@/api/tipos';
 import AvatarIniciales from '@/components/AvatarIniciales.vue';
+import RecortarFoto from '@/components/RecortarFoto.vue';
 import SelectorCarrera from '@/components/SelectorCarrera.vue';
 import { useSesionStore } from '@/stores/sesion';
-import { avisarError, avisarExito } from '@/utils/avisar';
+import { avisarAdvertencia, avisarError, avisarExito, confirmar } from '@/utils/avisar';
 import { calificacion, diaCorto } from '@/utils/formato';
 
 definePage({ meta: { titulo: 'Perfil' } });
@@ -230,6 +274,65 @@ const errores = reactive<Record<string, string>>({});
 const guardando = ref(false);
 const saliendo = ref(false);
 const reportes = ref<Reporte[] | null>(null);
+
+// Foto de perfil: se elige, se recorta en RecortarFoto y se sube. El API la revisa otra vez.
+const TIPOS_FOTO = ['image/jpeg', 'image/png', 'image/webp'];
+const FOTO_MAX_MB = 5;
+const entradaFoto = ref<HTMLInputElement | null>(null);
+const archivoFoto = ref<File | null>(null);
+const subiendoFoto = ref(false);
+
+function elegirFoto() {
+  entradaFoto.value?.click();
+}
+
+function fotoElegida(evento: Event) {
+  const entrada = evento.target as HTMLInputElement;
+  const archivo = entrada.files?.[0];
+  entrada.value = ''; // para poder elegir el mismo archivo otra vez
+  if (!archivo) return;
+  if (!TIPOS_FOTO.includes(archivo.type)) {
+    avisarAdvertencia('Elige una imagen JPG, PNG o WebP.');
+    return;
+  }
+  if (archivo.size > FOTO_MAX_MB * 1024 * 1024) {
+    avisarAdvertencia(`La foto pesa más de ${FOTO_MAX_MB} MB. Elige una más ligera.`);
+    return;
+  }
+  archivoFoto.value = archivo;
+}
+
+async function subirFoto(foto: Blob, nombre: string) {
+  subiendoFoto.value = true;
+  try {
+    sesion.usuario = await cuenta.subirFoto(foto, nombre);
+    archivoFoto.value = null;
+    avisarExito('Guardamos tu foto.');
+  } catch (e) {
+    avisarError(e);
+  } finally {
+    subiendoFoto.value = false;
+  }
+}
+
+async function quitarFoto() {
+  const ok = await confirmar({
+    titulo: '¿Quitar tu foto?',
+    mensaje: 'En su lugar se mostrarán tus iniciales.',
+    confirmar: 'Quitar foto',
+    peligro: true,
+  });
+  if (!ok) return;
+  subiendoFoto.value = true;
+  try {
+    sesion.usuario = await cuenta.quitarFoto();
+    avisarExito('Quitamos tu foto.');
+  } catch (e) {
+    avisarError(e);
+  } finally {
+    subiendoFoto.value = false;
+  }
+}
 
 const usoTexto = computed(() => {
   const rol = usuario.value?.rol;
@@ -349,6 +452,16 @@ async function salir() {
   box-shadow:
     0 0 0 4px var(--raite-blanco),
     0 0 0 6px var(--raite-azul-niebla);
+}
+.perfil__foto-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px;
+  margin: -4px 0 8px;
+}
+.perfil__entrada-foto {
+  display: none;
 }
 .perfil__nombre {
   margin: 0;
