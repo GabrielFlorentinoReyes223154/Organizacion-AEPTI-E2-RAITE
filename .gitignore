@@ -238,3 +238,4 @@ graphify-out/cache/
 
 # Estáticos generados por collectstatic
 Back_Raite/staticfiles/
+Back_Raite/media/

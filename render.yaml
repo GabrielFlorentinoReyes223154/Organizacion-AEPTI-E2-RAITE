@@ -48,6 +48,16 @@ services:
         sync: false
       - key: DEFAULT_FROM_EMAIL
         value: Raite <raite.uacj@gmail.com>
+      # Fotos de perfil: Cloudflare R2 (bucket privado). Sin estas cuatro se usaría el disco,
+      # que Render borra en cada despliegue.
+      - key: R2_BUCKET
+        sync: false
+      - key: R2_ENDPOINT_URL
+        sync: false
+      - key: R2_ACCESS_KEY_ID
+        sync: false
+      - key: R2_SECRET_ACCESS_KEY
+        sync: false
 
   # --- Frontend (build de Quasar) ---
   - type: web

@@ -23,6 +23,11 @@ validar_telefono = RegexValidator(
 )
 
 
+def ruta_foto(usuario, _nombre_original: str) -> str:
+    """Nombre nuevo en cada subida (siempre WebP, ver fotos.py): una URL vieja no muestra la foto nueva."""
+    return f"fotos/{usuario.pk}/{uuid.uuid4().hex}.webp"
+
+
 def correo_es_institucional(correo: str) -> bool:
     dominio = settings.CORREO_DOMINIO_PERMITIDO.lower()
     return (correo or "").strip().lower().endswith("@" + dominio)
@@ -100,6 +105,13 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
         choices=PreferenciaCompatibilidad.choices,
         default=PreferenciaCompatibilidad.MIXTO,
         help_text="Preferencia por defecto; se copia a cada viaje o solicitud.",
+    )
+    foto = models.ImageField(
+        "foto de perfil",
+        upload_to=ruta_foto,
+        max_length=150,
+        blank=True,
+        help_text="Opcional. Se guarda como WebP de 512 px como máximo; solo la ven usuarios con sesión.",
     )
     correo_verificado = models.BooleanField(
         default=False,

@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/6.1/ref/settings/
 """
 
 import os
+import sys
 import dj_database_url
 from dotenv import load_dotenv
 from pathlib import Path
@@ -160,8 +161,43 @@ USE_TZ = True
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'  # destino de collectstatic; lo sirve whitenoise
 
+# Archivos subidos (fotos de perfil)
+# Con las cuatro variables R2_* se guardan en Cloudflare R2 (bucket privado, URLs firmadas
+# que vencen); sin ellas, en MEDIA_ROOT para desarrollar sin internet. En Render siempre
+# debe haber R2: su disco se borra en cada despliegue. Los tests nunca usan R2.
+MEDIA_URL = 'media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
+R2_BUCKET = os.getenv('R2_BUCKET', '')
+R2_ENDPOINT_URL = os.getenv('R2_ENDPOINT_URL', '')
+R2_ACCESS_KEY_ID = os.getenv('R2_ACCESS_KEY_ID', '')
+R2_SECRET_ACCESS_KEY = os.getenv('R2_SECRET_ACCESS_KEY', '')
+EN_TESTS = len(sys.argv) > 1 and sys.argv[1] == 'test'
+USA_R2 = not EN_TESTS and all((R2_BUCKET, R2_ENDPOINT_URL, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY))
+
+if EN_TESTS:
+    ALMACEN_ARCHIVOS = {'BACKEND': 'django.core.files.storage.InMemoryStorage'}
+elif USA_R2:
+    ALMACEN_ARCHIVOS = {
+        'BACKEND': 'storages.backends.s3.S3Storage',
+        'OPTIONS': {
+            'bucket_name': R2_BUCKET,
+            'endpoint_url': R2_ENDPOINT_URL,
+            'access_key': R2_ACCESS_KEY_ID,
+            'secret_key': R2_SECRET_ACCESS_KEY,
+            'region_name': 'auto',
+            'signature_version': 's3v4',
+            'default_acl': None,          # R2 no usa ACL; el bucket es privado
+            'querystring_auth': True,     # URLs firmadas
+            'querystring_expire': 3600,   # segundos que dura cada URL
+            'file_overwrite': False,
+        },
+    }
+else:
+    ALMACEN_ARCHIVOS = {'BACKEND': 'django.core.files.storage.FileSystemStorage'}
+
 STORAGES = {
-    'default': {'BACKEND': 'django.core.files.storage.FileSystemStorage'},
+    'default': ALMACEN_ARCHIVOS,
     'staticfiles': {'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage'},
 }
 
@@ -206,6 +242,8 @@ BUSQUEDA_RADIO_MAX_KM = 15
 VENTANA_CRUCE_MINUTOS = 60         # separación mínima entre dos viajes/solicitudes activos del mismo usuario
 INICIO_ANTICIPACION_MINUTOS = 30   # un viaje se puede iniciar desde este tiempo antes de su hora
 VENCIMIENTO_HORAS = 2              # un viaje PUBLICADO vence cuando su hora pasó hace más de esto
+FOTO_MAX_MB = 5                    # tamaño máximo del archivo de la foto de perfil
+FOTO_MAX_PX = 512                  # la foto se reduce a este lado máximo
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
