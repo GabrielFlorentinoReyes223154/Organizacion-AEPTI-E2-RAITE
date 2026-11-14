@@ -67,6 +67,25 @@ python manage.py createsuperuser          # usuario para el admin de Django
 python manage.py runserver                # http://localhost:8000  (admin en /admin/)
 ```
 
+#### Cargar los datos por defecto
+
+Con el virtualenv activado y desde `Back_Raite/`:
+
+```bash
+python manage.py migrate                      # si hay migraciones nuevas
+python manage.py cargar_datos_iniciales       # 5 campus, 74 carreras y 128 puntos de referencia
+```
+
+- `cargar_datos_iniciales` lee `apps/locations/data/*.json`. Se puede repetir: no duplica ni pisa lo editado en el admin. Con `--actualizar-estados` copia también el campo `activo` del JSON.
+- Para tener algo que probar (solo en local, nunca en producción):
+
+  ```bash
+  python manage.py crear_datos_demo --reiniciar   # usuarios, viajes y solicitudes de demo
+  ```
+
+  Los usuarios de demo tienen correos `*.demo@alumnos.uacj.mx` y la contraseña `raite1234`. `--reiniciar` borra los datos de demo anteriores y los vuelve a crear.
+- Para entrar al admin (`/admin/`): `python manage.py createsuperuser`.
+
 Comprobación rápida:
 
 ```bash
