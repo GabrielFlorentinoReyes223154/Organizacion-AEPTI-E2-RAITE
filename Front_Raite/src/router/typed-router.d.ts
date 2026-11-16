@@ -66,6 +66,13 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
+    '/foto': RouteRecordInfo<
+      '/foto',
+      '/foto',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
     '/historial': RouteRecordInfo<
       '/historial',
       '/historial',
@@ -205,6 +212,14 @@ declare module 'vue-router/auto-routes' {
     'src/pages/entrar.vue': {
       routes:
         | '/entrar'
+      views:
+        | never
+      pathParamNames:
+        | never
+    }
+    'src/pages/foto.vue': {
+      routes:
+        | '/foto'
       views:
         | never
       pathParamNames:
