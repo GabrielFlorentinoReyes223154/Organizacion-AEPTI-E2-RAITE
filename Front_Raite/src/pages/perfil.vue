@@ -252,8 +252,9 @@ import AvatarIniciales from '@/components/AvatarIniciales.vue';
 import RecortarFoto from '@/components/RecortarFoto.vue';
 import SelectorCarrera from '@/components/SelectorCarrera.vue';
 import { useSesionStore } from '@/stores/sesion';
-import { avisarAdvertencia, avisarError, avisarExito, confirmar } from '@/utils/avisar';
+import { avisarError, avisarExito } from '@/utils/avisar';
 import { calificacion, diaCorto } from '@/utils/formato';
+import { useFotoPerfil } from '@/utils/foto-perfil';
 
 definePage({ meta: { titulo: 'Perfil' } });
 
@@ -275,64 +276,9 @@ const guardando = ref(false);
 const saliendo = ref(false);
 const reportes = ref<Reporte[] | null>(null);
 
-// Foto de perfil: se elige, se recorta en RecortarFoto y se sube. El API la revisa otra vez.
-const TIPOS_FOTO = ['image/jpeg', 'image/png', 'image/webp'];
-const FOTO_MAX_MB = 5;
-const entradaFoto = ref<HTMLInputElement | null>(null);
-const archivoFoto = ref<File | null>(null);
-const subiendoFoto = ref(false);
-
-function elegirFoto() {
-  entradaFoto.value?.click();
-}
-
-function fotoElegida(evento: Event) {
-  const entrada = evento.target as HTMLInputElement;
-  const archivo = entrada.files?.[0];
-  entrada.value = ''; // para poder elegir el mismo archivo otra vez
-  if (!archivo) return;
-  if (!TIPOS_FOTO.includes(archivo.type)) {
-    avisarAdvertencia('Elige una imagen JPG, PNG o WebP.');
-    return;
-  }
-  if (archivo.size > FOTO_MAX_MB * 1024 * 1024) {
-    avisarAdvertencia(`La foto pesa más de ${FOTO_MAX_MB} MB. Elige una más ligera.`);
-    return;
-  }
-  archivoFoto.value = archivo;
-}
-
-async function subirFoto(foto: Blob, nombre: string) {
-  subiendoFoto.value = true;
-  try {
-    sesion.usuario = await cuenta.subirFoto(foto, nombre);
-    archivoFoto.value = null;
-    avisarExito('Guardamos tu foto.');
-  } catch (e) {
-    avisarError(e);
-  } finally {
-    subiendoFoto.value = false;
-  }
-}
-
-async function quitarFoto() {
-  const ok = await confirmar({
-    titulo: '¿Quitar tu foto?',
-    mensaje: 'En su lugar se mostrarán tus iniciales.',
-    confirmar: 'Quitar foto',
-    peligro: true,
-  });
-  if (!ok) return;
-  subiendoFoto.value = true;
-  try {
-    sesion.usuario = await cuenta.quitarFoto();
-    avisarExito('Quitamos tu foto.');
-  } catch (e) {
-    avisarError(e);
-  } finally {
-    subiendoFoto.value = false;
-  }
-}
+// Foto de perfil: se elige, se recorta en RecortarFoto y se sube.
+const { entradaFoto, archivoFoto, subiendoFoto, elegirFoto, fotoElegida, subirFoto, quitarFoto } =
+  useFotoPerfil();
 
 const usoTexto = computed(() => {
   const rol = usuario.value?.rol;
