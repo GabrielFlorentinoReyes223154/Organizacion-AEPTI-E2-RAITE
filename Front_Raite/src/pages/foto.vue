@@ -48,15 +48,6 @@
 
       <div class="foto__acciones">
         <q-btn
-          v-if="!usuario.foto"
-          flat
-          color="primary"
-          no-caps
-          label="Lo hago después"
-          :disable="subiendoFoto"
-          @click="terminar"
-        />
-        <q-btn
           color="primary"
           unelevated
           no-caps
