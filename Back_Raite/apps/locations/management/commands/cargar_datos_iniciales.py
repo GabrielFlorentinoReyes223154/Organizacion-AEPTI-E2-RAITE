@@ -6,6 +6,7 @@ from django.db import transaction
 
 from apps.locations.models import Campus, Carrera, PuntoReferencia
 
+# parents[2] sube de commands/ y management/ hasta apps/locations/
 DATOS = Path(__file__).resolve().parents[2] / "data"
 
 
@@ -28,6 +29,7 @@ class Command(BaseCommand):
             ),
         )
 
+    # Todo o nada: si algo falla no queda el catálogo a medias
     @transaction.atomic
     def handle(self, *args, **opciones):
         campus = self._leer(opciones["campus"])
@@ -37,11 +39,13 @@ class Command(BaseCommand):
         c_creados = c_actualizados = 0
         for dato in campus:
             obj = Campus(**{k: dato[k] for k in ("codigo", "nombre", "latitud", "longitud")})
+            # Solo valida el dato del JSON; lo guarda update_or_create
             obj.full_clean(exclude=["codigo"], validate_unique=False)
             _, creado = Campus.objects.update_or_create(
                 codigo=dato["codigo"],
                 defaults={"nombre": dato["nombre"], "latitud": dato["latitud"], "longitud": dato["longitud"]},
             )
+            # creado es bool, así que suma como 1 o 0
             c_creados += creado
             c_actualizados += not creado
 

@@ -23,6 +23,7 @@ class PuntoReferenciaSerializer(serializers.ModelSerializer):
         fields = ["id", "nombre", "latitud", "longitud", "distancia_km"]
 
     def get_distancia_km(self, punto):
+        # No es campo del modelo: solo existe si quien arma la consulta lo asignó al objeto
         distancia = getattr(punto, "distancia_km", None)
         return round(distancia, 2) if distancia is not None else None
 

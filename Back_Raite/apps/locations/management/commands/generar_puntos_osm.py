@@ -7,7 +7,9 @@ from django.core.management.base import BaseCommand, CommandError
 
 from apps.locations import osm
 
+# El export está en la carpeta de documentación, un nivel arriba del proyecto Django
 ENTRADA = settings.BASE_DIR.parent / "RaiteDocs" / "BD_PuntosMapa" / "Oxxo.json"
+# parents[2] sube de commands/ y management/ hasta apps/locations/
 SALIDA = Path(__file__).resolve().parents[2] / "data" / "puntos_referencia.json"
 
 
@@ -37,8 +39,10 @@ class Command(BaseCommand):
         pausa = opciones["pausa"]
         total = len(puntos)
 
+        # El diccionario por defecto (_estado) hace de contador compartido entre llamadas
         def geocodificar(lat, lon, _estado={"n": 0}):
             _estado["n"] += 1
+            # La pausa va entre peticiones, no antes de la primera
             if _estado["n"] > 1:
                 time.sleep(pausa)
             if _estado["n"] % 20 == 0:

@@ -51,6 +51,7 @@ def _emitir_registro(datos: dict) -> str:
     """
     espera = settings.CODIGO_REENVIO_SEGUNDOS
     clave = _clave_envio(datos["correo"])
+    # add() solo escribe si la llave no existe: así se frena el reenvío seguido
     if not cache.add(clave, True, espera):
         raise Conflicto(f"Espera {espera} segundos antes de pedir otro código.")
 
@@ -59,6 +60,7 @@ def _emitir_registro(datos: dict) -> str:
     try:
         correo_codigo(SimpleNamespace(nombre=datos["nombre"], correo=datos["correo"]), codigo).send()
     except Exception:
+        # Si el correo no salió, se libera la espera para poder reintentar
         cache.delete(clave)
         raise
     return signing.dumps({**datos, "jti": jti, "codigo_hash": _hash_codigo(jti, codigo)}, salt=SAL_REGISTRO, compress=True)
@@ -83,6 +85,7 @@ def registrar(datos: dict) -> tuple[Usuario, str]:
     usuario = Usuario(rol=rol, **datos)
     usuario.correo = Usuario.objects.normalize_email(usuario.correo).lower()
     usuario.set_password(password)
+    # Sin validar unicidad: el correo se revisa hasta que confirman el código
     usuario.full_clean(validate_unique=False)
     return usuario, _emitir_registro({campo: getattr(usuario, campo) for campo in CAMPOS_REGISTRO})
 
@@ -95,6 +98,7 @@ def verificar_correo(token: str, codigo: str) -> Usuario:
     """
     datos = _leer_registro(token)
     clave = f"registro:intentos:{datos['jti']}"
+    # El intento se cuenta antes de comparar para que no se puedan probar códigos sin límite
     cache.add(clave, 0, settings.CODIGO_VERIFICACION_MINUTOS * 60)
     intentos = cache.incr(clave)
     maximo = settings.CODIGO_VERIFICACION_MAX_INTENTOS
@@ -102,11 +106,13 @@ def verificar_correo(token: str, codigo: str) -> Usuario:
     if intentos > maximo:
         raise agotados
     if not constant_time_compare(_hash_codigo(datos["jti"], codigo), datos["codigo_hash"]):
+        # En el último intento fallido ya se avisa que se agotaron
         raise agotados if intentos >= maximo else ValidationError({"codigo": MENSAJE_CODIGO_INVALIDO})
 
     conflicto = Conflicto("Tu correo ya está verificado. Inicia sesión.")
     try:
         with transaction.atomic():
+            # Se bloquea la fila para que dos confirmaciones del mismo correo no se pisen
             previo = Usuario.objects.select_for_update().filter(correo__iexact=datos["correo"]).first()
             if previo is not None and previo.correo_verificado:
                 raise conflicto
@@ -152,6 +158,7 @@ def registrar_vehiculo(usuario: Usuario, datos: dict) -> Vehiculo:
     vehiculo.save()
     if usuario.rol == Rol.PASAJERO:
         usuario.rol = Rol.AMBOS
+        # updated_at se lista a mano porque con update_fields auto_now no se actualiza solo
         usuario.save(update_fields=["rol", "updated_at"])
     return vehiculo
 
@@ -162,6 +169,7 @@ def actualizar_vehiculo(vehiculo: Vehiculo, datos: dict) -> Vehiculo:
 
     nuevos_asientos = datos.get("asientos_disponibles")
     if nuevos_asientos is not None:
+        # No se puede bajar la capacidad por debajo de lo que ya ofrecen viajes vigentes
         excedidos = Viaje.objects.vigentes().filter(vehiculo=vehiculo, lugares_ofrecidos__gt=nuevos_asientos)
         if excedidos.exists():
             raise ValidationError(
