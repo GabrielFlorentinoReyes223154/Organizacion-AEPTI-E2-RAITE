@@ -118,7 +118,7 @@
             color="primary"
             no-caps
             label="Lo hago después"
-            to="/foto"
+            :to="sesion.inicio"
           />
           <q-btn
             type="submit"
@@ -141,7 +141,7 @@
           <p>
             {{
               bienvenida
-                ? 'Para dar raite necesitas registrar tu auto. Después solo falta tu foto, que es opcional.'
+                ? 'Último paso para dar raite: los datos de tu auto.'
                 : 'Al registrar tu vehículo podrás pedir raite y también ofrecerlo. Cambias entre las dos cosas arriba, con "Pido raite / Doy raite".'
             }}
           </p>
@@ -288,10 +288,7 @@ async function enviar() {
         ? 'Listo. Ya puedes ofrecer raites.'
         : 'Listo. Ya puedes publicar tu primer viaje.',
     );
-    // En el registro, la foto (opcional) es el último paso; luego a publicar.
-    await router.replace(
-      bienvenida ? { path: '/foto', query: { siguiente: '/publicar' } } : '/publicar',
-    );
+    await router.replace('/publicar');
   } catch (error) {
     const legible = leerError(error);
     Object.assign(errores, legible.campos);

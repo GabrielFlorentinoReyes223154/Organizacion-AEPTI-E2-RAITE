@@ -1,7 +1,7 @@
 <template>
   <q-page v-if="usuario" class="raite-contenedor foto">
     <section class="foto__tarjeta raite-tarjeta" aria-labelledby="foto-titulo">
-      <span class="foto__paso">Último paso · Opcional</span>
+      <span class="foto__paso">Opcional</span>
       <h2 id="foto-titulo" class="foto__titulo">Agrega una foto de perfil</h2>
       <p class="foto__texto">
         Ayuda a que tus compañeros te reconozcan cuando se encuentren para el raite. Solo la ven
@@ -17,12 +17,13 @@
 
       <div class="foto__elegir">
         <q-btn
-          outline
+          unelevated
           color="primary"
           no-caps
           icon="photo_camera"
           :label="usuario.foto ? 'Cambiar foto' : 'Elegir foto'"
           :disable="subiendoFoto"
+          class="foto__boton"
           @click="elegirFoto"
         />
         <q-btn
@@ -48,12 +49,12 @@
 
       <div class="foto__acciones">
         <q-btn
+          outline
           color="primary"
-          unelevated
           no-caps
           :label="usuario.foto ? 'Continuar' : 'Continuar sin foto'"
           :disable="subiendoFoto"
-          class="raite-btn-xl foto__continuar"
+          class="foto__boton"
           @click="terminar"
         />
       </div>
@@ -69,10 +70,10 @@
 </template>
 
 <script setup lang="ts">
-// Último paso del registro (RF-01): foto de perfil opcional. Llega aquí desde /verificar
-// (pasajero) o desde /vehiculo?bienvenida=1 (conductor); `siguiente` dice a dónde seguir.
+// Paso del registro justo después de verificar el código (RF-01): foto de perfil opcional.
+// Después sigue el vehículo si va a dar raite y aún no lo registra; si no, el inicio.
 import { computed } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { useRouter } from 'vue-router';
 import AvatarIniciales from '@/components/AvatarIniciales.vue';
 import RecortarFoto from '@/components/RecortarFoto.vue';
 import { useSesionStore } from '@/stores/sesion';
@@ -80,7 +81,6 @@ import { useFotoPerfil } from '@/utils/foto-perfil';
 
 definePage({ meta: { titulo: 'Tu foto' } });
 
-const route = useRoute();
 const router = useRouter();
 const sesion = useSesionStore();
 const usuario = computed(() => sesion.usuario);
@@ -88,16 +88,11 @@ const usuario = computed(() => sesion.usuario);
 const { entradaFoto, archivoFoto, subiendoFoto, elegirFoto, fotoElegida, subirFoto, quitarFoto } =
   useFotoPerfil();
 
-// Solo rutas internas, para que `?siguiente=` no pueda mandar a otro sitio.
-const siguiente = computed(() => {
-  const valor = route.query.siguiente;
-  return typeof valor === 'string' && valor.startsWith('/') && !valor.startsWith('//')
-    ? valor
-    : sesion.inicio;
-});
-
 async function terminar() {
-  await router.replace(siguiente.value);
+  const necesitaVehiculo = usuario.value?.es_conductor && !usuario.value.vehiculo;
+  await router.replace(
+    necesitaVehiculo ? { path: '/vehiculo', query: { bienvenida: '1' } } : sesion.inicio,
+  );
 }
 </script>
 
@@ -157,11 +152,10 @@ async function terminar() {
   margin-top: 16px;
   display: flex;
   flex-wrap: wrap;
-  justify-content: flex-end;
-  align-items: center;
-  gap: 12px;
+  justify-content: center;
 }
-.foto__continuar {
-  min-width: 220px;
+// "Elegir foto" y "Continuar" miden lo mismo.
+.foto__boton {
+  min-width: 200px;
 }
 </style>

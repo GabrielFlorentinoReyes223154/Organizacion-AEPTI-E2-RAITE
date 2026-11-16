@@ -105,11 +105,8 @@ async function enviar() {
   try {
     await sesion.verificar(token.value ?? '', codigo.value);
     avisarExito(`¡Listo, ${sesion.usuario?.nombre ?? ''}! Tu cuenta está activa.`);
-    // Pasos que siguen: el vehículo (si va a dar raite) y al final la foto, que es opcional.
-    const necesitaVehiculo = sesion.usuario?.es_conductor && !sesion.usuario.vehiculo;
-    await router.replace(
-      necesitaVehiculo ? { path: '/vehiculo', query: { bienvenida: '1' } } : '/foto',
-    );
+    // Sigue la foto (opcional); de ahí, el vehículo si va a dar raite.
+    await router.replace('/foto');
   } catch (error) {
     const legible = leerError(error);
     if (legible.status === 409) {
