@@ -39,6 +39,7 @@ class UsuarioManager(BaseUserManager):
             )
         if rol is None:
             rol = Rol.PASAJERO
+        # El admin solo se crea por create_superuser, nunca desde el registro público
         if rol == Rol.ADMIN:
             raise ValueError("El rol ADMIN no se otorga en el registro público.")
         user = self.model(correo=correo, rol=rol, **extra_fields)
@@ -58,6 +59,7 @@ class UsuarioManager(BaseUserManager):
 
         extra_fields.setdefault("correo_verificado", True)
         user = self.model(correo=self.normalize_email(correo), rol=Rol.ADMIN, **extra_fields)
+        # Se guarda primero sin permisos y luego se activan, ya con el rol ADMIN en la BD
         user.is_staff = False
         user.is_superuser = False
         user.set_password(password)
@@ -112,13 +114,13 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
         validators=[MinValueValidator(Decimal("0.00")), MaxValueValidator(Decimal("5.00"))],
     )
     rol = models.PositiveSmallIntegerField(choices=Rol.choices, default=Rol.PASAJERO)
+    # Sanción que pone el admin (por ejemplo, tras un reporte). Impide publicar viajes
+    # y solicitar lugares; el login sigue permitido. Solo el admin puede quitarla.
     suspendido = models.BooleanField(default=False)
-    """Sanción que pone el admin (por ejemplo, tras un reporte). Impide publicar viajes
-    y solicitar lugares; el login sigue permitido. Solo el admin puede quitarla."""
 
     is_staff = models.BooleanField(default=False)
+    # Habilitación de la cuenta (login permitido aunque esté suspendido)
     is_active = models.BooleanField(default=True)
-    # Habilitación de la cuenta (login permitido aunque esté suspendido).
     is_superuser = models.BooleanField(default=False)
 
     last_login = models.DateTimeField(null=True, blank=True)
@@ -145,6 +147,7 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
 
     def clean(self):
         super().clean()
+        # Los admins quedan fuera de las reglas de correo institucional y carrera
         if self.correo and not self.es_admin and not correo_es_institucional(self.correo):
             raise ValidationError(
                 {"correo": f"Usa tu correo institucional @{settings.CORREO_DOMINIO_PERMITIDO}."}

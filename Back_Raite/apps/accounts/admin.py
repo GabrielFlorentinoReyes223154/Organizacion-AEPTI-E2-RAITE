@@ -5,6 +5,7 @@ from django.contrib.auth.models import User as AuthUser
 
 from .models import CodigoVerificacion, Usuario, Vehiculo
 
+# Django registra su User por defecto; se quita para administrar solo el Usuario propio
 try:
     admin.site.unregister(AuthUser)
 except admin.sites.NotRegistered:
@@ -29,6 +30,7 @@ class UsuarioCreationForm(forms.ModelForm):
         return password2
 
     def save(self, commit=True):
+        # commit=False para poner la contraseña con hash antes de guardar
         user = super().save(commit=False)
         user.set_password(self.cleaned_data["password1"])
         if commit:

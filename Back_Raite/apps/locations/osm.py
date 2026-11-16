@@ -22,6 +22,7 @@ SIN_DATO = "(sin calle)"
 
 
 def _seis_decimales(valor) -> str:
+    # Se pasa por str() primero para no arrastrar la imprecisión del float
     return str(Decimal(str(valor)).quantize(Decimal("0.000001"), rounding=ROUND_HALF_UP))
 
 
@@ -39,6 +40,7 @@ def extraer_puntos(datos_overpass: dict) -> tuple[list[dict], Counter]:
     """Devuelve (puntos, descartados). Cada punto: osm_id, marca, latitud, longitud."""
     puntos, descartados = [], Counter()
     for elemento in datos_overpass.get("elements", []):
+        # Los nodos traen lat/lon directos; las vías y relaciones traen `center`
         coords = elemento if "lat" in elemento else elemento.get("center")
         if not coords:
             descartados["sin coordenadas"] += 1
@@ -70,6 +72,7 @@ def calle_y_colonia(respuesta_nominatim: dict | None) -> tuple[str, str]:
 
 
 def componer_nombre(marca: str, calle: str, colonia: str) -> str:
+    # `colonia and ...` deja vacío si no hay colonia, y el filtro lo descarta
     partes = [p for p in (calle, colonia and f"Col. {colonia}") if p]
     return f"{marca} – {', '.join(partes) if partes else SIN_DATO}"
 
@@ -82,6 +85,7 @@ def desambiguar(puntos: list[dict]) -> None:
         nombre = punto["nombre"]
         if totales[nombre] > 1:
             vistos[nombre] += 1
+            # El primero conserva su nombre; del segundo en adelante se numera
             if vistos[nombre] > 1:
                 punto["nombre"] = f"{nombre} ({vistos[nombre]})"
 

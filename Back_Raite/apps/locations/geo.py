@@ -7,6 +7,7 @@ KM_POR_GRADO_LATITUD = 111.32
 
 
 def haversine_km(lat1, lon1, lat2, lon2) -> float:
+    # float() por si las coordenadas llegan como Decimal desde la base de datos
     lat1, lon1, lat2, lon2 = map(lambda v: radians(float(v)), (lat1, lon1, lat2, lon2))
     a = sin((lat2 - lat1) / 2) ** 2 + cos(lat1) * cos(lat2) * sin((lon2 - lon1) / 2) ** 2
     return 2 * RADIO_TIERRA_KM * asin(sqrt(a))
@@ -15,6 +16,7 @@ def haversine_km(lat1, lon1, lat2, lon2) -> float:
 def recuadro(lat, lon, radio_km) -> dict:
     """Rectángulo que contiene el círculo de `radio_km`, para descartar en SQL lo que está lejos."""
     dlat = radio_km / KM_POR_GRADO_LATITUD
+    # Un grado de longitud mide menos conforme sube la latitud; el max() evita dividir entre casi cero
     dlon = radio_km / (KM_POR_GRADO_LATITUD * max(cos(radians(float(lat))), 0.01))
     lat, lon = float(lat), float(lon)
     return {
