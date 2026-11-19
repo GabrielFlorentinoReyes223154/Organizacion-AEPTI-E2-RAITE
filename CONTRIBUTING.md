@@ -148,15 +148,15 @@ Cada app del backend se organiza de la misma manera, a causa de ello es que resu
 - Cada página declara con `definePage({ meta })` si es pública, qué papel necesita (`pasajero` o `conductor`), su título y su ruta de regreso.
 - Para importar desde `src/` se usa el alias `@/`.
 - El archivo `Front_Raite/src/router/typed-router.d.ts` se genera solo, por lo que no se edita a mano.
-- El diseño visual se apega a [`DESIGN.md`](DESIGN.md). Se da prioridad a la computadora, aunque el celular debe seguir funcionando.
+- El diseño visual sigue la paleta institucional de la UACJ definida en `Front_Raite/src/css/quasar.variables.scss`. Se da prioridad a la computadora, aunque el celular debe seguir funcionando.
 
 ### Documentación
 
-Los archivos de `RaiteDocs/docs/` provienen de Google Docs, por ello no se editan directamente en el repositorio (ver `RaiteDocs/docs/README.md`). Cuando un cambio modifica el comportamiento del sistema, se actualiza también el documento que lo describe, como lo son `RaiteDocs/API.md`, `RaiteDocs/Modelo-ER.md` o `CLAUDE.md`.
+Cuando un cambio modifica el comportamiento del sistema, se actualiza también el documento que lo describe, como lo son [`ARCHITECTURE.md`](ARCHITECTURE.md), [`DEPLOYMENT.md`](DEPLOYMENT.md) o el [`README.md`](README.md).
 
 ### Alcance del proyecto
 
-No se agregan requerimientos que no estén en el SRS, en la carta del proyecto o en las reglas de negocio de [`CLAUDE.md`](CLAUDE.md). Tampoco se implementan, salvo que se pidan de forma explícita, los pagos dentro de la aplicación, el seguimiento GPS permanente, los conductores externos a la comunidad universitaria, la cobertura fuera de Ciudad Juárez ni la integración con sistemas internos de la UACJ. Antes de cambiar la tecnología o instalar dependencias grandes (PostGIS, Channels, Celery, Redis, entre otras), se consulta con el equipo.
+No se agregan requerimientos fuera de las reglas de negocio descritas en [`ARCHITECTURE.md`](ARCHITECTURE.md#4-reglas-de-negocio-que-influyen-en-el-diseño). Tampoco se implementan, salvo que se pidan de forma explícita, los pagos dentro de la aplicación, el seguimiento GPS permanente, los conductores externos a la comunidad universitaria, la cobertura fuera de Ciudad Juárez ni la integración con sistemas internos de la UACJ. Antes de cambiar la tecnología o instalar dependencias grandes (PostGIS, Channels, Celery, Redis, entre otras), se consulta con el equipo.
 
 ## 4. Trabajo con Git
 

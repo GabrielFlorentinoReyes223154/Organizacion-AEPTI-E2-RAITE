@@ -1,6 +1,6 @@
 # Arquitectura
 
-Este documento explica cómo está armado Raite por dentro y por qué se tomaron ciertas decisiones durante su desarrollo. Para conocer los detalles de la base de datos se puede consultar [`RaiteDocs/Modelo-ER.md`](RaiteDocs/Modelo-ER.md), y para ver la lista completa de endpoints, [`RaiteDocs/API.md`](RaiteDocs/API.md).
+Este documento explica cómo está armado Raite por dentro y por qué se tomaron ciertas decisiones durante su desarrollo.
 
 ## Contenido
 
@@ -89,7 +89,7 @@ La aplicación web está hecha con Quasar, Vue 3 y TypeScript, y su código se r
 - `components/`: piezas reutilizables, como las tarjetas de viaje, el mapa y los selectores.
 - `utils/`: funciones de apoyo, como el formato de horas en la zona `America/Ciudad_Juarez`.
 
-Cada página indica en `definePage({ meta })` si es pública, qué papel necesita, su título y a dónde regresa. Si una persona no ha iniciado sesión, se le envía a `/entrar`, y cuando tiene los dos roles, el papel activo cambia según la pantalla que abra. El diseño visual (colores, tipografías y componentes) se describe en [`DESIGN.md`](DESIGN.md).
+Cada página indica en `definePage({ meta })` si es pública, qué papel necesita, su título y a dónde regresa. Si una persona no ha iniciado sesión, se le envía a `/entrar`, y cuando tiene los dos roles, el papel activo cambia según la pantalla que abra. Los colores institucionales de la UACJ se definen en `src/css/quasar.variables.scss`.
 
 ## 4. Reglas de negocio que influyen en el diseño
 
